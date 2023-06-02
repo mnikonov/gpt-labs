@@ -25,9 +25,13 @@
     <None Remove="Controls\OpenAiStopsSettingControls.xaml" />
     <None Remove="Controls\Wizards\Activation\OpenAISettingsControl.xaml" />
     <None Remove="Controls\Wizards\Initialization.xaml" />
+    <None Remove="logo.pdn" />
+    <None Remove="logo.png" />
     <None Remove="MessagesPage.xaml" />
     <None Remove="SettingsPage.xaml" />
     <None Remove="ShellPage.xaml" />
+    <None Remove="splash.pdn" />
+    <None Remove="splash.png" />
     <None Remove="Styles\AppResources.xaml" />
     <None Remove="Styles\Colors.xaml" />
     <None Remove="Styles\OpenAiSettingsResources.xaml" />
