@@ -1,0 +1,57 @@
+<Page x:Class="Gpt.Labs.ShellPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:controls="using:Gpt.Labs.Controls" 
+    xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <!--UNCOMMENT-->
+    <!--
+        Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    muxc:BackdropMaterial.ApplyToRootOrPageBackground="True"-->
+
+    <Grid x:Name="Root" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+        <controls:PageHeader Margin="48 0 0 0" x:Name="AppTitleBar" x:FieldModifier="public" VerticalAlignment="Top" />       
+
+        <NavigationView x:Name="MainNavigationView"
+                        SelectedItem="{x:Bind ViewModel.Selected, Mode=OneWay}"
+                        ItemInvoked="OnMainNavigationViewItemInvoked"
+                        AlwaysShowHeader="False"
+                        IsSettingsVisible="True" 
+                        IsTabStop="False"
+                        Header=" "
+                        Padding="30"
+                        IsTitleBarAutoPaddingEnabled="False"
+                        IsBackEnabled="True" 
+                        ExpandedModeThresholdWidth="5000" 
+                        OpenPaneLength="250" 
+                        CompactModeThresholdWidth="500"
+                        Loaded="OnMainNavigationViewLoaded">
+
+            <NavigationView.MenuItems>
+                <NavigationViewItem x:Uid="ChatMenuItem" Content="Chats" Tag="ChatsPage?chat-type=1">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xe8f2;"></FontIcon>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                
+                <NavigationViewItem x:Uid="ImageMenuItem" Content="Images" Tag="ChatsPage?chat-type=2">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xe8b9;"></FontIcon>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+            </NavigationView.MenuItems>
+
+            <Frame x:Name="ShellFrame" x:FieldModifier="public" />
+
+        </NavigationView>
+        
+        <ProgressRing x:Name="Progress" IsActive="True" VerticalAlignment="Center" HorizontalAlignment="Center" Width="40" Height="40" Margin="24" Value="0" Visibility="Collapsed"></ProgressRing>
+
+    </Grid>
+</Page>

@@ -1,0 +1,40 @@
+<base:ContentDialogBase
+    xmlns:base="using:Gpt.Labs.Controls.Dialogs.Base"
+    x:Class="Gpt.Labs.Controls.Dialogs.EditOpenAISettingsDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:controls="using:Gpt.Labs.Controls"
+    xmlns:models="using:Gpt.Labs.Models"
+    Style="{StaticResource DefaultContentDialogStyle}"
+    Title="Chat details"
+    PrimaryButtonText="Apply" 
+    SecondaryButtonText="Cancel"
+    PrimaryButtonClick="OnPrimaryButtonClick"
+    x:Uid="EditOpenAISettingsDialog"
+    mc:Ignorable="d">
+
+     <StackPanel Width="480" Margin="0 6 0 0" Spacing="4">
+         
+        <TextBlock x:Name="OpenAIOrganizationLabel" x:Uid="OpenAIOrganizationLabel" Text="Organization ID" 
+                   Style="{StaticResource LabelStyle}"/>
+
+        <TextBox x:Name="OpenAIOrganizationTextBox" x:Uid="OpenAIOrganizationTextBox" 
+                 Text="{x:Bind ViewModel.Organization, Mode=TwoWay}"
+                 PlaceholderText="Enter OpenAI organization ID..."></TextBox>
+        
+        <TextBlock x:Name="OpenAIApiKeyLabel" x:Uid="OpenAIApiKeyLabel" Text="Secret key" 
+                   Style="{StaticResource LabelStyle}"/>
+
+        <TextBox x:Name="OpenAIApiKeyTextBox" x:Uid="OpenAIApiKeyTextBox" 
+                 Text="{x:Bind ViewModel.ApiKey, Mode=TwoWay}"
+                 PlaceholderText="Enter OpenAI secret key..."></TextBox>
+
+        <controls:ErrorsListPanel Margin="0 24 0 0"
+            ViewModel="{x:Bind ViewModel.Errors, Mode=OneWay}"
+            Visibility="{x:Bind ViewModel.HasErrors, Mode=OneWay}">
+        </controls:ErrorsListPanel>
+
+    </StackPanel>
+</base:ContentDialogBase>

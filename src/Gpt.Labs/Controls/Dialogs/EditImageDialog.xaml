@@ -1,0 +1,50 @@
+<base:ContentDialogBase
+    xmlns:base="using:Gpt.Labs.Controls.Dialogs.Base"
+    x:Class="Gpt.Labs.Controls.Dialogs.EditImageDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:controls="using:Gpt.Labs.Controls"
+    xmlns:models="using:Gpt.Labs.Models"
+    Style="{StaticResource DefaultContentDialogStyle}"
+    Title="Chat details"
+    PrimaryButtonText="Apply" 
+    SecondaryButtonText="Cancel"
+    PrimaryButtonClick="OnPrimaryButtonClick"
+    x:Uid="EditChatDialog"
+    mc:Ignorable="d">
+
+     <StackPanel Width="480" Margin="0 6 0 0" Spacing="4">
+        <TextBlock x:Uid="TitleLabel" Style="{StaticResource LabelStyle}" Text="Title"/>
+
+        <TextBox x:Name="TitleTextBox" x:Uid="TitleTextBox" MaxLength="255"
+            Text="{x:Bind ViewModel.Title, Mode=TwoWay}"
+            PlaceholderText="Enter title">
+        </TextBox>
+            
+        <TextBlock x:Uid="SizeLabel" Style="{StaticResource LabelStyle}" Text="Size"/>
+                
+        <ComboBox x:Name="SizeComboBox" HorizontalAlignment="Stretch"
+                  SelectedItem="{x:Bind ((models:OpenAIImageSettings)ViewModel.Settings).Size, Converter={StaticResource OpenAIImageSizeConverter}, Mode=TwoWay}" >
+            <x:String>256x256</x:String>
+            <x:String>512x512</x:String>
+            <x:String>1024x1024</x:String>
+        </ComboBox>
+
+        <TextBlock x:Uid="SizeMessageDescription" Style="{StaticResource DescriptionStyle}" />
+
+        <StackPanel Margin="0 24 0 0" Grid.Row="1" >
+            <controls:ErrorsListPanel
+                ViewModel="{x:Bind ViewModel.Errors, Mode=OneWay}"
+                Visibility="{x:Bind ViewModel.HasErrors, Mode=OneWay}">
+            </controls:ErrorsListPanel>
+            
+            <controls:ErrorsListPanel
+                ViewModel="{x:Bind ViewModel.Settings.Errors, Mode=OneWay}"
+                Visibility="{x:Bind ViewModel.Settings.HasErrors, Mode=OneWay}">
+            </controls:ErrorsListPanel>
+        </StackPanel>
+
+    </StackPanel>
+</base:ContentDialogBase>

@@ -1,0 +1,122 @@
+<UserControl
+    x:Class="Gpt.Labs.Controls.OpenAiLogitBiasSettingsControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:models="using:Gpt.Labs.Models"
+    mc:Ignorable="d">
+
+    <StackPanel Spacing="4">
+        <Grid Height="18" Margin="0 12 0 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+                    
+            <TextBlock x:Uid="LogitBiasLabel" Text="Logit bias" Grid.Column="0" Margin="0" Style="{StaticResource LabelStyle}" />
+                    
+            <CommandBar Margin="6 0" HorizontalAlignment="Right" Grid.Column="1">
+                <AppBarButton x:Name="AddLogitBias" x:Uid="Add" 
+                        Click="OnAddLogitBiasClick">
+                    <ToolTipService.ToolTip>
+                        <ToolTip x:Uid="AddNewItemToolTip" Content="Add" />
+                    </ToolTipService.ToolTip>
+                    <AppBarButton.Icon>
+                        <FontIcon Glyph="&#xe710;"/>
+                    </AppBarButton.Icon>
+                </AppBarButton>
+            </CommandBar>
+        </Grid>
+                
+        <StackPanel>
+            <Grid Height="26">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="50"></ColumnDefinition>
+                    <ColumnDefinition Width="44"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource TableBorderStyle}">
+                    <TextBlock x:Uid="ListHeaderToken" Text="Token" Style="{StaticResource TableHeaderLeftStyle}" />
+                </Border>
+                        
+                <Border Grid.Column="1" Style="{StaticResource TableBorderStyle}">
+                    <TextBlock x:Uid="ListHeaderBias" Text="Bias" Style="{StaticResource TableHeaderCenterStyle}" />
+                </Border>
+
+                <Border Grid.Column="2" BorderThickness="0 0 0 1" Style="{StaticResource TableBorderStyle}" />
+            </Grid>
+
+            <ItemsRepeater x:Name="LogitBiasCollection" 
+                            ItemsSource="{x:Bind ChatSettings.LogitBias, Mode=OneWay}">
+                <ItemsRepeater.ItemTemplate>
+                    <DataTemplate x:DataType="models:OpenAILogitBias">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"></ColumnDefinition>
+                                <ColumnDefinition Width="50"></ColumnDefinition>
+                                <ColumnDefinition Width="44"></ColumnDefinition>
+                            </Grid.ColumnDefinitions>
+
+                            <Border Grid.Column="0" Style="{StaticResource TableBorderStyle}">
+                                <TextBlock Style="{StaticResource TableTextLeftStyle}"
+                                            Text="{x:Bind Token, Mode=OneWay}">
+                                    <ToolTipService.ToolTip>
+                                        <ToolTip x:Uid="EditItemToolTip" Content="{x:Bind Token, Mode=OneWay}" />
+                                    </ToolTipService.ToolTip>
+                                </TextBlock>
+                            </Border>
+                                    
+                            <Border Grid.Column="1" Style="{StaticResource TableBorderStyle}">
+                                <TextBlock Style="{StaticResource TableTextCenterStyle}"
+                                            Text="{x:Bind Bias, Mode=OneWay}">
+                                </TextBlock>
+                            </Border>
+                                    
+                                    
+                            <Border Grid.Column="2" BorderThickness="0 0 0 1" Style="{StaticResource TableBorderStyle}">
+                                <CommandBar Margin="2 0" HorizontalAlignment="Right">
+                                    <AppBarButton x:Name="DeleteStop" x:Uid="Delete" DataContext="{x:Bind}"
+                                            Click="OnDeleteLogitBiasClick">
+                                        <ToolTipService.ToolTip>
+                                            <ToolTip x:Uid="DeleteItemToolTip" Content="Delete" />
+                                        </ToolTipService.ToolTip>
+                                        <AppBarButton.Icon>
+                                            <FontIcon Glyph="&#xe74d;"/>
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                    <AppBarButton x:Name="EditStop" x:Uid="Add" DataContext="{x:Bind}"
+                                            Click="OnEditLogitBiasClick">
+                                        <ToolTipService.ToolTip>
+                                            <ToolTip x:Uid="EditItemToolTip" Content="Edit" />
+                                        </ToolTipService.ToolTip>
+                                        <AppBarButton.Icon>
+                                            <FontIcon Glyph="&#xe70f;"/>
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                </CommandBar>
+                            </Border>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsRepeater.ItemTemplate>
+            </ItemsRepeater>
+
+            <Grid Height="6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                    <ColumnDefinition Width="50"></ColumnDefinition>
+                    <ColumnDefinition Width="44"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource TableFooterBorderStyle}" />
+                        
+                <Border Grid.Column="1" Style="{StaticResource TableFooterBorderStyle}" />
+
+                <Border Grid.Column="2" BorderThickness="0" Style="{StaticResource TableFooterBorderStyle}" />
+            </Grid>
+        </StackPanel>
+
+        <TextBlock x:Uid="LogitBiasDescription" Style="{StaticResource DescriptionStyle}" />
+    </StackPanel>
+</UserControl>

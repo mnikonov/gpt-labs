@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Gpt.Labs (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Gpt.Labs (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

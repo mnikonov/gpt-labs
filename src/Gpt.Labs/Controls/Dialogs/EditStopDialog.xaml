@@ -1,0 +1,32 @@
+<base:ContentDialogBase
+    xmlns:base="using:Gpt.Labs.Controls.Dialogs.Base"
+    x:Class="Gpt.Labs.Controls.Dialogs.EditStopDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:controls="using:Gpt.Labs.Controls"
+    Style="{StaticResource DefaultContentDialogStyle}"
+    Title="Stop token input"
+    PrimaryButtonText="Apply" 
+    SecondaryButtonText="Cancel"
+    PrimaryButtonClick="OnPrimaryButtonClick"
+    x:Uid="EditStopDialog"
+    mc:Ignorable="d">
+
+     <StackPanel Width="480" Margin="0 6 0 0" Spacing="4">
+        <TextBlock x:Uid="TokenLabel" Style="{StaticResource LabelStyle}"
+                        Text="Token"/>
+
+        <TextBox x:Name="TokenTextBox" x:Uid="TokenTextBox" MaxLength="250"
+            Text="{x:Bind ViewModel.Token, Mode=TwoWay}"
+            PlaceholderText="Enter token">
+        </TextBox>
+            
+        <controls:ErrorsListPanel x:Name="ErrorsPanel" Margin="0 24 0 0" Grid.Row="1" 
+            ViewModel="{x:Bind ViewModel.Errors, Mode=OneWay}"
+            Visibility="{x:Bind ViewModel.HasErrors, Mode=OneWay}">
+        </controls:ErrorsListPanel>
+
+    </StackPanel>
+</base:ContentDialogBase>

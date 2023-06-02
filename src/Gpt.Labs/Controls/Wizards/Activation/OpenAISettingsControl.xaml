@@ -1,0 +1,34 @@
+<UserControl
+    x:Class="Gpt.Labs.Controls.Wizards.Activation.OpenAISettingsControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Gpt.Labs.Controls.Wizards.Activation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid Margin="16 0">
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" x:Uid="OpenAISettingsLabel" Text="OpenAI settings" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0 0 0 16" />
+
+        <TextBlock Grid.Row="1" x:Name="OpenAIOrganizationLabel" x:Uid="OpenAIOrganizationLabel" Margin="0 0 0 6" Text="Organization ID" TextWrapping="Wrap" Style="{StaticResource CaptionTextBlockStyle}"/>
+
+        <TextBox Grid.Row="2" x:Name="OpenAIOrganizationTextBox" x:Uid="OpenAIOrganizationTextBox" 
+                 Text="{x:Bind ViewModel.Organization, Mode=TwoWay}"
+                 PlaceholderText="Enter OpenAI organization ID..."></TextBox>
+        
+        <TextBlock Grid.Row="3" x:Name="OpenAIApiKeyLabel" x:Uid="OpenAIApiKeyLabel" Margin="0 16 0 6" Text="Secret key" TextWrapping="Wrap" Style="{StaticResource CaptionTextBlockStyle}"/>
+
+        <TextBox Grid.Row="4" x:Name="OpenAIApiKeyTextBox" x:Uid="OpenAIApiKeyTextBox" 
+                 Text="{x:Bind ViewModel.ApiKey, Mode=TwoWay}"
+                 PlaceholderText="Enter OpenAI secret key..."></TextBox>
+    </Grid>
+</UserControl>

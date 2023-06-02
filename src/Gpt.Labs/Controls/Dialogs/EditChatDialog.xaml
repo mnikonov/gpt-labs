@@ -1,0 +1,65 @@
+<base:ContentDialogBase
+    xmlns:base="using:Gpt.Labs.Controls.Dialogs.Base"
+    x:Class="Gpt.Labs.Controls.Dialogs.EditChatDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:controls="using:Gpt.Labs.Controls"
+    xmlns:models="using:Gpt.Labs.Models"
+    Style="{StaticResource DefaultContentDialogStyle}"
+    Title="Chat details"
+    PrimaryButtonText="Apply" 
+    SecondaryButtonText="Cancel"
+    PrimaryButtonClick="OnPrimaryButtonClick"
+    x:Uid="EditChatDialog"
+    mc:Ignorable="d">
+
+     <StackPanel Width="480" Margin="0 6 0 0" Spacing="4">
+        <TextBlock x:Uid="TitleLabel" Style="{StaticResource LabelStyle}" Text="Title"/>
+
+        <TextBox x:Name="TitleTextBox" x:Uid="TitleTextBox" MaxLength="255"
+            Text="{x:Bind ViewModel.Title, Mode=TwoWay}"
+            PlaceholderText="Enter title">
+        </TextBox>
+            
+        <TextBlock x:Uid="SystemMessageLabel" Style="{StaticResource LabelStyle}"
+                    Text="System message"/>
+
+        <TextBox x:Name="SystemMessageTextBox" x:Uid="SystemMessageTextBox" 
+                    TextWrapping="Wrap" AcceptsReturn="True" MaxLength="2500"
+                    MaxHeight="106" 
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    Text="{x:Bind ((models:OpenAIChatSettings)ViewModel.Settings).SystemMessage, Mode=TwoWay}"
+                    PlaceholderText="Enter system message">
+        </TextBox>
+
+        <TextBlock x:Uid="SystemMessageDescription" Style="{StaticResource DescriptionStyle}" />
+        
+        <TextBlock x:Uid="ModelLabel" Style="{StaticResource LabelStyle}" Text="Model"/>
+                
+        <ComboBox x:Name="ModelComboBox" HorizontalAlignment="Stretch"
+                ItemsSource="{x:Bind SupportedAiModels}" 
+                SelectedItem="{x:Bind ((models:OpenAIChatSettings)ViewModel.Settings).ModelId, Mode=TwoWay}" >
+        </ComboBox>
+
+        <TextBlock x:Uid="ModelDescription" Style="{StaticResource DescriptionStyle}">                    
+            <Run x:Uid="ModelDescription1"/><Hyperlink NavigateUri="https://platform.openai.com/docs/models"><Run x:Uid="ModelDescription2"/></Hyperlink><Run x:Uid="ModelDescription3"/>
+            <LineBreak/><LineBreak/>
+            <Run x:Uid="ModelDescription4"/><Hyperlink NavigateUri="https://platform.openai.com/docs/models/model-endpoint-compatibility"><Run x:Uid="ModelDescription5"/></Hyperlink><Run x:Uid="ModelDescription7"/>
+        </TextBlock>
+
+        <StackPanel Margin="0 24 0 0" Grid.Row="1" >
+            <controls:ErrorsListPanel
+                ViewModel="{x:Bind ViewModel.Errors, Mode=OneWay}"
+                Visibility="{x:Bind ViewModel.HasErrors, Mode=OneWay}">
+            </controls:ErrorsListPanel>
+            
+            <controls:ErrorsListPanel
+                ViewModel="{x:Bind ViewModel.Settings.Errors, Mode=OneWay}"
+                Visibility="{x:Bind ViewModel.Settings.HasErrors, Mode=OneWay}">
+            </controls:ErrorsListPanel>
+        </StackPanel>
+
+    </StackPanel>
+</base:ContentDialogBase>

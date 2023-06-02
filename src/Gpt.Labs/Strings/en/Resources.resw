@@ -1,0 +1,534 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="AppDisplayName" xml:space="preserve">
+    <value>GPT Giggle</value>
+  </data>
+  <data name="ChatCaption" xml:space="preserve">
+    <value>Chat</value>
+  </data>
+  <data name="ChatMenuItem.Content" xml:space="preserve">
+    <value>Chats</value>
+  </data>
+  <data name="ModelLabel.Text" xml:space="preserve">
+    <value>Model</value>
+  </data>
+  <data name="CopyToolTip.Content" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="NextStep.Content" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="OpenAIApiKeyLabel.Text" xml:space="preserve">
+    <value>Secret key</value>
+  </data>
+  <data name="OpenAIApiKeyTextBox.PlaceholderText" xml:space="preserve">
+    <value>Enter OpenAI secret key...</value>
+  </data>
+  <data name="OpenAIOrganizationLabel.Text" xml:space="preserve">
+    <value>Organization ID</value>
+  </data>
+  <data name="OpenAIOrganizationTextBox.PlaceholderText" xml:space="preserve">
+    <value>Enter OpenAI organization ID...</value>
+  </data>
+  <data name="OpenAISettingsLabel.Text" xml:space="preserve">
+    <value>OpenAI settings</value>
+  </data>
+  <data name="PreviousStep.Content" xml:space="preserve">
+    <value>Previous</value>
+  </data>
+  <data name="RecordMessageToolTip.Content" xml:space="preserve">
+    <value>Record (Ctrl+R)</value>
+  </data>
+  <data name="SendMessageToolTip.Content" xml:space="preserve">
+    <value>Send (Ctrl+Enter)</value>
+  </data>
+  <data name="SettingsCaption.Text" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="TestsCaption.Text" xml:space="preserve">
+    <value>Tests</value>
+  </data>
+  <data name="ThemeCaption.Title" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+  <data name="ThemeDark.Content" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="ThemeDefault.Content" xml:space="preserve">
+    <value>Default</value>
+  </data>
+  <data name="ThemeDescription.Text" xml:space="preserve">
+    <value>The main color scheme that would be used within application</value>
+  </data>
+  <data name="ThemeLight.Content" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="WizardDialog.Apply" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="WizardDialog.Back" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="WizardDialog.Cancel" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="WizardDialog.Next" xml:space="preserve">
+    <value>Next</value>
+  </data>
+  <data name="ChatSettingsToolTip.Content" xml:space="preserve">
+    <value>Chat settings (Ctrl+S)</value>
+  </data>
+  <data name="ChatSettings.Title" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="ModelDescription1.Text" xml:space="preserve">
+    <value>You can refer to the </value>
+  </data>
+  <data name="ModelDescription2.Text" xml:space="preserve">
+    <value>Models documentation</value>
+  </data>
+  <data name="ModelDescription3.Text" xml:space="preserve">
+    <value> to understand what models are available and the differences between them.</value>
+  </data>
+  <data name="ModelDescription4.Text" xml:space="preserve">
+    <value>Also checkout </value>
+  </data>
+  <data name="ModelDescription5.Text" xml:space="preserve">
+    <value>model endpoint compatibility</value>
+  </data>
+  <data name="ModelDescription6.Text" xml:space="preserve">
+    <value> to understand which models work with which endpoints.</value>
+  </data>
+  <data name="FrequencyPenaltyDescription1.Text" xml:space="preserve">
+    <value>Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.</value>
+  </data>
+  <data name="FrequencyPenaltyDescription2.Text" xml:space="preserve">
+    <value>See more information about frequency and presence penalties.</value>
+  </data>
+  <data name="FrequencyPenaltyLabel.Text" xml:space="preserve">
+    <value>Frequency penalty</value>
+  </data>
+  <data name="FrequencyPenaltyNumberBox.PlaceholderText" xml:space="preserve">
+    <value>Enter frequency penalty</value>
+  </data>
+  <data name="MaxTokensDescription1.Text" xml:space="preserve">
+    <value>The maximum number of </value>
+  </data>
+  <data name="MaxTokensDescription2.Text" xml:space="preserve">
+    <value>tokens</value>
+  </data>
+  <data name="MaxTokensDescription3.Text" xml:space="preserve">
+    <value> to generate in the chat completion.</value>
+  </data>
+  <data name="MaxTokensDescription4.Text" xml:space="preserve">
+    <value>The total length of input tokens and generated tokens is limited by the model's context length.</value>
+  </data>
+  <data name="MaxTokensLabel.Text" xml:space="preserve">
+    <value>Max tokens</value>
+  </data>
+  <data name="MaxTokensNumberBox.PlaceholderText" xml:space="preserve">
+    <value>Enter max tokens</value>
+  </data>
+  <data name="PresencePenaltyDescription1.Text" xml:space="preserve">
+    <value>Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.</value>
+  </data>
+  <data name="PresencePenaltyDescription2.Text" xml:space="preserve">
+    <value>See more information about frequency and presence penalties.</value>
+  </data>
+  <data name="PresencePenaltyLabel.Text" xml:space="preserve">
+    <value>Presence penalty</value>
+  </data>
+  <data name="PresencePenaltyNumberBox.PlaceholderText" xml:space="preserve">
+    <value>Enter presence penalty</value>
+  </data>
+  <data name="SystemMessageDescription.Text" xml:space="preserve">
+    <value>The system message helps set the behavior of the assistant. Typically, a conversation is formatted with a system message first, followed by alternating user and assistant messages.</value>
+  </data>
+  <data name="SystemMessageLabel.Text" xml:space="preserve">
+    <value>System message</value>
+  </data>
+  <data name="SystemMessageTextBox.PlaceholderText" xml:space="preserve">
+    <value>Enter system message</value>
+  </data>
+  <data name="TemperatureDescription.Text" xml:space="preserve">
+    <value>What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.
+
+We generally recommend altering this or top_p but not both.</value>
+  </data>
+  <data name="TemperatureLabel.Text" xml:space="preserve">
+    <value>Temperature</value>
+  </data>
+  <data name="TemperatureNumberBox.PlaceholderText" xml:space="preserve">
+    <value>Enter temperature</value>
+  </data>
+  <data name="TopPDescription.Text" xml:space="preserve">
+    <value>An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.
+
+We generally recommend altering this or temperature but not both.</value>
+  </data>
+  <data name="TopPLabel.Text" xml:space="preserve">
+    <value>Top_P</value>
+  </data>
+  <data name="TopPNumberBox.PlaceholderText" xml:space="preserve">
+    <value>Enter top_p</value>
+  </data>
+  <data name="LastNMessagesToIncludeDescription.Text" xml:space="preserve">
+    <value>The amount of messages from conversation history that supposed to be included to request.
+
+Including the conversation history helps when user instructions refer to prior messages. Because the models have no memory of past requests, all relevant information must be supplied via the conversation. If a conversation cannot fit within the model’s token limit, it will need to be shortened in some way.</value>
+  </data>
+  <data name="LastNMessagesToIncludeNumberBox.PlaceholderText" xml:space="preserve">
+    <value>Enter Last N messages to include</value>
+  </data>
+  <data name="LastNMessagesToIncludeLabel.Text" xml:space="preserve">
+    <value>Last N messages to include</value>
+  </data>
+  <data name="DialogDescription.UnhandledError" xml:space="preserve">
+    <value>Unhandled exception occurred on attempt to perform action.  
+
+Please try again or contact your system administrator</value>
+  </data>
+  <data name="DialogTitle.Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="Ok" xml:space="preserve">
+    <value>Ok</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="StreamDescription.Text" xml:space="preserve">
+    <value>If set, partial message deltas will be sent, like in ChatGPT. 
+
+Tokens will be sent as data-only server-sent events as they become available, with the stream terminated by a data: [DONE] message.</value>
+  </data>
+  <data name="StreamLabel.Text" xml:space="preserve">
+    <value>Stream</value>
+  </data>
+  <data name="NDescription.Text" xml:space="preserve">
+    <value>How many chat completion choices to generate for each input message.</value>
+  </data>
+  <data name="NLabel.Text" xml:space="preserve">
+    <value>Number of completions</value>
+  </data>
+  <data name="NNumberBox.PlaceholderText" xml:space="preserve">
+    <value>Enter number of completions</value>
+  </data>
+  <data name="UserDescription1.Text" xml:space="preserve">
+    <value>A unique identifier representing your end-user, which can help OpenAI to monitor and detect abuse. </value>
+  </data>
+  <data name="UserDescription2.Text" xml:space="preserve">
+    <value>Learn more.</value>
+  </data>
+  <data name="UserLabel.Text" xml:space="preserve">
+    <value>User</value>
+  </data>
+  <data name="UserTextBox.PlaceholderText" xml:space="preserve">
+    <value>Enter user</value>
+  </data>
+  <data name="StopDescription.Text" xml:space="preserve">
+    <value>Up to 4 sequences where the API will stop generating further tokens.</value>
+  </data>
+  <data name="StopLabel.Text" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="AddNewItemToolTip.Content" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="DeleteItemToolTip.Content" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DialogDescription.DeleteStopToken" xml:space="preserve">
+    <value>Are you shure that you want to delete '{0}' stop token?</value>
+  </data>
+  <data name="DialogTitle.Confirm" xml:space="preserve">
+    <value>Confirm...</value>
+  </data>
+  <data name="EditItemToolTip.Content" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="EditStopDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="EditStopDialog.SecondaryButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="EditStopDialog.Title" xml:space="preserve">
+    <value>Stop token input</value>
+  </data>
+  <data name="ListHeaderStop.Text" xml:space="preserve">
+    <value>Stop token</value>
+  </data>
+  <data name="TokenLabel.Text" xml:space="preserve">
+    <value>Token</value>
+  </data>
+  <data name="TokenTextBox.PlaceholderText" xml:space="preserve">
+    <value>Enter token</value>
+  </data>
+  <data name="DialogDescription.DeleteLogitBias" xml:space="preserve">
+    <value>Are you shure that you want to delete '{0}' logit bias?</value>
+  </data>
+  <data name="EditLogitBiasDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="EditLogitBiasDialog.SecondaryButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="EditLogitBiasDialog.Title" xml:space="preserve">
+    <value>Logit bias input</value>
+  </data>
+  <data name="ListHeaderBias.Text" xml:space="preserve">
+    <value>Bias</value>
+  </data>
+  <data name="ListHeaderToken.Text" xml:space="preserve">
+    <value>Token</value>
+  </data>
+  <data name="LogitBiasDescription.Text" xml:space="preserve">
+    <value>Modify the likelihood of specified tokens appearing in the completion.
+
+Accepts a json object that maps tokens (specified by their token ID in the tokenizer) to an associated bias value from -100 to 100. Mathematically, the bias is added to the logits generated by the model prior to sampling. The exact effect will vary per model, but values between -1 and 1 should decrease or increase likelihood of selection; values like -100 or 100 should result in a ban or exclusive selection of the relevant token.</value>
+  </data>
+  <data name="LogitBiasLabel.Text" xml:space="preserve">
+    <value>Logit bias</value>
+  </data>
+  <data name="EditChatDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="EditChatDialog.SecondaryButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="EditChatDialog.Title" xml:space="preserve">
+    <value>Chat details</value>
+  </data>
+  <data name="TitleLabel.Text" xml:space="preserve">
+    <value>Title</value>
+  </data>
+  <data name="TitleTextBox.PlaceholderText" xml:space="preserve">
+    <value>Enter title</value>
+  </data>
+  <data name="SelectChatLabel.Text" xml:space="preserve">
+    <value>Select a chat to start messaging</value>
+  </data>
+  <data name="AddChatLabel.Text" xml:space="preserve">
+    <value>Add new chat</value>
+  </data>
+  <data name="AddChatToolTip.Content" xml:space="preserve">
+    <value>Add chat</value>
+  </data>
+  <data name="DeleteMenu.Text" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DialogDescription.DeleteChat" xml:space="preserve">
+    <value>Are you shure that you want to delete '{0}' chat?</value>
+  </data>
+  <data name="EditMenu.Text" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="CancelButton.Content" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="DialogDescription.CancellSettingsChanges" xml:space="preserve">
+    <value>Are you sure, that you want to cancel unapplied settings changes?</value>
+  </data>
+  <data name="ChatsLabel.Text" xml:space="preserve">
+    <value>Chats</value>
+  </data>
+  <data name="SelectMultiToolTip.Content" xml:space="preserve">
+    <value>Select multiple</value>
+  </data>
+  <data name="DeleteMultiToolTip.Content" xml:space="preserve">
+    <value>Delete multiple</value>
+  </data>
+  <data name="DialogDescription.DeleteChats" xml:space="preserve">
+    <value>Are you shure that you want to delete selected chats?</value>
+  </data>
+  <data name="DeleteMultiMessagesToolTip.Content" xml:space="preserve">
+    <value>Delete multiple (Ctrl+D)</value>
+  </data>
+  <data name="DialogDescription.DeleteMessage" xml:space="preserve">
+    <value>Are you shure that you want to delete message?</value>
+  </data>
+  <data name="DialogDescription.DeleteMessages" xml:space="preserve">
+    <value>Are you shure that you want to delete selected messages?</value>
+  </data>
+  <data name="SelectMultiMessagesToolTip.Content" xml:space="preserve">
+    <value>Select multiple (Crtl+M)</value>
+  </data>
+  <data name="MoreToolTip.Content" xml:space="preserve">
+    <value>More...</value>
+  </data>
+  <data name="Assistant" xml:space="preserve">
+    <value>ASSISTANT:</value>
+  </data>
+  <data name="CopyMultiMessagesToolTip.Content" xml:space="preserve">
+    <value>Copy multiple (Crtl+C)</value>
+  </data>
+  <data name="ShareMenu.Text" xml:space="preserve">
+    <value>Share</value>
+  </data>
+  <data name="ShareMultiMessagesToolTip.Content" xml:space="preserve">
+    <value>Share multiple (Crtl+E)</value>
+  </data>
+  <data name="User" xml:space="preserve">
+    <value>USER:</value>
+  </data>
+  <data name="OpenAISettingsCaption.Title" xml:space="preserve">
+    <value>OpenAI settings</value>
+  </data>
+  <data name="CollapseToolTip.Content" xml:space="preserve">
+    <value>Collapse</value>
+  </data>
+  <data name="EditOpenAISettingsDialog.PrimaryButtonText" xml:space="preserve">
+    <value>Apply</value>
+  </data>
+  <data name="EditOpenAISettingsDialog.SecondaryButtonText" xml:space="preserve">
+    <value>Cancel</value>
+  </data>
+  <data name="EditOpenAISettingsDialog.Title" xml:space="preserve">
+    <value>Change OpenAI settings</value>
+  </data>
+  <data name="EditToolTip.Content" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="SelectAllToolTip.Content" xml:space="preserve">
+    <value>Select all</value>
+  </data>
+  <data name="ImageCaption" xml:space="preserve">
+    <value>Image</value>
+  </data>
+  <data name="ImageMenuItem.Content" xml:space="preserve">
+    <value>Images</value>
+  </data>
+  <data name="SizeLabel.Text" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="SizeMessageDescription.Text" xml:space="preserve">
+    <value>The size of the generated images.</value>
+  </data>
+  <data name="DialogDescription.ImageVariationValidationError" xml:space="preserve">
+    <value>The image must be a valid PNG file, less than 4MB, and square!</value>
+  </data>
+  <data name="SendImageToolTip.Content" xml:space="preserve">
+    <value>Create image variation</value>
+  </data>
+</root>

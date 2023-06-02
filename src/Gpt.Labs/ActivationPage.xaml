@@ -1,0 +1,47 @@
+<Page
+    x:Class="Gpt.Labs.ActivationPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:controls="using:Gpt.Labs.Controls"
+    mc:Ignorable="d">
+
+   <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <controls:PageHeader Height="40" x:Name="AppTitleBar" x:FieldModifier="public" VerticalAlignment="Top" />
+
+        <Border x:Name="WizartInfoStepContainer" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed">
+        </Border>
+
+        <UserControl Margin="24 88 24 24" x:Name="WizardFormContent" VerticalAlignment="Center" Grid.Row="0" Width="500" Visibility="Collapsed">
+            <Border Padding="0 16" Style="{StaticResource PivotItemContainerBorderStyle}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" x:Name="WizardFormStepContainer">
+
+                    </Border>
+
+                    <Border x:Name="ErrorsPanel" Margin="16 16 16 0" Grid.Row="1">
+                        <controls:ErrorsListPanel x:Name="ErrorsList">
+                        </controls:ErrorsListPanel>
+                    </Border>
+
+                    <Border Margin="16 16 16 0" BorderThickness="0 1 0 0" Grid.Row="2" BorderBrush="{ThemeResource SystemControlForegroundChromeHighBrush}">
+                        <StackPanel Orientation="Horizontal" Padding="0 16 0 0" HorizontalAlignment="Right">
+                            <Button x:Name="PreviousStep" Width="80" x:Uid="PreviousStep" Content="Previous" HorizontalContentAlignment="Center" Click="OnPrevButtonClick" Visibility="Collapsed"></Button>
+                            <Button x:Name="NextStep"  Width="80" x:Uid="NextStep" Content="Next" Margin="16 0 0 0"  HorizontalContentAlignment="Center" Click="OnNextButtonClick"></Button>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </UserControl>
+        
+        <ProgressRing x:Name="Progress" IsActive="True" VerticalAlignment="Bottom" HorizontalAlignment="Center" Width="40" Height="40" Margin="24" Value="0" Visibility="Collapsed"></ProgressRing>
+
+    </Grid>
+</Page>

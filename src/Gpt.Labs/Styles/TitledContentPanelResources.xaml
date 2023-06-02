@@ -1,0 +1,54 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Gpt.Labs.Controls">
+
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="ms-appx:///Styles/Colors.xaml"/>
+    </ResourceDictionary.MergedDictionaries>
+
+    <Style TargetType="controls:TitledContentPanel">
+        <Style.Setters>
+            <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseLowBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="18" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="controls:TitledContentPanel">
+                                                                       
+                        <Grid x:Name="Root" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="{TemplateBinding CornerRadius}">
+                        
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="*"></RowDefinition>
+                            </Grid.RowDefinitions>     
+
+                            <Grid Grid.Row="0" Height="40" BorderThickness="0 0 0 1" BorderBrush="{TemplateBinding BorderBrush}">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock TextTrimming="WordEllipsis" Text="{TemplateBinding Title}" Grid.Column="0" Margin="16 0 0 0" TextLineBounds="Tight" TextAlignment="Left" VerticalAlignment="Center" HorizontalAlignment="Left" FontSize="14" FontWeight="SemiBold"></TextBlock>
+
+                                <Border x:Name="ActionsPanel" Grid.Column="1" Padding="0 0 8 0" VerticalAlignment="Center">
+                                </Border>
+                                                                
+                            </Grid>
+                            
+                            <ContentPresenter Grid.Row="1" Margin="{TemplateBinding Padding}"
+                                              x:Name="ContentPresenter"
+                                              Content="{TemplateBinding Content}"
+                                              ContentTransitions="{TemplateBinding ContentTransitions}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"></ContentPresenter>
+
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
+    </Style>
+
+</ResourceDictionary>

@@ -1,0 +1,38 @@
+<Application
+    x:Class="Gpt.Labs.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="using:Gpt.Labs.Helpers.Converters">
+    <Application.Resources>
+        <ResourceDictionary>
+            <converters:EnumToBoolConverter x:Key="EnumToBoolConverter" />
+            <converters:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+            <converters:CountToBooleanConverter x:Key="CountToBooleanConverter" />
+            <converters:ObjectToBooleanConverter x:Key="ObjectToBooleanConverter" />
+            <converters:ObjectToVisibilityConverter x:Key="ObjectToVisibilityConverter" />
+            <converters:IntToDoubleConverter x:Key="IntToDoubleConverter" />
+            <converters:OpenAiSettingsStyleConverter x:Key="OpenAiSettingsStyleConverter" />
+            <converters:OpenAiMessageStyleConverter x:Key="OpenAiMessageStyleConverter" />
+            <converters:StringFormatConverter x:Key="StringFormatConverter" />
+            <converters:ChatTypeToCaptionConverter x:Key="ChatTypeToCaptionConverter" />
+            <converters:InvertBooleanConverter x:Key="InvertBooleanConverter" />
+            <converters:ListViewSelectionModeConverter x:Key="ListViewSelectionModeConverter" />
+            <converters:OpenAiKeyConverter x:Key="OpenAiKeyConverter" />
+            <converters:OpenAIImageSizeConverter x:Key="OpenAIImageSizeConverter" />
+
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+                
+                <ResourceDictionary Source="ms-appx:///Styles/Colors.xaml"/>
+                <ResourceDictionary Source="ms-appx:///Styles/AppResources.xaml"/>
+                <ResourceDictionary Source="ms-appx:///Styles/PageHeaderResources.xaml"/>
+                <ResourceDictionary Source="ms-appx:///Styles/TitledContentPanelResources.xaml"/>
+                <ResourceDictionary Source="ms-appx:///Styles/RadioButtonResources.xaml"/>
+                <ResourceDictionary Source="ms-appx:///Styles/OpenAiMessageResources.xaml"/>
+                <ResourceDictionary Source="ms-appx:///Styles/ContentDialodResources.xaml"/>
+                <ResourceDictionary Source="ms-appx:///Styles/OpenAiSettingsResources.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
