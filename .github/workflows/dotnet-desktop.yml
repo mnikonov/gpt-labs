@@ -95,7 +95,7 @@ jobs:
 
     # Create the app package by building and packaging the Windows Application Packaging project
     - name: Create the x64 app package
-      run: msbuild $env:Solution_Name /t:$env:Project_Name /p:Configuration=$env:Configuration /p:GenerateAppxPackageOnBuild=true /p:Platform=$env:Platform /p:AppxBundlePlatforms=$env:Platform /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=$env:App_Folder_Path\GptLabs_SideloadingKey.pfx /p:PackageCertificatePassword=${{ secrets.Pfx_Key }} /p:PackageCertificateThumbprint=$env:Pfx_Thumbprint
+      run: msbuild $env:Solution_Name /t:$env:Project_Name /p:Configuration=$env:Configuration /p:GenerateAppxPackageOnBuild=true /p:Platform=$env:Platform /p:AppxBundlePlatforms=$env:Platform /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=$env:App_Folder_Path\GitHubActionsWorkflow.pfx /p:PackageCertificatePassword=${{ secrets.Pfx_Key }} /p:PackageCertificateThumbprint=$env:Pfx_Thumbprint
       env:
         Platform: x64
 
