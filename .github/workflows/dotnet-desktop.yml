@@ -55,6 +55,7 @@ jobs:
       Configuration: Release
       Appx_Bundle: Always
       Appx_Package_Build_Mode: StoreUpload
+      Pfx_Thumbprint: 0E5C79562647F3DC3DA7C04DA762A5773CF1A3FD
       Solution_Name: src\Gpt.Labs.sln                               # Replace with your solution name, i.e. MyWpfApp.sln.
       Project_Name: Gpt_Labs
       #Test_Project_Path: your-test-project-path                 # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
@@ -94,7 +95,7 @@ jobs:
 
     # Create the app package by building and packaging the Windows Application Packaging project
     - name: Create the x64 app package
-      run: msbuild $env:Solution_Name /t:$env:Project_Name /p:Configuration=$env:Configuration /p:GenerateAppxPackageOnBuild=true /p:Platform=$env:Platform /p:AppxBundlePlatforms=$env:Platform /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=$env:App_Folder_Path\GptLabs_SideloadingKey.pfx /p:PackageCertificatePassword=${{ secrets.Pfx_Key }} /p:PackageCertificateThumbprint=${{ secrets.Pfx_Thumbprint }}
+      run: msbuild $env:Solution_Name /t:$env:Project_Name /p:Configuration=$env:Configuration /p:GenerateAppxPackageOnBuild=true /p:Platform=$env:Platform /p:AppxBundlePlatforms=$env:Platform /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=$env:App_Folder_Path\GptLabs_SideloadingKey.pfx /p:PackageCertificatePassword=${{ secrets.Pfx_Key }} /p:PackageCertificateThumbprint=$env:Pfx_Thumbprint
       env:
         Platform: x64
 
