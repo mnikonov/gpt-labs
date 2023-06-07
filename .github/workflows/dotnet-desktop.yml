@@ -60,7 +60,7 @@ jobs:
       Project_Name: Gpt_Labs
       #Test_Project_Path: your-test-project-path                 # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
       Packages_Folder_Path: packages
-      App_Folder_Path: src\Gpt.Labs
+      App_Folder_Path: src
 
     steps:
     - name: Checkout
