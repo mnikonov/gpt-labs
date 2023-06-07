@@ -60,7 +60,7 @@ jobs:
       Project_Name: Gpt_Labs
       #Test_Project_Path: your-test-project-path                 # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
       Packages_Folder_Path: packages
-      App_Folder_Path: src
+      Certificate_Path: src\GptLabs_SideloadingKey.pfx
 
     steps:
     - name: Checkout
@@ -90,18 +90,17 @@ jobs:
     - name: Decode the pfx
       run: |
         $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.Base64_Encoded_Pfx }}")
-        $certificatePath = Join-Path -Path $env:App_Folder_Path -ChildPath GitHubActionsWorkflow.pfx
-        [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
+        [IO.File]::WriteAllBytes("$env:$Certificate_Path", $pfx_cert_byte)
 
     # Create the app package by building and packaging the Windows Application Packaging project
     - name: Create the x64 app package
-      run: msbuild $env:Solution_Name /t:$env:Project_Name /p:Configuration=$env:Configuration /p:GenerateAppxPackageOnBuild=true /p:Platform=$env:Platform /p:AppxBundlePlatforms=$env:Platform /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=$env:App_Folder_Path\GitHubActionsWorkflow.pfx /p:PackageCertificatePassword=${{ secrets.Pfx_Key }} /p:PackageCertificateThumbprint=$env:Pfx_Thumbprint
+      run: msbuild $env:Solution_Name /t:$env:Project_Name /p:Configuration=$env:Configuration /p:GenerateAppxPackageOnBuild=true /p:Platform=$env:Platform /p:AppxBundlePlatforms=$env:Platform /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=$env:Certificate_Path /p:PackageCertificatePassword=${{ secrets.Pfx_Key }} /p:PackageCertificateThumbprint=$env:Pfx_Thumbprint
       env:
         Platform: x64
 
     # Remove the pfx
     - name: Remove the pfx
-      run: Remove-Item -path $env:App_Folder_Path\GitHubActionsWorkflow.pfx
+      run: Remove-Item -path $env:Certificate_Path
 
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload build artifacts
