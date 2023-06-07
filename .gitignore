@@ -6,6 +6,7 @@ _ReSharper.*
 artifacts/
 *.user
 *.suo
+*.pfx
 *.userprefs
 *DS_Store
 *.sln.ide
