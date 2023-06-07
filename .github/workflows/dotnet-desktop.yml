@@ -47,20 +47,19 @@ on:
 jobs:
 
   build:
-
-    strategy:
-      matrix:
-        #configuration: [Debug, Release]
-        configuration: [Release]
+  
     runs-on: windows-latest  # For a list of available runner types, refer to
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
 
     env:
+      Configuration: Release
+      Appx_Bundle: Always
+      Appx_Package_Build_Mode: StoreUpload
       Solution_Name: src\Gpt.Labs.sln                               # Replace with your solution name, i.e. MyWpfApp.sln.
+      Project_Name: Gpt_Labs
       #Test_Project_Path: your-test-project-path                 # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
       Packages_Folder_Path: packages
       App_Folder_Path: src\Gpt.Labs
-      App_Project_Path: src\Gpt.Labs\Gpt.Labs.csproj                   # Replace with the path to your Wap project, i.e. MyWpf.App.Package\MyWpfApp.Package.wapproj.
 
     steps:
     - name: Checkout
@@ -85,8 +84,6 @@ jobs:
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
-      env:
-        Configuration: ${{ matrix.configuration }}
 
     # Decode the base 64 encoded pfx and save the Signing_Certificate
     - name: Decode the pfx
@@ -96,13 +93,10 @@ jobs:
         [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
 
     # Create the app package by building and packaging the Windows Application Packaging project
-    - name: Create the app package
-      run: msbuild $env:App_Project_Path /p:Configuration=$env:Configuration /p:AppxBundlePlatforms=$env:Appx_Bundle_Platforms /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=GitHubActionsWorkflow.pfx /p:PackageCertificatePassword=${{ secrets.Pfx_Key }}
+    - name: Create the x64 app package
+      run: msbuild $env:Solution_Name /t:$env:Gpt_Labs /p:Configuration=$env:Configuration /p:GenerateAppxPackageOnBuild=true /p:Platform=$env:Platform /p:AppxBundlePlatforms=$env:Platform /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=GptLabs_SideloadingKey.pfx /p:PackageCertificatePassword=${{ secrets.Pfx_Key }} /p:PackageCertificateThumbprint=${{ secrets.Pfx_Thumbprint }}
       env:
-        Appx_Bundle: Always
-        Appx_Bundle_Platforms: x86|x64
-        Appx_Package_Build_Mode: StoreUpload
-        Configuration: ${{ matrix.configuration }}
+        Platform: x64
 
     # Remove the pfx
     - name: Remove the pfx
