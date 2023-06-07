@@ -3,7 +3,6 @@
 .nuget/
 .vs/
 _ReSharper.*
-packages/
 artifacts/
 *.user
 *.suo

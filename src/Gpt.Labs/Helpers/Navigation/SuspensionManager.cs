@@ -80,7 +80,13 @@ namespace Gpt.Labs.Helpers.Navigation
 
             try
             {
-                var file = await ApplicationData.Current.TemporaryFolder.GetFileAsync(SessionStateFilename);
+                var file = (await ApplicationData.Current.TemporaryFolder.TryGetItemAsync(SessionStateFilename)) as StorageFile;
+
+                if (file == null)
+                {
+                    return;
+                }
+
                 using (var stream = await file.OpenStreamForReadAsync())
                 {
                     this.SessionState = await JsonSerializer.DeserializeAsync<Dictionary<string, FrameState>>(stream, ApplicationSettings.Instance.SerializerOptions);
