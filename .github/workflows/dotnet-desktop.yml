@@ -169,7 +169,7 @@ jobs:
         sdk-version: 10.0.22621.0
         architecture: x64
         enable-bundle-signing: true
-        certificate-path: ${{env:Project_Folder_Path}}\${{env:Pfx_Name}}
+        certificate-path: ${{env.Project_Folder_Path}}\${{env.Pfx_Name}}
         certificate-private-key: ${{secrets.Pfx_Key}}
         signing-hash-algorithm: SHA256
 
