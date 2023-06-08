@@ -184,12 +184,12 @@ jobs:
 
     - name: Copy optional files
       run: |
-        $optionalFiles = Get-ChildItem -Path $env:x64_Packages_Folder_Path -Recurse -Include *.cer,*.ps1,*.msixsym
+        $optionalFiles = Get-ChildItem -Path $env:x64_Packages_Folder_Path\Gpt.Labs_${{steps.versionStep.outputs.Version}}_Test -Recurse -Include *.cer,*.ps1,*.msixsym
         $optionalFiles | ForEach-Object {
           Copy-Item -Path $_ -Destination $env:Boundle_Folder_Path
         }
 
-        $resourceDirectory = Get-ChildItem -Path $env:x64_Packages_Folder_Path -Directory -Recurse -Include Add-AppDevPackage.resources
+        $resourceDirectory = Get-ChildItem -Path $env:x64_Packages_Folder_Path\Gpt.Labs_${{steps.versionStep.outputs.Version}}_Test -Directory -Recurse -Include Add-AppDevPackage.resources
         $resourceDirectory | ForEach-Object {
           Copy-Item -Recurse -Path $_ -Destination $env:Boundle_Folder_Path
         }
