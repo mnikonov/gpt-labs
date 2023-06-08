@@ -160,6 +160,12 @@ jobs:
           Copy-Item -Path $_ -Destination $env:Boundle_Folder_Path
         }
         
+    - name: the msixbundle folder with all the msix files
+      uses: actions/upload-artifact@v3
+      with:
+        name: the msixbundle folder with all the msix files
+        path: ${{env.Boundle_Folder_Path}}
+        
     - name: MSIX Bundler
       uses: LanceMcCarthy/Action-MsixBundler@v1.0.1
       with:
