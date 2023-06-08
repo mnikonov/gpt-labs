@@ -110,6 +110,8 @@ jobs:
             /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode `
             /p:AppxBundle=$env:Appx_Bundle `
             /p:AppxPackageSigningEnabled=true `
+            /p:PackageCertificateKeyFile=$env:Project_Folder_Path\$env:Pfx_Name `
+            /p:PackageCertificatePassword=${{ secrets.Pfx_Key }} `
             /p:PackageCertificateThumbprint=${{steps.decodePfxStep.outputs.Thumbprint}} `
             /p:GenerateAppxPackageOnBuild=true `
             /p:AppxPackageDir=$env:Packages_Folder_Path\
