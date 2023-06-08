@@ -149,8 +149,8 @@ jobs:
       run: |
         New-Item -Path $env:Boundle_Folder_Path -ItemType Directory -Force
 
-        $x64MsixFiles = Get-ChildItem -Path $env:x64_Packages_Folder_Path\Gpt.Labs_${{steps.versionStep.outputs.Version}}_Test -Include *.msix
-        $x86MsixFiles = Get-ChildItem -Path $env:x86_Packages_Folder_Path\Gpt.Labs_${{steps.versionStep.outputs.Version}}_Test -Include *.msix
+        $x64MsixFiles = Get-ChildItem -Path $env:x64_Packages_Folder_Path\Gpt.Labs_${{steps.versionStep.outputs.Version}}_Test -Filter *.msix
+        $x86MsixFiles = Get-ChildItem -Path $env:x86_Packages_Folder_Path\Gpt.Labs_${{steps.versionStep.outputs.Version}}_Test -Filter *.msix
 
         $x64MsixFiles | ForEach-Object {
           Copy-Item -Path $_ -Destination $env:Boundle_Folder_Path
