@@ -55,10 +55,11 @@ jobs:
       Configuration: Release
       Appx_Bundle: Always
       Appx_Package_Build_Mode: StoreUpload
-      Solution_Name: ${{github.workspace}}\src\Gpt.Labs.sln                               # Replace with your solution name, i.e. MyWpfApp.sln.
+      Solution_Name: ${{github.workspace}}\src\Gpt.Labs.sln
       Project_Name: Gpt_Labs
-      #Test_Project_Path: your-test-project-path                 # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
-      Packages_Folder_Path: ${{github.workspace}}\packages
+      #Test_Project_Path: your-test-project-path                  # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
+      x64_Packages_Folder_Path: ${{github.workspace}}\packages\x64
+      x86_Packages_Folder_Path: ${{github.workspace}}\packages\x86
       Project_Folder_Path: ${{github.workspace}}\src\Gpt.Labs
       Pfx_Name: GptLabs_SideloadingKey.pfx
 
@@ -85,6 +86,13 @@ jobs:
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
+
+    - name: Get application version
+      id: versionStep
+      run: |
+        $xml = [XML](Get-Content $env:Project_Folder_Path\Package.appxmanifest)
+        $version = $xml.Package.Identity.Version
+        echo "Version=$version" >> $env:GITHUB_OUTPUT
 
     # Decode the base 64 encoded pfx and save the Signing_Certificate
     - name: Decode the pfx
@@ -113,17 +121,42 @@ jobs:
             /p:PackageCertificatePassword=${{ secrets.Pfx_Key }} `
             /p:PackageCertificateThumbprint=${{steps.decodePfxStep.outputs.Thumbprint}} `
             /p:GenerateAppxPackageOnBuild=true `
-            /p:AppxPackageDir=$env:Packages_Folder_Path\
+            /p:AppxPackageDir=$env:x64_Packages_Folder_Path\
       env:
         Platform: x64
+        
+    - name: Create the x86 app package
+      run: |
+        msbuild `
+            $env:Solution_Name `
+            /t:$env:Project_Name `
+            /p:Configuration=$env:Configuration `
+            /p:Platform=$env:Platform `
+            /p:AppxBundlePlatforms=$env:Platform `
+            /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode `
+            /p:AppxBundle=$env:Appx_Bundle `
+            /p:AppxPackageSigningEnabled=true `
+            /p:PackageCertificateKeyFile=$env:Project_Folder_Path\$env:Pfx_Name `
+            /p:PackageCertificatePassword=${{ secrets.Pfx_Key }} `
+            /p:PackageCertificateThumbprint=${{steps.decodePfxStep.outputs.Thumbprint}} `
+            /p:GenerateAppxPackageOnBuild=true `
+            /p:AppxPackageDir=$env:x86_Packages_Folder_Path\
+      env:
+        Platform: x86
 
     # Remove the pfx
     - name: Remove the pfx
       run: Remove-Item -path $env:Project_Folder_Path\$env:Pfx_Name
 
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
-    - name: Upload build artifacts
+    - name: Upload x64 build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: MSIX Package
-        path: ${{ env.Packages_Folder_Path }}
+        name: MSIX Package v{{steps.versionStep.outputs.Version}} x64
+        path: ${{ env.x64_Packages_Folder_Path }}\Gpt.Labs_${{steps.versionStep.outputs.Version}}_Test
+    
+    - name: Upload x86 build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: MSIX Package v{{steps.versionStep.outputs.Version}} x86
+        path: ${{ env.x86_Packages_Folder_Path }}\Gpt.Labs_${{steps.versionStep.outputs.Version}}_Test
