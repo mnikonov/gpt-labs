@@ -152,11 +152,11 @@ jobs:
     - name: Upload x64 build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: MSIX Package v{{steps.versionStep.outputs.Version}} x64
+        name: MSIX Package v${{steps.versionStep.outputs.Version}} x64
         path: ${{ env.x64_Packages_Folder_Path }}\Gpt.Labs_${{steps.versionStep.outputs.Version}}_Test
     
     - name: Upload x86 build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: MSIX Package v{{steps.versionStep.outputs.Version}} x86
+        name: MSIX Package v${{steps.versionStep.outputs.Version}} x86
         path: ${{ env.x86_Packages_Folder_Path }}\Gpt.Labs_${{steps.versionStep.outputs.Version}}_Test
