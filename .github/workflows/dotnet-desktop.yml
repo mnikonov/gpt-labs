@@ -60,6 +60,7 @@ jobs:
       #Test_Project_Path: your-test-project-path                  # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
       x64_Packages_Folder_Path: ${{github.workspace}}\packages\x64
       x86_Packages_Folder_Path: ${{github.workspace}}\packages\x86
+      Boundle_Folder_Path: ${{github.workspace}}\packages\bundle
       Project_Folder_Path: ${{github.workspace}}\src\Gpt.Labs
       Pfx_Name: GptLabs_SideloadingKey.pfx
 
@@ -143,20 +144,75 @@ jobs:
             /p:AppxPackageDir=$env:x86_Packages_Folder_Path\
       env:
         Platform: x86
+        
+    - name: Generate the msixbundle folder with all the msix files
+      run: |
+        New-Item -Path $env:BundleOutputPath -ItemType Directory -Force
 
-    # Remove the pfx
-    - name: Remove the pfx
-      run: Remove-Item -path $env:Project_Folder_Path\$env:Pfx_Name
+        $x64MsixFiles = Get-ChildItem -Path $env:x64_Packages_Folder_Path\Gpt.Labs_${{steps.versionStep.outputs.Version}}_Test -Recurse -Include *.msix
+        $x86MsixFiles = Get-ChildItem -Path $env:x86_Packages_Folder_Path\Gpt.Labs_${{steps.versionStep.outputs.Version}}_Test -Recurse -Include *.msix
+
+        $x64MsixFiles | ForEach-Object {
+          Copy-Item -Path $_ -Destination $env:Boundle_Folder_Path
+        }
+
+        $arm64MsixFiles | ForEach-Object {
+          Copy-Item -Path $_ -Destination $env:Boundle_Folder_Path
+        }
+        
+    - name: MSIX Bundler
+      uses: LanceMcCarthy/Action-MsixBundler@v1.0.1
+      with:
+        msix-folder: ${{env.Boundle_Folder_Path}}
+        msixbundle-filepath: ${{env.Boundle_Folder_Path}}\Gpt.Labs_${{steps.versionStep.outputs.Version}}_x64_x86.msixbundle
+        msixbundle-version: ${{steps.versionStep.outputs.Version}}
+        sdk-version: 10.0.22621.0
+        architecture: x64
+        enable-bundle-signing: true
+        certificate-path: ${{env:Project_Folder_Path}}\${{env:Pfx_Name}}
+        certificate-private-key: ${{secrets.Pfx_Key}}
+        signing-hash-algorithm: SHA256
+
+    - name: Cleanup redundant and secret files
+      run: |
+        Remove-Item -path $env:Project_Folder_Path\$env:Pfx_Name
+
+        $msixFiles = Get-ChildItem -Path $env:Boundle_Folder_Path -Recurse -Exclude *.msixbundle
+        $msixFiles | ForEach-Object {
+          Remove-Item -Path $_
+        }
+
+    - name: Copy optional files
+      run: |
+        $optionalFiles = Get-ChildItem -Path $env:x64_Packages_Folder_Path -Recurse -Include *.cer,*.ps1,*.msixsym
+        $optionalFiles | ForEach-Object {
+          Copy-Item -Path $_ -Destination $env:BundleOutputPath
+        }
+
+        $resourceDirectory = Get-ChildItem -Path $env:x64_Packages_Folder_Path -Directory -Recurse -Include Add-AppDevPackage.resources
+        $resourceDirectory | ForEach-Object {
+          Copy-Item -Recurse -Path $_ -Destination $env:BundleOutputPath
+        }
+
+        $oldCertName = (Get-Item -Path "$env:Boundle_Folder_Path\*.cer").Name
+        $newCertName = $oldCertName.Replace("x64","x64_x86")
+        Rename-Item -Path "$env:BundleOutputPath\$oldCertName" -NewName $newCertName
 
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload x64 build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: MSIX Package v${{steps.versionStep.outputs.Version}} x64
+        name: GPT Labs MSIX Package v${{steps.versionStep.outputs.Version}} x64
         path: ${{ env.x64_Packages_Folder_Path }}\Gpt.Labs_${{steps.versionStep.outputs.Version}}_Test
     
     - name: Upload x86 build artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: MSIX Package v${{steps.versionStep.outputs.Version}} x86
+        name: GPT Labs MSIX Package v${{steps.versionStep.outputs.Version}} x86
         path: ${{ env.x86_Packages_Folder_Path }}\Gpt.Labs_${{steps.versionStep.outputs.Version}}_Test
+    
+    - name: Upload MSIXBUNDLE package
+      uses: actions/upload-artifact@v3
+      with:
+        name: GPT Labs MSIXBUNDLE Package v${{steps.versionStep.outputs.Version}} x64 x86
+        path: ${{env.BundleOutputPath}}
