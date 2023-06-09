@@ -207,7 +207,7 @@ jobs:
 
         $oldCertName = (Get-Item -Path "$env:Boundle_Folder_Path\*.cer").Name
         $newCertName = $oldCertName.Replace("x64","x64_x86")
-        Rename-Item -Path "$env:BundleOutputPath\$oldCertName" -NewName $newCertName
+        Rename-Item -Path "$env:Boundle_Folder_Path\$oldCertName" -NewName $newCertName
 
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload x64 build artifacts
