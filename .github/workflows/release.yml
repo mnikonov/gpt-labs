@@ -74,7 +74,7 @@ jobs:
       uses: softprops/action-gh-release@v0.1.15
       with:
         files: |
-          ${{env.Source_Folder_Path}}\gpt.labs-${{steps.versionStep.outputs.Version}}.zip
+          packages\source\gpt.labs-${{steps.versionStep.outputs.Version}}.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
