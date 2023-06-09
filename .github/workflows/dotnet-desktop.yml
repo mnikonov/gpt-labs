@@ -160,12 +160,6 @@ jobs:
           Copy-Item -Path $_ -Destination $env:Boundle_Folder_Path
         }
         
-    - name: the msixbundle folder with all the msix files
-      uses: actions/upload-artifact@v3
-      with:
-        name: the msixbundle folder with all the msix files
-        path: ${{env.Boundle_Folder_Path}}
-        
     - name: MSIX Bundler
       uses: LanceMcCarthy/Action-MsixBundler@v1.0.1
       with:
@@ -193,6 +187,11 @@ jobs:
         $optionalFiles = Get-ChildItem -Path $env:x64_Packages_Folder_Path\Gpt.Labs_${{steps.versionStep.outputs.Version}}_Test -Recurse -Include *.cer,*.ps1,*.msixsym
         $optionalFiles | ForEach-Object {
           Copy-Item -Path $_ -Destination $env:Boundle_Folder_Path
+        }
+
+        $dependenciesDirectory = Get-ChildItem -Path $env:x64_Packages_Folder_Path\Gpt.Labs_${{steps.versionStep.outputs.Version}}_Test -Directory -Recurse -Include Dependencies
+        $dependenciesDirectory | ForEach-Object {
+          Copy-Item -Recurse -Path $_ -Destination $env:Boundle_Folder_Path
         }
 
         $resourceDirectory = Get-ChildItem -Path $env:x64_Packages_Folder_Path\Gpt.Labs_${{steps.versionStep.outputs.Version}}_Test -Directory -Recurse -Include Add-AppDevPackage.resources
