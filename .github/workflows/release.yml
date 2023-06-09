@@ -48,7 +48,7 @@ jobs:
     - name: Compress source code to zip
       run: |
         New-Item -Path $env:Source_Folder_Path -ItemType Directory -Force
-        Compress-Archive -Path "${{github.workspace}}" -DestinationPath "$env:Source_Folder_Path\gpt.labs-${{steps.versionStep.outputs.Version}}.zip"
+        Compress-Archive -Path "${{github.workspace}}" -DestinationPath "gpt.labs-${{steps.versionStep.outputs.Version}}.zip"
     
     - name: Upload  artifacts
       uses: actions/upload-artifact@v3
@@ -74,7 +74,7 @@ jobs:
       uses: softprops/action-gh-release@v0.1.15
       with:
         files: |
-          packages/source/gpt.labs-${{steps.versionStep.outputs.Version}}.zip
+          gpt.labs-${{steps.versionStep.outputs.Version}}.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
