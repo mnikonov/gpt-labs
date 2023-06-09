@@ -44,17 +44,6 @@ jobs:
         $xml = [XML](Get-Content $env:Project_Folder_Path\Package.appxmanifest)
         $version = $xml.Package.Identity.Version
         echo "Version=$version" >> $env:GITHUB_OUTPUT
-
-    - name: Compress source code to zip
-      run: |
-        New-Item -Path $env:Source_Folder_Path -ItemType Directory -Force
-        Compress-Archive -Path "${{github.workspace}}" -DestinationPath "gpt.labs-${{steps.versionStep.outputs.Version}}.zip"
-    
-    - name: Upload  artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: gpt.labs-${{steps.versionStep.outputs.Version}}.zip
-        path: ${{ env.Source_Folder_Path }}\gpt.labs-${{steps.versionStep.outputs.Version}}.zip
     
     # - name: Restore the application
     #   run: |
