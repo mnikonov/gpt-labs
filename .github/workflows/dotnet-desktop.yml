@@ -226,4 +226,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: GPT Labs MSIXBUNDLE Package v${{steps.versionStep.outputs.Version}} x64 x86
-        path: ${{env.BundleOutputPath}}
+        path: ${{env.Boundle_Folder_Path}}
