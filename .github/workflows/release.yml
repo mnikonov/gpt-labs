@@ -1,0 +1,71 @@
+name: Release generation
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+
+  build:
+  
+    runs-on: windows-latest
+
+    env:
+      Configuration: Release
+      Appx_Bundle: Always
+      Appx_Package_Build_Mode: StoreUpload
+      Solution_Name: ${{github.workspace}}\src\Gpt.Labs.sln
+      Project_Name: Gpt_Labs
+      x64_Packages_Folder_Path: ${{github.workspace}}\packages\x64
+      x86_Packages_Folder_Path: ${{github.workspace}}\packages\x86
+      Source_Folder_Path: ${{github.workspace}}\packages\source
+      Boundle_Folder_Path: ${{github.workspace}}\packages\bundle
+      Project_Folder_Path: ${{github.workspace}}\src\Gpt.Labs
+      Pfx_Name: GptLabs_SideloadingKey.pfx
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 7.0.x
+
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Get application version
+      id: versionStep
+      run: |
+        $xml = [XML](Get-Content $env:Project_Folder_Path\Package.appxmanifest)
+        $version = $xml.Package.Identity.Version
+        echo "Version=$version" >> $env:GITHUB_OUTPUT
+
+    - name: Get application version
+      run: |
+        Compress-Archive -Path "C:\${{github.workspace}}" -DestinationPath "$env:Source_Folder_Path\gpt.labs-${{steps.versionStep.outputs.Version}}.zip"
+   
+    - name: Restore the application
+      run: |
+        msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
+
+    - name: Decode the pfx
+      id: decodePfxStep
+      run: |
+        $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.Base64_Encoded_Pfx }}")
+        $certificatePath = Join-Path -Path $env:Project_Folder_Path -ChildPath $env:Pfx_Name
+        [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
+        $secure_string_pwd = ConvertTo-SecureString "${{ secrets.Pfx_Key }}" -AsPlainText -Force
+        $thumbprint = (Import-PfxCertificate -FilePath "$certificatePath" -CertStoreLocation Cert:\CurrentUser\My -Password $secure_string_pwd).Thumbprint
+        echo "Thumbprint=$thumbprint" >> $env:GITHUB_OUTPUT
+
+    - name: Release
+      uses: softprops/action-gh-release@v0.1.15
+      with:
+        files: |
+          ${{env.Source_Folder_Path}}\gpt.labs-${{steps.versionStep.outputs.Version}}.zip
+
