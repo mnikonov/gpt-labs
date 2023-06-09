@@ -47,6 +47,7 @@ jobs:
 
     - name: Get application version
       run: |
+        New-Item -Path $env:Source_Folder_Path -ItemType Directory -Force
         Compress-Archive -Path "C:\${{github.workspace}}" -DestinationPath "$env:Source_Folder_Path\gpt.labs-${{steps.versionStep.outputs.Version}}.zip"
    
     - name: Restore the application
