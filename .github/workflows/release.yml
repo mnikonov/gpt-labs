@@ -45,11 +45,17 @@ jobs:
         $version = $xml.Package.Identity.Version
         echo "Version=$version" >> $env:GITHUB_OUTPUT
 
-    - name: Get application version
+    - name: Compress source code to zip
       run: |
         New-Item -Path $env:Source_Folder_Path -ItemType Directory -Force
         Compress-Archive -Path "${{github.workspace}}" -DestinationPath "$env:Source_Folder_Path\gpt.labs-${{steps.versionStep.outputs.Version}}.zip"
-   
+    
+    - name: Upload  artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: gpt.labs-${{steps.versionStep.outputs.Version}}.zip
+        path: ${{ env.Source_Folder_Path }}\gpt.labs-${{steps.versionStep.outputs.Version}}.zip
+    
     # - name: Restore the application
     #   run: |
     #     msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
