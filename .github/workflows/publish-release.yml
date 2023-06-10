@@ -193,7 +193,7 @@ jobs:
     - name: Compress MSIX Bundler
       run: |
         New-Item -Path $env:Source_Folder_Path -ItemType Directory -Force
-        Compress-Archive -Path "$env:Boundle_Folder_Path*" -DestinationPath "GPT.Labs_MSIXBUNDLE_v${{steps.versionStep.outputs.Version}}_x64_x86_arm64.zip"
+        Compress-Archive -Path "$env:Boundle_Folder_Path\*" -DestinationPath "GPT.Labs_MSIXBUNDLE_v${{steps.versionStep.outputs.Version}}_x64_x86_arm64.zip"
     
     - name: Release publish
       uses: softprops/action-gh-release@v0.1.15
