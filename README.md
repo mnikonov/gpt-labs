@@ -1,5 +1,5 @@
 <h1 align=center>
-    <img align=center width="30%" src="https://github.com/mnikonov/gpt-labs/blob/main/src/Gpt.Labs/splash.png?raw=true" />
+    <img align=center width="40%" src="https://github.com/mnikonov/gpt-labs/blob/main/src/Gpt.Labs/splash.png?raw=true" />
 </h1>
 
 
@@ -30,7 +30,7 @@
     - Select “Place all certificates in the following store” > “Browse...” > Select "Trusted Root Certificate Authorities" >  “Ok”
     - “Finish” certeficate installation
 
-3. Install dependant packages (optional)
+4. Install dependant packages (optional)
 
     - Navigate to the extracted folder and open a folder named “Dependencies”. 
     - Open the folder that corresponds to your processor architecture (for example  “x64”).
@@ -38,8 +38,33 @@
         - Double-click on the .msix file and select “Install”.
         - Follow the installation prompts to complete the installation of the developer package on your computer.
 
-3. Install app
+5. Install .NET 7.0 Desktop Runtime (optional)
+    
+    - Go to the official Microsoft .NET [website](https://dotnet.microsoft.com/) to download the .NET 7.0 Desktop Runtime installer.
+    - Click the Download .NET button on the home page.
+    - Select the .NET desktop runtime installer based on your operating system. 
+    - Click the Download button for the installer based on your preferred language.
+    - Once the download is complete, locate the installer file and double-click it to launch the installation wizard.
+    - Follow the prompts in the installation wizard to complete the installation.
+
+6. Install app
 
     - Navigate to the extracted folder and double-click a file named “Gpt.Labs_1.0.0.0_x64_x86_arm64.msixbundle”.
     - Follow the installation prompts to complete the installation
     - Once the app has installed successfully, you should be able to find it in the Start menu or the All apps list.
+
+# How can I get OpenAI Keys?
+
+### Get API keys
+
+- Go to OpenAI's Platform [website](https://platform.openai.com) 
+- Sign in with an OpenAI account.
+- Click your profile icon at the top-right corner of the page and select “[View API Keys](https://platform.openai.com/account/api-keys)“.
+- Click "Create New Secret Key" to generate a new API key.
+
+### Get Organization ID
+
+- Go to OpenAI's Platform [website](https://platform.openai.com) 
+- Sign in with an OpenAI account.
+- Click your profile icon at the top-right corner of the page and select “[Manage Account](https://platform.openai.com/account/org-settings)“.
+- Find value under “Organization ID“ label.
