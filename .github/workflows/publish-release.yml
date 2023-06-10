@@ -200,6 +200,8 @@ jobs:
       with:
         name: ${{steps.versionStep.outputs.Version}}
         generate_release_notes: true
+        draft: false
+        prerelease: false
         files: |
           GPT.Labs_MSIXBUNDLE_v${{steps.versionStep.outputs.Version}}_x64_x86_arm64.zip
       env:
