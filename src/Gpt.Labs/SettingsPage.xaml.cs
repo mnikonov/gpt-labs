@@ -4,6 +4,9 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml;
 using System;
 using Gpt.Labs.Controls.Dialogs;
+using Gpt.Labs.Helpers.Extensions;
+using Windows.ApplicationModel;
+using Windows.System;
 
 namespace Gpt.Labs
 {
@@ -12,8 +15,10 @@ namespace Gpt.Labs
         #region Constructors
 
         public SettingsPage()
-        {
+        {            
             this.InitializeComponent();
+
+            ApplicationVersion.Text = Package.Current.Id.Version.GetStringVersion(); 
         }
 
         #endregion
@@ -45,6 +50,22 @@ namespace Gpt.Labs
                 this.SettingsViewModel.OpenAIOrganization = dialog.ViewModel.Organization;
                 this.SettingsViewModel.OpenAIApiKey = dialog.ViewModel.ApiKey;
             }
+        }
+
+        
+        private async void OnFeatureButtonClick(object sender, RoutedEventArgs e)
+        {
+            await Launcher.LaunchUriAsync(new Uri("https://github.com/mnikonov/gpt-labs/issues/new?assignees=mnikonov&labels=enhancement&projects=&template=feature_request.md&title=%5BFEATURE%5D+-+")); 
+        }
+
+        private async void OnBugButtonClick(object sender, RoutedEventArgs e)
+        {
+            await Launcher.LaunchUriAsync(new Uri("https://github.com/mnikonov/gpt-labs/issues/new?assignees=mnikonov&labels=bug&projects=&template=bug_report.md&title=%5BBUG%5D+-+")); 
+        }
+
+        private async void OnSponsorButtonClick(object sender, RoutedEventArgs e)
+        {
+            await Launcher.LaunchUriAsync(new Uri("https://github.com/sponsors/mnikonov")); 
         }
 
         #endregion
