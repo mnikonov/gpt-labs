@@ -7,13 +7,13 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Name="a18e963b-bd44-407c-99e5-44753029147c"
-    Publisher="CN=mnikonov"
+    Name="6958MaxN.GPTLabs"
+    Publisher="CN=234A7787-DAA3-4406-8ECF-CFEC878022E8"
     Version="1.0.0.0" />
 
   <Properties>
-    <DisplayName>Gpt.Labs</DisplayName>
-    <PublisherDisplayName>mnikonov</PublisherDisplayName>
+    <DisplayName>GPT Labs</DisplayName>
+    <PublisherDisplayName>MaxN</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
@@ -45,4 +45,5 @@
   <Capabilities>
     <rescap:Capability Name="runFullTrust" />
   </Capabilities>
+	
 </Package>
