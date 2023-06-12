@@ -549,4 +549,41 @@ Accepts a json object that maps tokens (specified by their token ID in the token
   <data name="OpenAIOrganizationDescription3.Text" xml:space="preserve">
     <value> page</value>
   </data>
+  <data name="AboutCaption.Title" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="AboutDescription1.Text" xml:space="preserve">
+    <value>For detailed information about the project, please visit our </value>
+  </data>
+  <data name="AboutDescription2.Text" xml:space="preserve">
+    <value>GitHub repository</value>
+  </data>
+  <data name="AboutDescription3.Text" xml:space="preserve">
+    <value>. GPT Labs is open source, and we welcome contributions from the community.</value>
+  </data>
+  <data name="BecomeLabel.Text" xml:space="preserve">
+    <value>Become</value>
+  </data>
+  <data name="BugLabel.Text" xml:space="preserve">
+    <value>Bug</value>
+  </data>
+  <data name="ContributionDescription.Text" xml:space="preserve">
+    <value>Our team is always looking for talented developers and designers to join our community and contribute to building innovative solutions. Contributing to open-source projects like GPT Labs is an excellent way to build your profile and expand your skills. 
+
+Explore our repository, support with donations, suggest new features or suggest improvements, and help to take GPT Labs to the next level.
+
+We understand the significance of community contributions, and we highly appreciate everyone who helps make GPT Labs the best open-source project. Whether you're a developer, designer, tester or making donations your contribution will play a key role. Join us today, and let's make a difference tomorow.</value>
+  </data>
+  <data name="FeatureLabel.Text" xml:space="preserve">
+    <value>Feature</value>
+  </data>
+  <data name="ReportLabel.Text" xml:space="preserve">
+    <value>Report</value>
+  </data>
+  <data name="SponsorLabel.Text" xml:space="preserve">
+    <value>Sponsor</value>
+  </data>
+  <data name="SuggesNewLabel.Text" xml:space="preserve">
+    <value>Sugges new</value>
+  </data>
 </root>

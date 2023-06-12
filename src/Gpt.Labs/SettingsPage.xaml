@@ -69,6 +69,69 @@
 
                     </StackPanel>
                  </controls:TitledContentPanel>
+                
+                 <controls:TitledContentPanel x:Uid="AboutCaption" Title="About" HorizontalContentAlignment="Stretch">
+                                          
+                    <StackPanel Spacing="4">
+                        
+                        <TextBlock Style="{StaticResource LabelStyle}" Margin="0">
+                            <Run Text="GPT Labs" FontWeight="Bold"></Run><Run Text=" v" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"></Run><Run x:Name="ApplicationVersion" Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"></Run>
+                        </TextBlock>
+
+                        <TextBlock Style="{StaticResource LabelStyle}">
+                            <Run x:Uid="AboutDescription1"></Run><Hyperlink NavigateUri="https://github.com/mnikonov/gpt-labs"><Run x:Uid="AboutDescription2"/></Hyperlink><Run x:Uid="AboutDescription3"></Run>
+                        </TextBlock>
+                        
+                        <TextBlock x:Uid="ContributionDescription" Style="{StaticResource LabelStyle}" Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}">
+                        </TextBlock>
+                        
+                        <Grid Margin="0 18 0 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock x:Uid="SuggesNewLabel" Text="Sugges new" Grid.Column="0" Grid.Row="0" TextLineBounds="Tight" Margin="0 12 0 0"/>
+                        
+                            <Button x:Name="FeatureButton" Grid.Column="1" Grid.Row="0"
+                                    Click="OnFeatureButtonClick">
+                                <StackPanel Orientation="Horizontal" Spacing="12"> 
+                                    <FontIcon Glyph="&#xe771;" FontSize="14" Foreground="{StaticResource GreenBrush}" />
+                                    <TextBlock x:Uid="FeatureLabel" Text="Feature" /> 
+                                </StackPanel> 
+                            </Button>
+                        
+                        
+                            <TextBlock x:Uid="ReportLabel" Text="Report" Grid.Column="0" Grid.Row="1" TextLineBounds="Tight" Margin="0 24 0 0"/>
+                        
+                            <Button x:Name="BugButton" Grid.Column="1" Grid.Row="1" Margin="0 12 0 0"
+                                    Click="OnBugButtonClick">
+                                <StackPanel Orientation="Horizontal" Spacing="12"> 
+                                    <FontIcon Glyph="&#xebe8;" FontSize="14" Foreground="{StaticResource OrangeBrush}" />
+                                    <TextBlock x:Uid="BugLabel" Text="Bug" /> 
+                                </StackPanel> 
+                            </Button>
+                        
+                        
+                            <TextBlock x:Uid="BecomeLabel" Text="Become" Grid.Column="0" Grid.Row="2" TextLineBounds="Tight" Margin="0 24 0 0"/>
+                        
+                            <Button x:Name="SponsorButton" Grid.Column="1" Grid.Row="2" Margin="0 12 0 0"
+                                    Click="OnSponsorButtonClick">
+                                <StackPanel Orientation="Horizontal" Spacing="12"> 
+                                    <FontIcon Glyph="&#xeb51;" FontSize="14" Foreground="{StaticResource PinkBrush}"/>
+                                    <TextBlock x:Uid="SponsorLabel" Text="Sponsor" /> 
+                                </StackPanel> 
+                            </Button>
+
+                        </Grid>
+
+                    </StackPanel>
+                 </controls:TitledContentPanel>
             </StackPanel>
         </ScrollViewer>
     </Grid>
