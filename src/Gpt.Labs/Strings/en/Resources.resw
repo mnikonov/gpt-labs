@@ -531,4 +531,22 @@ Accepts a json object that maps tokens (specified by their token ID in the token
   <data name="SendImageToolTip.Content" xml:space="preserve">
     <value>Create image variation</value>
   </data>
+  <data name="OpenAIApiKeyDescription1.Text" xml:space="preserve">
+    <value>Get your API key from </value>
+  </data>
+  <data name="OpenAIApiKeyDescription2.Text" xml:space="preserve">
+    <value>API keys</value>
+  </data>
+  <data name="OpenAIApiKeyDescription3.Text" xml:space="preserve">
+    <value> page</value>
+  </data>
+  <data name="OpenAIOrganizationDescription1.Text" xml:space="preserve">
+    <value>Get your Organization ID from </value>
+  </data>
+  <data name="OpenAIOrganizationDescription2.Text" xml:space="preserve">
+    <value>Organization settings</value>
+  </data>
+  <data name="OpenAIOrganizationDescription3.Text" xml:space="preserve">
+    <value> page</value>
+  </data>
 </root>
