@@ -26,7 +26,11 @@ Whether you're a creative professional or simply curious about the possibilities
 
 So whether you're a seasoned developer or just getting started with AI-powered applications feel free to contribute. 
 
-![Chat screen](https://github.com/mnikonov/gpt-labs/blob/main/content/screens/chat.jpg?raw=true)
+![GPT](https://github.com/mnikonov/gpt-labs/blob/main/content/screens/store_screenshots_2732-1536_1.png?raw=true)
+
+![GPT](https://github.com/mnikonov/gpt-labs/blob/main/content/screens/store_screenshots_2732-1536_2.png?raw=true)
+
+![GPT](https://github.com/mnikonov/gpt-labs/blob/main/content/screens/store_screenshots_2732-1536_5.png?raw=true)
 
 # How to install application?
 
