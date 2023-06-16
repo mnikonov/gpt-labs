@@ -140,7 +140,7 @@ namespace Gpt.Labs
                     { "chat-id", chat.Id }
                 };
 
-                this.chatFrame.Navigate(typeof(MessagesPage), query.ToString(), new DrillInNavigationTransitionInfo());
+                this.chatFrame.Navigate(typeof(MessagesPage), query.ToString(), new EntranceNavigationTransitionInfo());
             }
         }
 

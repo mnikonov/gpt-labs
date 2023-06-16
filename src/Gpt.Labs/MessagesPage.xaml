@@ -15,8 +15,8 @@
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
-        <Grid Background="{ThemeResource LayerFillColorDefaultBrush}"
-              BorderBrush="{ThemeResource SystemControlForegroundBaseLowBrush}"
+        <Grid Background="{ThemeResource PanelBackgroundBrush}"
+              BorderBrush="{ThemeResource PanelBordersBrush}"
               BorderThickness="1 1 1 0"
               CornerRadius="8 8 0 0"
               Margin="0 0 6 0"

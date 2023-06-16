@@ -15,20 +15,28 @@
 
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Default">
-            <Color x:Key="LayerFillColorDefault">#272727</Color>
+            <Color x:Key="PanelBordersColor">#19000000</Color>
+            <Color x:Key="PanelBackgroundColor">#0DFFFFFF</Color>
             
-            <SolidColorBrush x:Key="LayerFillColorDefaultBrush" Color="{StaticResource LayerFillColorDefault}" />
             <SolidColorBrush x:Key="MarkdownLinkForeground" Color="{ThemeResource SystemAccentColorLight2}" />
+            
+            <SolidColorBrush x:Key="PanelBordersBrush" Color="{StaticResource PanelBordersColor}" />
+            <SolidColorBrush x:Key="PanelBackgroundBrush" Color="{StaticResource PanelBackgroundColor}" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Light">
-             <Color x:Key="LayerFillColorDefault">#F9F9F9</Color>
-             
-             <SolidColorBrush x:Key="LayerFillColorDefaultBrush" Color="{StaticResource LayerFillColorDefault}" />
-             <SolidColorBrush x:Key="MarkdownLinkForeground" Color="{ThemeResource SystemAccentColorDark1}" />
+            <Color x:Key="PanelBordersColor">#0F000000</Color>
+            <Color x:Key="PanelBackgroundColor">#B3FFFFFF</Color>
+            
+            <SolidColorBrush x:Key="MarkdownLinkForeground" Color="{ThemeResource SystemAccentColorDark1}" />
+            
+            <SolidColorBrush x:Key="PanelBordersBrush" Color="{StaticResource PanelBordersColor}" />
+            <SolidColorBrush x:Key="PanelBackgroundBrush" Color="{StaticResource PanelBackgroundColor}" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="HighContrast">
-             <SolidColorBrush x:Key="LayerFillColorDefaultBrush" Color="{ThemeResource SystemColorWindowColor}" />
-             <SolidColorBrush x:Key="MarkdownLinkForeground" Color="{ThemeResource SystemAccentColorDark1}" />
+            <SolidColorBrush x:Key="MarkdownLinkForeground" Color="{ThemeResource SystemAccentColorDark1}" />
+            
+            <SolidColorBrush x:Key="PanelBordersBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="PanelBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
         </ResourceDictionary>
      </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>

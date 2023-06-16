@@ -28,8 +28,8 @@ namespace Gpt.Labs.Helpers
                     switch (root.RequestedTheme)
                     {
                         case ElementTheme.Dark:
-                            titleBar.ButtonBackgroundColor = "#FF202020".ToColor();
-                            titleBar.ButtonInactiveBackgroundColor = "#FF202020".ToColor();
+                            titleBar.ButtonBackgroundColor = "#00FFFFFF".ToColor();
+                            titleBar.ButtonInactiveBackgroundColor = "#00FFFFFF".ToColor();
                             titleBar.ButtonHoverBackgroundColor = "#FF2D2D2D".ToColor();
                             titleBar.ButtonPressedBackgroundColor = "#FF292929".ToColor();
                             titleBar.ButtonForegroundColor = "#FFFFFFFF".ToColor();
@@ -38,8 +38,8 @@ namespace Gpt.Labs.Helpers
                             titleBar.ButtonInactiveForegroundColor = "#5DFFFFFF".ToColor();
                             break;
                         case ElementTheme.Light:
-                            titleBar.ButtonBackgroundColor = "#FFF3F3F3".ToColor();
-                            titleBar.ButtonInactiveBackgroundColor = "#FFF3F3F3".ToColor();
+                            titleBar.ButtonBackgroundColor = "#00FFFFFF".ToColor();
+                            titleBar.ButtonInactiveBackgroundColor = "#00FFFFFF".ToColor();
                             titleBar.ButtonHoverBackgroundColor = "#FFE9E9E9".ToColor();
                             titleBar.ButtonPressedBackgroundColor = "#FFEDEDED".ToColor();
                             titleBar.ButtonForegroundColor = "#E4000000".ToColor();

@@ -3,18 +3,10 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-    xmlns:controls="using:Gpt.Labs.Controls" 
-    xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
-    mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    xmlns:controls="using:Gpt.Labs.Controls"
+    mc:Ignorable="d">
 
-    <!--UNCOMMENT-->
-    <!--
-        Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
-    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
-    muxc:BackdropMaterial.ApplyToRootOrPageBackground="True"-->
-
-    <Grid x:Name="Root" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid x:Name="Root">
 
         <controls:PageHeader Margin="48 0 0 0" x:Name="AppTitleBar" x:FieldModifier="public" VerticalAlignment="Top" />       
 

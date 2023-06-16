@@ -15,7 +15,7 @@
         </TransitionCollection>
     </UserControl.Transitions>
 
-    <Border Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="350" Margin="0 0 6 0">
+    <Border Width="350" Margin="0 0 6 0">
         <controls:TitledContentPanel x:Uid="ChatSettings" Title="Settings" CornerRadius="8 8 0 0" Padding="0 12" BorderThickness="1 1 1 0">
 
             <controls:TitledContentPanel.PrimaryCommands>
