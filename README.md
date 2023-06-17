@@ -36,7 +36,7 @@ So whether you're a seasoned developer or just getting started with AI-powered a
 
 ## Install app from microsoft store
 
-<a style="display: block;text-align: center;" target="_blank" href="https://apps.microsoft.com/store/detail/9P2FX8S80WHS?launch=true&mode=mini">
+<a style='display: block;text-align: center;' href="https://apps.microsoft.com/store/detail/9P2FX8S80WHS?launch=true&mode=mini">
 	<img src="https://get.microsoft.com/images/en-US%20dark.svg" width="40%"/>
 </a>
 
