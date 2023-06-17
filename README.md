@@ -36,6 +36,10 @@ So whether you're a seasoned developer or just getting started with AI-powered a
 
 ## Install app from microsoft store
 
+<a href="https://apps.microsoft.com/store/detail/9P2FX8S80WHS?launch=true&mode=mini">
+	<img src="https://get.microsoft.com/images/en-US%20dark.svg" width="40%"/>
+</a>
+
 ## Install app from sideloading package
 
 1. Download the app 
