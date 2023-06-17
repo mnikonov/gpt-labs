@@ -36,6 +36,10 @@ So whether you're a seasoned developer or just getting started with AI-powered a
 
 ## Install app from microsoft store
 
+<a href="https://apps.microsoft.com/store/detail/9P2FX8S80WHS?launch=true&mode=mini">
+	<img src="https://get.microsoft.com/images/en-US%20dark.svg" width="40%"/>
+</a>
+
 ## Install app from sideloading package
 
 1. Download the app 
@@ -59,24 +63,7 @@ So whether you're a seasoned developer or just getting started with AI-powered a
     - Select “Place all certificates in the following store” > “Browse...” > Select "Trusted Root Certificate Authorities" >  “Ok”
     - “Finish” certeficate installation
 
-4. Install dependant packages (optional)
-
-    - Navigate to the extracted folder and open a folder named “Dependencies”. 
-    - Open the folder that corresponds to your processor architecture (for example  “x64”).
-    - Install all .msix packages located in this directory.
-        - Double-click on the .msix file and select “Install”.
-        - Follow the installation prompts to complete the installation of the developer package on your computer.
-
-5. Install .NET 7.0 Desktop Runtime (optional)
-    
-    - Go to the official Microsoft .NET [website](https://dotnet.microsoft.com/) to download the .NET 7.0 Desktop Runtime installer.
-    - Click the Download .NET button on the home page.
-    - Select the .NET desktop runtime installer based on your operating system. 
-    - Click the Download button for the installer based on your preferred language.
-    - Once the download is complete, locate the installer file and double-click it to launch the installation wizard.
-    - Follow the prompts in the installation wizard to complete the installation.
-
-6. Install app
+4. Install app
 
     - Navigate to the extracted folder and double-click a file named “Gpt.Labs_1.0.0.0_x64_x86_arm64.msixbundle”.
     - Follow the installation prompts to complete the installation

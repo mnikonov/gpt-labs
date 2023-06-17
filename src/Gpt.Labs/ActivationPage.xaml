@@ -7,7 +7,7 @@
     xmlns:controls="using:Gpt.Labs.Controls"
     mc:Ignorable="d">
 
-   <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+   <Grid>
         <controls:PageHeader Height="40" x:Name="AppTitleBar" x:FieldModifier="public" VerticalAlignment="Top" />
 
         <Border x:Name="WizartInfoStepContainer" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed">

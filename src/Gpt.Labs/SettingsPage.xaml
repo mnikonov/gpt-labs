@@ -14,7 +14,7 @@
     </local:BasePage.AppTitleBarContent>   
     
     <Grid>
-        <ScrollViewer Padding="12">
+        <ScrollViewer Padding="0 0 12 12">
             <StackPanel Spacing="10">            
                 <controls:TitledContentPanel x:Uid="ThemeCaption" Title="Theme" HorizontalContentAlignment="Stretch">
                     <StackPanel Spacing="4">

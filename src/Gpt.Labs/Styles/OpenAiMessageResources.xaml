@@ -7,10 +7,12 @@
     <Style x:Key="UserMessageStyle" TargetType="controls:OpenAiMessageControl">
         <Style.Setters>
             <Setter Property="Background" Value="{StaticResource ChatUserMessageBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource PanelBordersBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Padding" Value="18 6" />
             <Setter Property="Margin" Value="0" />
             <Setter Property="HorizontalAlignment" Value="Right" />
-            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="CornerRadius" Value="4" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="controls:OpenAiMessageControl">
@@ -96,11 +98,13 @@
     
     <Style x:Key="AssistantMessageStyle" TargetType="controls:OpenAiMessageControl">
         <Style.Setters>
-            <Setter Property="Background" Value="{ThemeResource SystemChromeAltHighColor}" />
+            <Setter Property="Background" Value="{ThemeResource AssistantMessageBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource PanelBordersBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Padding" Value="18 6" />
             <Setter Property="Margin" Value="0" />
             <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="CornerRadius" Value="4" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="controls:OpenAiMessageControl">
@@ -129,7 +133,7 @@
                                     Padding="{TemplateBinding Padding}"
                                     CornerRadius="{TemplateBinding CornerRadius}">
                                 <toolkit:MarkdownTextBlock x:Name="MessageTextBlock" Grid.Column="0"
-                                    Background="{TemplateBinding Background}"
+                                    Background="Transparent"
                                     Text="{Binding Content, Mode=OneWay}"
                                     LinkForeground="{ThemeResource MarkdownLinkForeground}">
                                 </toolkit:MarkdownTextBlock> 

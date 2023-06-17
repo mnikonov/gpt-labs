@@ -233,7 +233,7 @@ namespace Gpt.Labs
         {
             if (args.IsSettingsInvoked)
             {
-                this.Navigate(typeof(SettingsPage));
+                this.Navigate(typeof(SettingsPage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom });
                 return;
             }
 
@@ -260,7 +260,7 @@ namespace Gpt.Labs
             //    return;
             //}
 
-            this.Navigate(pageType, query);
+            this.Navigate(pageType, query, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft } );
         }
 
         private void OnBackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
