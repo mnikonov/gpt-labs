@@ -12,7 +12,7 @@
             <Setter Property="Padding" Value="18 6" />
             <Setter Property="Margin" Value="0" />
             <Setter Property="HorizontalAlignment" Value="Right" />
-            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="CornerRadius" Value="4" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="controls:OpenAiMessageControl">
@@ -98,13 +98,13 @@
     
     <Style x:Key="AssistantMessageStyle" TargetType="controls:OpenAiMessageControl">
         <Style.Setters>
-            <Setter Property="Background" Value="{ThemeResource SmokeFillColorDefaultBrush}" />
+            <Setter Property="Background" Value="{ThemeResource AssistantMessageBackgroundBrush}" />
             <Setter Property="BorderBrush" Value="{ThemeResource PanelBordersBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="Padding" Value="18 6" />
             <Setter Property="Margin" Value="0" />
             <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="CornerRadius" Value="4" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="controls:OpenAiMessageControl">

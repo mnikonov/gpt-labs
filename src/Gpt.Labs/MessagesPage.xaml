@@ -18,7 +18,7 @@
         <Grid Background="{ThemeResource PanelBackgroundBrush}"
               BorderBrush="{ThemeResource PanelBordersBrush}"
               BorderThickness="1 1 1 0"
-              CornerRadius="8 8 0 0"
+              CornerRadius="6 6 0 0"
               Margin="0 0 6 0"
               Grid.Column="0">
 
@@ -76,7 +76,7 @@
                     
                     <TextBox x:Name="MessageTextBox" Grid.Row="0" Grid.RowSpan="2" TextWrapping="Wrap" AcceptsReturn="True" 
                          Padding="12 6 12 50"
-                         CornerRadius="6"
+                         CornerRadius="4"
                          MaxHeight="244" 
                          MinHeight="102"
                          ScrollViewer.VerticalScrollBarVisibility="Hidden"
