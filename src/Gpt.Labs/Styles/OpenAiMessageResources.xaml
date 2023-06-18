@@ -9,7 +9,7 @@
             <Setter Property="Background" Value="{StaticResource ChatUserMessageBrush}" />
             <Setter Property="BorderBrush" Value="{ThemeResource PanelBordersBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="18 6" />
+            <Setter Property="Padding" Value="18 4" />
             <Setter Property="Margin" Value="0" />
             <Setter Property="HorizontalAlignment" Value="Right" />
             <Setter Property="CornerRadius" Value="4" />
@@ -101,7 +101,7 @@
             <Setter Property="Background" Value="{ThemeResource AssistantMessageBackgroundBrush}" />
             <Setter Property="BorderBrush" Value="{ThemeResource PanelBordersBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="18 6" />
+            <Setter Property="Padding" Value="18 4" />
             <Setter Property="Margin" Value="0" />
             <Setter Property="HorizontalAlignment" Value="Left" />
             <Setter Property="CornerRadius" Value="4" />

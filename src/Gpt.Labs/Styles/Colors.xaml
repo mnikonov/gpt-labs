@@ -23,7 +23,6 @@
             
             <SolidColorBrush x:Key="PanelBordersBrush" Color="{StaticResource PanelBordersColor}" />
             <SolidColorBrush x:Key="PanelBackgroundBrush" Color="{StaticResource PanelBackgroundColor}" />
-            <!--SmokeFillColorDefaultBrush-->
             <SolidColorBrush x:Key="AssistantMessageBackgroundBrush" Color="{StaticResource AssistantMessageBackgroundColorDefault}" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Light">

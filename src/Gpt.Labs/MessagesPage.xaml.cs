@@ -305,6 +305,11 @@ namespace Gpt.Labs
                 this.ViewModel.Result.MultiSelectModeEnabled = false;
             }
         }
+                
+        private void OnMessagePanelSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            MessagesList.Padding = new Thickness(MessagesList.Padding.Left, MessagesList.Padding.Top, MessagesList.Padding.Right, e.NewSize.Height);
+        }
 
         #endregion
     }
