@@ -10,7 +10,7 @@ using System;
 
 namespace Gpt.Labs.Controls
 {
-    public sealed partial class OpenAiLogitBiasSettingsControl : UserControl
+    public sealed partial class OpenAiLogitBiasSettingsControl : BaseUserControl
     {
         #region Fields
 
@@ -60,7 +60,7 @@ namespace Gpt.Labs.Controls
 
         private async Task AddEditLogitBias(OpenAILogitBias token)
         {
-            var dialog = new EditLogitBiasDialog(new OpenAILogitBias() { Token = token?.Token, Bias = token?.Bias ?? 0 });
+            var dialog = new EditLogitBiasDialog(this.Window, new OpenAILogitBias() { Token = token?.Token, Bias = token?.Bias ?? 0 });
             var result = await dialog.ShowAsync();
 
             if (result == ContentDialogResult.Primary)
@@ -96,7 +96,7 @@ namespace Gpt.Labs.Controls
 
         private async Task DeleteLogitBias(OpenAILogitBias token)
         {
-            var dialog = "Confirm".CreateYesNoDialog("DeleteLogitBias", token.Token);
+            var dialog = this.Window.CreateYesNoDialog("Confirm", "DeleteLogitBias", token.Token);
             var result = await dialog.ShowAsync();
 
             if (result == ContentDialogResult.Primary)

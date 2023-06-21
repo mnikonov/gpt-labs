@@ -4,6 +4,7 @@ using Gpt.Labs.Models.Enums;
 using Gpt.Labs.Models.Extensions;
 using Gpt.Labs.ViewModels.Collections;
 using Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base;
+using Microsoft.UI.Dispatching;
 using OpenAI;
 using System;
 using System.Collections.Generic;
@@ -18,8 +19,8 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
     {
         #region Constructors
 
-        public ImageVariationEndpointProcessor(OpenAIClient openAiClient, OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, Action cleanUserMessage) 
-            : base(openAiClient, chat, messagesCollection, cleanUserMessage)
+        public ImageVariationEndpointProcessor(OpenAIClient openAiClient, OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, DispatcherQueue dispatcher, Action cleanUserMessage) 
+            : base(openAiClient, chat, messagesCollection, dispatcher, cleanUserMessage)
         {
         }
 
@@ -56,7 +57,7 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
                         
             var messageFile = await storageFile.CopyAsync(chatFolder, $"{message.Id}.png");
 
-            await App.Window.DispatcherQueue.EnqueueAsync(() =>
+            await this.dispatcher.EnqueueAsync(() =>
             {
                 message.Content = $"![Image]({messageFile.Path})";
             });
@@ -116,7 +117,7 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
                     await writeStream.FlushAsync();
                 }
 
-                await App.Window.DispatcherQueue.EnqueueAsync(() =>
+                await this.dispatcher.EnqueueAsync(() =>
                 {
                     message.Content = $"![Image]({file.Path})";
                 });

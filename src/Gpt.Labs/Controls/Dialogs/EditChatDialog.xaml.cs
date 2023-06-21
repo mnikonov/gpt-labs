@@ -1,6 +1,7 @@
 using Gpt.Labs.Controls.Dialogs.Base;
 using Gpt.Labs.Models;
 using Gpt.Labs.ViewModels;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,8 @@ namespace Gpt.Labs.Controls.Dialogs
     {
         #region Constructors
 
-        public EditChatDialog(OpenAIChat viewModel)
+        public EditChatDialog(Window window, OpenAIChat viewModel)
+            : base(window)
         {           
             this.SupportedAiModels = ApplicationSettings.Instance.OpenAIModels.Where(p => p.Id.Contains("gpt")).OrderByDescending(p => p.CreatedAt).Select(p => p.Id).ToList().AsReadOnly();
             this.ViewModel = viewModel;

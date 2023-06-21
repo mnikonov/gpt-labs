@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Windowing;
 using Gpt.Labs.Helpers.Extensions;
 using System.Runtime.InteropServices;
+using Gpt.Labs.Helpers;
 
 namespace Gpt.Labs.Controls
 {
@@ -17,7 +18,9 @@ namespace Gpt.Labs.Controls
 
         private ContentPresenter container;
 
-        private readonly AppWindowTitleBar titleBar;
+        private Window window;
+
+        private AppWindowTitleBar titleBar;
 
         #endregion
 
@@ -26,11 +29,6 @@ namespace Gpt.Labs.Controls
         public PageHeader()
         {
             DefaultStyleKey = typeof(PageHeader);
-
-            if (AppWindowTitleBar.IsCustomizationSupported())
-            {
-                titleBar = App.Window.GetAppWindow().TitleBar;
-            }
         }
 
         #endregion
@@ -39,6 +37,13 @@ namespace Gpt.Labs.Controls
 
         protected override void OnApplyTemplate()
         {
+            window = this.GetParent<BasePage>().Window;
+
+            if (AppWindowTitleBar.IsCustomizationSupported())
+            {
+                titleBar = window.GetAppWindow().TitleBar;
+            }
+
             container = (ContentPresenter)GetTemplateChild("HeaderContentPresenter");
 
             if (titleBar != null)
@@ -84,7 +89,7 @@ namespace Gpt.Labs.Controls
                 return;
             }
 
-            var scale = App.Window.GetDpiScale();
+            var scale = window.GetDpiScale();
 
     #if DEBUG
             var y = (int)(22 * scale);
@@ -103,7 +108,7 @@ namespace Gpt.Labs.Controls
 
             try
             {
-                var containerPosition = container.TransformToVisual(App.Window.Content).TransformPoint(new Point(0, 0));
+                var containerPosition = container.TransformToVisual(window.Content).TransformPoint(new Point(0, 0));
 
                 var x = containerPosition.X;
                 var width = 0d;
@@ -116,7 +121,7 @@ namespace Gpt.Labs.Controls
                 {
                     foreach (var control in controls)
                     {
-                        var controlPosition = control.TransformToVisual(App.Window.Content).TransformPoint(new Point(0, 0));
+                        var controlPosition = control.TransformToVisual(window.Content).TransformPoint(new Point(0, 0));
 
                         if (controlPosition.X > x)
                         {

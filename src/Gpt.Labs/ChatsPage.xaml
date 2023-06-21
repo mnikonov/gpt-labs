@@ -1,4 +1,4 @@
-<local:BasePage
+<local:StatePage
     xmlns:local="using:Gpt.Labs"
     x:Class="Gpt.Labs.ChatsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -10,14 +10,14 @@
     xmlns:datatemplateselectors="using:Gpt.Labs.Helpers.DataTemplateSelectors"
     mc:Ignorable="d">
 
-    <local:BasePage.AppTitleBarContent>
+    <local:StatePage.AppTitleBarContent>
         <TextBlock TextLineBounds="Tight" FontSize="12" Grid.Column="0" Margin="10 6 0 0" VerticalAlignment="Center">
             <Run Text="{x:Bind ViewModel.Result.ChatType, Converter={StaticResource ChatTypeToCaptionConverter}, Mode=OneWay}" />
             <Run Text="{x:Bind ViewModel.Result.SelectedElement.Title, Converter={StaticResource StringFormatConverter}, ConverterParameter='- {0}', Mode=OneWay}"/>
         </TextBlock>
-    </local:BasePage.AppTitleBarContent>
+    </local:StatePage.AppTitleBarContent>
     
-    <local:BasePage.Resources>
+    <local:StatePage.Resources>
          <DataTemplate x:Key="ChatDataTemplate" x:DataType="models:OpenAIChat">
             <Grid x:Name="RootChatGrid" Background="Transparent" Padding="18 12"
                   RightTapped="OnRootChatGridRightTapped">
@@ -85,6 +85,13 @@
                 ImageDataTemplate="{StaticResource ImageDataTemplate}"/>
         
         <MenuFlyout x:Name="ChatActionsMenu">
+            <MenuFlyoutItem x:Name="OpenChatInNewWindow" x:Uid="OpenInNewWindowMenu" Text="Open in new window"
+                            Click="OnOpenChatInNewWindowClick">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xe78b;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            
             <MenuFlyoutItem x:Name="EditChat" x:Uid="EditMenu" Text="Edit"
                             Click="OnEditChatClick">
                 <MenuFlyoutItem.Icon>
@@ -102,8 +109,7 @@
             </MenuFlyoutItem>
         </MenuFlyout>
 
-        
-    </local:BasePage.Resources>
+    </local:StatePage.Resources>
 
     <Grid x:Name="RootGrid">
         <Grid.ColumnDefinitions>
@@ -215,4 +221,4 @@
         </StackPanel>
         
     </Grid>
-</local:BasePage>
+</local:StatePage>

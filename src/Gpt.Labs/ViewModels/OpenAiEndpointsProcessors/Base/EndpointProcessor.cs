@@ -3,10 +3,9 @@ using Gpt.Labs.Models;
 using Gpt.Labs.Models.Enums;
 using Gpt.Labs.ViewModels.Collections;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.UI.Dispatching;
 using OpenAI;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base
@@ -21,18 +20,21 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base
 
         protected ObservableList<OpenAIMessage, Guid> messagesCollection;
 
+        protected DispatcherQueue dispatcher;
+
         private Action cleanUserMessage;
 
         #endregion
 
         #region Constructors
 
-        public EndpointProcessor(OpenAIClient openAiClient, OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, Action cleanUserMessage) 
+        public EndpointProcessor(OpenAIClient openAiClient, OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, DispatcherQueue dispatcher, Action cleanUserMessage) 
         { 
             this.openAiClient = openAiClient; 
             this.chat = chat;
             this.messagesCollection = messagesCollection;
             this.cleanUserMessage = cleanUserMessage;
+            this.dispatcher = dispatcher;
         }
 
         #endregion
@@ -51,7 +53,7 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base
 
             await SaveChatMessagesAsync(aiMessage);
 
-            await App.Window.DispatcherQueue.EnqueueAsync(() =>
+            await this.dispatcher.EnqueueAsync(() =>
             {
                 messagesCollection.Add(aiMessage);
             });
@@ -61,7 +63,7 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base
 
         protected Task CleanUserMessageAsync()
         {
-            return App.Window.DispatcherQueue.EnqueueAsync(() =>
+            return this.dispatcher.EnqueueAsync(() =>
             {
                 cleanUserMessage();
             });

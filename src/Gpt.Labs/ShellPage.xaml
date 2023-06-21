@@ -1,8 +1,10 @@
-<Page x:Class="Gpt.Labs.ShellPage"
+<labs:BasePage
+    x:Class="Gpt.Labs.ShellPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:labs="using:Gpt.Labs"
     xmlns:controls="using:Gpt.Labs.Controls"
     mc:Ignorable="d">
 
@@ -43,7 +45,5 @@
 
         </NavigationView>
         
-        <ProgressRing x:Name="Progress" IsActive="True" VerticalAlignment="Center" HorizontalAlignment="Center" Width="40" Height="40" Margin="24" Value="0" Visibility="Collapsed"></ProgressRing>
-
     </Grid>
-</Page>
+</labs:BasePage>

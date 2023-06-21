@@ -19,6 +19,15 @@ namespace Gpt.Labs.ViewModels.Base
 
         #endregion
 
+        #region Constructors
+
+        protected ListViewModel(Func<BasePage> getBasePage)
+            : base(getBasePage)
+        {
+        }
+
+        #endregion
+
         #region Properties
 
         public ObservableList<TElement, Guid> ItemsCollection

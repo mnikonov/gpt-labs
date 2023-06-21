@@ -1,4 +1,5 @@
 using Gpt.Labs.Helpers;
+using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Helpers.Navigation;
 using Gpt.Labs.Models;
 using Gpt.Labs.ViewModels;
@@ -14,7 +15,7 @@ using System.Linq;
 
 namespace Gpt.Labs
 {
-    public sealed partial class ChatsPage : BasePage
+    public sealed partial class ChatsPage : StatePage
     {
         #region Fields
 
@@ -67,7 +68,7 @@ namespace Gpt.Labs
 
             ViewModel.Function = async token =>
             {
-                var viewModel = new ChatsListViewModel();
+                var viewModel = new ChatsListViewModel(() => this.RootPage);
 
                 await viewModel.LoadStateAsync(destinationPageType, parameters, state, mode);
 
@@ -86,8 +87,8 @@ namespace Gpt.Labs
             ViewModel.Result?.SaveState(destinationPageType, parameters, state, mode);
             base.SaveState(destinationPageType, parameters, state, mode);
 
-            this.Shell.SuspensionManager.SaveFrameNavigationState(this.chatFrame);
-            this.Shell.SuspensionManager.UnregisterFrame(this.chatFrame, false);
+            this.RootPage?.SuspensionManager?.SaveFrameNavigationState(this.chatFrame);
+            this.RootPage?.SuspensionManager?.UnregisterFrame(this.chatFrame, false);
         }
 
         public override Frame GetInnerFrame()
@@ -211,6 +212,13 @@ namespace Gpt.Labs
             ClearBackState(chats);
         }
 
+        private async void OnOpenChatInNewWindowClick(object sender, RoutedEventArgs e)
+        {
+            var chat = (OpenAIChat)((FrameworkElement)sender).DataContext;
+            
+            await chat.OpenChatInNewWindows();
+        }
+
         private void ClearBackState(params OpenAIChat[] chats)
         {
             if (this.ViewModel.Result.MultiSelectModeEnabled && this.ViewModel.Result.ItemsCollection.Count == 0)
@@ -218,7 +226,7 @@ namespace Gpt.Labs
                 this.ViewModel.Result.MultiSelectModeEnabled = false;
             }
 
-            var sessionState = this.Shell.SuspensionManager.SessionStateForFrame(this.chatFrame);
+            var sessionState = this.RootPage?.SuspensionManager?.SessionStateForFrame(this.chatFrame);
 
             foreach (var chat in chats) 
             {
@@ -267,7 +275,7 @@ namespace Gpt.Labs
                 }
             }
 
-            if (this.chatFrame.Content != null && this.chatFrame.Content is BasePage page)
+            if (this.chatFrame.Content != null && this.chatFrame.Content is StatePage page)
             {
                 page.NavigationHelper.SetPageKey();
             }
@@ -298,14 +306,14 @@ namespace Gpt.Labs
                 }
             }
 
-            this.Shell.UpdateBackState();
+            this.RootPage?.UpdateBackState();
         }
 
         private void RegisterFrame()
         {
             if (this.chatFrame != null)
             {
-                this.Shell.SuspensionManager.UnregisterFrame(this.chatFrame, true);
+                this.RootPage?.SuspensionManager?.UnregisterFrame(this.chatFrame, true);
 
                 this.RootGrid.Children.Remove(this.chatFrame);
             }
@@ -314,7 +322,7 @@ namespace Gpt.Labs
             Grid.SetColumn(this.chatFrame, 1);
             this.RootGrid.Children.Add(this.chatFrame);
 
-            this.Shell.SuspensionManager.RegisterFrame(this.chatFrame, $"ChatFrameState_{this.frameUid}");
+            this.RootPage?.SuspensionManager?.RegisterFrame(this.chatFrame, $"ChatFrameState_{this.frameUid}");
         }
 
         #endregion

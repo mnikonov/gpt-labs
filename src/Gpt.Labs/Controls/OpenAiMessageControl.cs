@@ -5,10 +5,7 @@ using CommunityToolkit.WinUI.UI.Controls;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using Windows.System;
-using Windows.ApplicationModel.DataTransfer;
-using Gpt.Labs.Helpers.Extensions;
 using Microsoft.UI.Xaml.Input;
-using System.Diagnostics;
 using Gpt.Labs.Helpers;
 
 namespace Gpt.Labs.Controls
@@ -100,17 +97,17 @@ namespace Gpt.Labs.Controls
 
         private async void OnCopyButtonClick(object sender, RoutedEventArgs e)
         {
-            await this.GetParent<MessagesPage>().ViewModel.Result.CopyMessages((OpenAIMessage)this.DataContext);
+            await this.GetParent<MessagesControl>().ViewModel.CopyMessages((OpenAIMessage)this.DataContext);
         }
 
         private void OnShareButtonClick(object sender, RoutedEventArgs e)
         {
-            this.GetParent<MessagesPage>().ViewModel.Result.ShareMessages((OpenAIMessage)this.DataContext);
+            this.GetParent<MessagesControl>().ViewModel.ShareMessages((OpenAIMessage)this.DataContext);
         }
 
         private async void OnDeleteButtonClick(object sender, RoutedEventArgs e)
         {
-            await this.GetParent<MessagesPage>().ViewModel.Result.DeleteMessages((OpenAIMessage)this.DataContext);
+            await this.GetParent<MessagesControl>().ViewModel.DeleteMessages((OpenAIMessage)this.DataContext);
         }
 
         private async void OnMarkdownTextBlockLinkClicked(object sender, LinkClickedEventArgs e)

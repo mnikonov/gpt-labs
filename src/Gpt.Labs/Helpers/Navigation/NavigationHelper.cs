@@ -64,7 +64,7 @@ namespace Gpt.Labs.Helpers.Navigation
         /// <param name="page">A reference to the current page used for navigation.
         /// This reference allows for frame manipulation.
         /// </param>
-        public NavigationHelper(Page page)
+        public NavigationHelper(StatePage page)
         {
             this.Page = page;
         }
@@ -75,7 +75,7 @@ namespace Gpt.Labs.Helpers.Navigation
 
         private Frame Frame => this.Page.Frame;
 
-        private Page Page { get; }
+        private StatePage Page { get; }
 
         #endregion
 
@@ -95,7 +95,7 @@ namespace Gpt.Labs.Helpers.Navigation
         /// property provides the group to be displayed.</param>
         public void OnNavigatedFrom(NavigationEventArgs e)
         {
-            var frameState = ShellPage.Current.SuspensionManager.SessionStateForFrame(this.Frame);
+            var frameState = this.Page.RootPage.SuspensionManager.SessionStateForFrame(this.Frame);
             var pageState = new ViewModelState();
 
 #if SHOW_DEBUG_NOTIFICATIONS
@@ -128,7 +128,7 @@ namespace Gpt.Labs.Helpers.Navigation
         /// property provides the group to be displayed.</param>
         public void OnNavigatedTo(NavigationEventArgs e)
         {
-            var frameState = ShellPage.Current.SuspensionManager.SessionStateForFrame(this.Frame);
+            var frameState = this.Page.RootPage.SuspensionManager.SessionStateForFrame(this.Frame);
             this.pageKey = "Page-" + this.Frame.BackStackDepth;
 
 #if SHOW_DEBUG_NOTIFICATIONS
@@ -173,7 +173,7 @@ namespace Gpt.Labs.Helpers.Navigation
                 state,
                 e.NavigationMode);
 
-            ShellPage.Current.UpdateBackState();
+            this.Page.RootPage?.UpdateBackState();
 
 #if SHOW_DEBUG_NOTIFICATIONS
             watch.Stop();
