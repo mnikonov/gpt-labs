@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml;
 using System;
 using Gpt.Labs.Helpers;
+using Gpt.Labs.Controls.Extensions;
 
 namespace Gpt.Labs
 {
@@ -91,11 +92,14 @@ namespace Gpt.Labs
 
         #region Private Methods
 
-        private static void AppTitleBarContentChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static async void AppTitleBarContentChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is StatePage page && e.NewValue is UIElement element)
             {
-                page.RootPage?.UpdateTitleBarContent(element);
+                await page.ExecuteOnLoaded(() =>
+                {
+                    page.RootPage.UpdateTitleBarContent(element);
+                });
             }
         }
 

@@ -30,6 +30,7 @@ using Windows.Storage;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
+using Microsoft.UI.Xaml;
 
 namespace Gpt.Labs.ViewModels
 {
@@ -392,6 +393,11 @@ namespace Gpt.Labs.ViewModels
                     }
                 }
             }
+        }
+
+        public async Task OpenChatInNewWindow()
+        {
+            await this.Chat.OpenChatInNewWindows();
         }
 
         public async Task StartStopRecord()

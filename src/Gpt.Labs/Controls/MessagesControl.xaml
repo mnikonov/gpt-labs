@@ -44,7 +44,8 @@
         <Grid VerticalAlignment="Bottom" Padding="12"
                 SizeChanged="OnMessagePanelSizeChanged">
             <ContentControl x:Name="MessagePanel" HorizontalAlignment="Stretch" MaxWidth="800" HorizontalContentAlignment="Stretch"
-                IsEnabled="{x:Bind IsMessagePanelEnabled, Mode=OneWay}">
+                IsEnabled="{x:Bind IsMessagePanelEnabled, Mode=OneWay}"
+                IsEnabledChanged="OnMessagePanelIsEnabledChanged">
 
                 <ContentControl.Resources>
                     <ResourceDictionary Source="ms-appx:///Styles/CommandBarBigResources.xaml"/>
@@ -161,6 +162,16 @@
                                     <FontIcon Glyph="&#xe720;"/>
                                 </AppBarToggleButton.Icon>
                             </AppBarToggleButton>
+                            
+                            <AppBarButton x:Name="OpenChatInNewWindow" Click="{x:Bind ViewModel.OpenChatInNewWindow}"
+                                          x:Load="{x:Bind ShowOpenNewWindowButton, Mode=OneWay}">
+                                <ToolTipService.ToolTip>
+                                    <ToolTip x:Uid="OpenChatInNewWindowToolTip" Content="Open chat in new window" />
+                                </ToolTipService.ToolTip>
+                                <AppBarButton.Icon>
+                                    <FontIcon Glyph="&#xe78b;"/>
+                                </AppBarButton.Icon>
+                            </AppBarButton>
                         </CommandBar>
                         
                         

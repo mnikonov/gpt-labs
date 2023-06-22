@@ -589,4 +589,7 @@ We understand the significance of community contributions, and we highly appreci
   <data name="OpenInNewWindowMenu.Text" xml:space="preserve">
     <value>Open in a new window</value>
   </data>
+  <data name="OpenChatInNewWindowToolTip.Content" xml:space="preserve">
+    <value>Open chat in new window (Ctrl+W)</value>
+  </data>
 </root>

@@ -10,6 +10,7 @@
     <controls:MessagesControl x:Name="Messages"
         ViewModel="{x:Bind ViewModel.Result, Mode=OneWay}"
         IsMessagePanelEnabled="{x:Bind ViewModel.IsCompleted, Mode=OneWay}"
-        ShowSettingsButton="False">
+        ShowSettingsButton="False"
+        ShowOpenNewWindowButton="False">
     </controls:MessagesControl>
 </Page>

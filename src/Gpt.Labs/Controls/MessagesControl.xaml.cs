@@ -1,4 +1,3 @@
-using Gpt.Labs.Controls.Extensions;
 using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Models;
 using Gpt.Labs.ViewModels;
@@ -26,6 +25,12 @@ namespace Gpt.Labs.Controls
 
         public static readonly DependencyProperty ShowSettingsButtonProperty = DependencyProperty.Register(
             nameof(ShowSettingsButton),
+            typeof(bool),
+            typeof(MessagesPage),
+            new PropertyMetadata(true, null));
+
+        public static readonly DependencyProperty ShowOpenNewWindowButtonProperty = DependencyProperty.Register(
+            nameof(ShowOpenNewWindowButton),
             typeof(bool),
             typeof(MessagesPage),
             new PropertyMetadata(true, null));
@@ -59,6 +64,12 @@ namespace Gpt.Labs.Controls
         {
             get => (bool)GetValue(ShowSettingsButtonProperty);
             set => SetValue(ShowSettingsButtonProperty, value);
+        }
+
+        public bool ShowOpenNewWindowButton
+        {
+            get => (bool)GetValue(ShowOpenNewWindowButtonProperty);
+            set => SetValue(ShowOpenNewWindowButtonProperty, value);
         }
 
         public bool IsMessagePanelEnabled
@@ -111,6 +122,11 @@ namespace Gpt.Labs.Controls
                     case VirtualKey.E:
                         var shareMessages = this.MessagesList.SelectedItems.OfType<OpenAIMessage>().ToArray();
                         this.ViewModel.ShareMessages(shareMessages);
+                        e.Handled = true;
+                        return;
+
+                    case VirtualKey.W:
+                        await ViewModel.OpenChatInNewWindow();
                         e.Handled = true;
                         return;
                 }
@@ -226,18 +242,16 @@ namespace Gpt.Labs.Controls
             try
             {
                 this.MessageProgress.Visibility = Visibility.Visible;
+                this.IsMessagePanelEnabled = false;
 
-                await this.MessagePanel.DisableUiAndExecuteAsync(async token =>
-                {
-                    await ViewModel.SendMessage();
-                });
+                await ViewModel.SendMessage();
             }
             finally
             {
                 await this.DispatcherQueue.EnqueueAsync(() =>
                 {
                     this.MessageProgress.Visibility = Visibility.Collapsed;
-                    this.MessageTextBox.Focus(FocusState.Programmatic);
+                    this.IsMessagePanelEnabled = true;
                 });
             }
         }
@@ -247,18 +261,16 @@ namespace Gpt.Labs.Controls
             try
             {
                 this.MessageProgress.Visibility = Visibility.Visible;
+                this.IsMessagePanelEnabled = false;
 
-                await this.MessagePanel.DisableUiAndExecuteAsync(async token =>
-                {
-                    await ViewModel.CreateImageVariation();
-                });
+                await ViewModel.CreateImageVariation();
             }
             finally
             {
                 await this.DispatcherQueue.EnqueueAsync(() =>
                 {
                     this.MessageProgress.Visibility = Visibility.Collapsed;
-                    this.MessageTextBox.Focus(FocusState.Programmatic);
+                    this.IsMessagePanelEnabled = true;
                 });
             }
         }
@@ -283,6 +295,14 @@ namespace Gpt.Labs.Controls
         private void OnMessagePanelSizeChanged(object sender, SizeChangedEventArgs e)
         {
             MessagesList.Padding = new Thickness(MessagesList.Padding.Left, MessagesList.Padding.Top, MessagesList.Padding.Right, e.NewSize.Height);
+        }
+
+        private void OnMessagePanelIsEnabledChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (e.NewValue is bool val && val)
+            {
+                MessageTextBox.Focus(FocusState.Programmatic);
+            }
         }
 
         #endregion
