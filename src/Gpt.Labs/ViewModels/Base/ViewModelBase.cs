@@ -1,21 +1,35 @@
-﻿using Gpt.Labs.Controls.Extensions;
-using Gpt.Labs.Helpers.Navigation;
+﻿using Gpt.Labs.Helpers.Navigation;
 using Gpt.Labs.Models.Base;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Media.Animation;
 using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Gpt.Labs.ViewModels.Base
 {
     public abstract class ViewModelBase : ObservableObject
     {
+        #region Fields
+
+        Func<BasePage> getBasePage;
+
+        #endregion
+
+        #region Constructors
+
+        public ViewModelBase(Func<BasePage> getBasePage)
+        {
+            this.getBasePage = getBasePage;
+        }
+
+        #endregion
+
         #region Properties
 
-        public ShellPage Shell => ShellPage.Current;
+        public BasePage BasePage => this.getBasePage();
 
-        public DispatcherQueue DispatcherQueue => App.Window.DispatcherQueue;
+        public MainWindow Window => this.BasePage?.Window;
+
+        public DispatcherQueue DispatcherQueue => this.Window?.DispatcherQueue;
 
         #endregion
 
@@ -23,22 +37,7 @@ namespace Gpt.Labs.ViewModels.Base
 
         public void Navigate<TPageType>(Query param, NavigationTransitionInfo infoOverride = null)
         {
-            this.Shell.Navigate(typeof(TPageType), param, infoOverride);
-        }
-
-        public Task BlockUiAndExecute(Func<CancellationToken, Task> action, bool showProgress = true, CancellationToken cancellationToken = default)
-        {
-            return this.Shell.BlockUiAndExecute(action, showProgress, cancellationToken);
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        protected T GetCurrentPage<T>()
-            where T : class
-        {
-            return ShellPage.Current.ShellFrame.Content as T;
+            this.BasePage?.Navigate(typeof(TPageType), param, infoOverride);
         }
 
         #endregion

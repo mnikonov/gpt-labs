@@ -1,4 +1,5 @@
 using Gpt.Labs.Helpers;
+using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Helpers.Navigation;
 using Gpt.Labs.Models;
 using Gpt.Labs.ViewModels;
@@ -14,7 +15,7 @@ using System.Linq;
 
 namespace Gpt.Labs
 {
-    public sealed partial class ChatsPage : BasePage
+    public sealed partial class ChatsPage : StatePage
     {
         #region Fields
 
@@ -67,7 +68,7 @@ namespace Gpt.Labs
 
             ViewModel.Function = async token =>
             {
-                var viewModel = new ChatsListViewModel();
+                var viewModel = new ChatsListViewModel(() => this.RootPage);
 
                 await viewModel.LoadStateAsync(destinationPageType, parameters, state, mode);
 
@@ -86,13 +87,103 @@ namespace Gpt.Labs
             ViewModel.Result?.SaveState(destinationPageType, parameters, state, mode);
             base.SaveState(destinationPageType, parameters, state, mode);
 
-            this.Shell.SuspensionManager.SaveFrameNavigationState(this.chatFrame);
-            this.Shell.SuspensionManager.UnregisterFrame(this.chatFrame, false);
+            this.RootPage?.SuspensionManager?.SaveFrameNavigationState(this.chatFrame);
+            this.RootPage?.SuspensionManager?.UnregisterFrame(this.chatFrame, false);
         }
 
         public override Frame GetInnerFrame()
         {
             return this.chatFrame;
+        }
+
+        public void ClearBackState(params OpenAIChat[] chats)
+        {
+            if (this.ViewModel.Result.MultiSelectModeEnabled && this.ViewModel.Result.ItemsCollection.Count == 0)
+            {
+                this.ViewModel.Result.MultiSelectModeEnabled = false;
+            }
+
+            var sessionState = this.RootPage?.SuspensionManager?.SessionStateForFrame(this.chatFrame);
+
+            foreach (var chat in chats) 
+            {
+                bool hasRemovedStates = false;
+                foreach (var state in sessionState.PageState.ToList())
+                {
+                    var chatId = state.Value.GetValue<Guid>(nameof(MessagesListViewModel.ChatId));
+                    if (chatId == chat.Id)
+                    {
+                        sessionState.PageState.Remove(state.Key);
+                        hasRemovedStates = true;
+                    }
+                }
+
+                if (hasRemovedStates)
+                {
+                    var i = 0;
+
+                    var states = sessionState.PageState.ToList();
+                    foreach (var state in sessionState.PageState.ToList())
+                    {
+                        var newKey = $"Page-{i}";
+
+                        if (newKey != state.Key)
+                        {
+                            var index = states.IndexOf(state);
+                            states.RemoveAt(index);
+                            states.Insert(index, new KeyValuePair<string, ViewModelState>(newKey, state.Value));
+                        }
+
+                        i ++;
+                    }
+
+                    sessionState.PageState = states.ToDictionary(p => p.Key, p => p.Value);
+                }
+
+                foreach (var stack in this.chatFrame.BackStack.ToList())
+                {
+                    var query = Query.Parse(stack.Parameter);
+                    var chatId = query.GetValue<Guid>("chat-id");
+
+                    if (chatId == chat.Id)
+                    {
+                        this.chatFrame.BackStack.Remove(stack);
+                    }
+                }
+            }
+
+            if (this.chatFrame.Content != null && this.chatFrame.Content is StatePage page)
+            {
+                page.NavigationHelper.SetPageKey();
+            }
+
+            if (this.ViewModel.Result.SelectedElement == null && this.chatFrame.Content != null)
+            {
+                if (this.chatFrame.CanGoBack)
+                {
+                    this.chatFrame.GoBack();
+                }
+                else
+                {
+                    this.RegisterFrame();
+                }
+            }
+
+            foreach (var chat in chats) 
+            {
+                foreach (var stack in this.chatFrame.ForwardStack.ToList())
+                {
+                    var query = Query.Parse(stack.Parameter);
+                    var chatId = query.GetValue<Guid>("chat-id");
+
+                    if (chatId == chat.Id)
+                    {
+                        this.chatFrame.ForwardStack.Remove(stack);
+                    }
+                }
+            }
+
+            this.RootPage?.UpdateBackState();
         }
 
         #endregion
@@ -102,29 +193,6 @@ namespace Gpt.Labs
         private async void OnAddChatClick(object sender, RoutedEventArgs e)
         {
             await this.ViewModel.Result.AddEditChat(null);
-        }
-
-        private void OnRootChatGridRightTapped(object sender, RightTappedRoutedEventArgs e)
-        {
-            var element = (FrameworkElement)sender;
-
-            foreach (FrameworkElement item in element.GetDescendantsOfType<MenuFlyoutItem>())
-            {
-                item.DataContext = element.DataContext;
-            }           
-
-            this.ChatActionsMenu.ShowAt(element, e.GetPosition(element));
-        }
-
-        private async void OnEditChatClick(object sender, RoutedEventArgs e)
-        {
-            var chat = (OpenAIChat)((FrameworkElement)sender).DataContext;
-            var result = await this.ViewModel.Result.AddEditChat((OpenAIChat)((FrameworkElement)sender).DataContext);
-
-            if (result && this.ViewModel.Result.SelectedElement != null && chat.Id == this.ViewModel.Result.SelectedElement.Id)
-            {
-                ((MessagesPage)this.chatFrame.Content).ViewModel.Result.Chat = this.ViewModel.Result.SelectedElement;
-            }
         }
                 
         private void OnChatListItemClick(object sender, ItemClickEventArgs e)
@@ -195,14 +263,6 @@ namespace Gpt.Labs
             }
         }
 
-        private async void OnDeleteChatClick(object sender, RoutedEventArgs e)
-        {
-            var chat = (OpenAIChat)((FrameworkElement)sender).DataContext;
-            await this.ViewModel.Result.DeleteChats(chat);
-
-            ClearBackState(chat);
-        }
-
         private async void OnDeleteMultiClick(object sender, RoutedEventArgs e)
         {
             var chats = this.ChatList.SelectedItems.OfType<OpenAIChat>().ToArray();
@@ -211,101 +271,11 @@ namespace Gpt.Labs
             ClearBackState(chats);
         }
 
-        private void ClearBackState(params OpenAIChat[] chats)
-        {
-            if (this.ViewModel.Result.MultiSelectModeEnabled && this.ViewModel.Result.ItemsCollection.Count == 0)
-            {
-                this.ViewModel.Result.MultiSelectModeEnabled = false;
-            }
-
-            var sessionState = this.Shell.SuspensionManager.SessionStateForFrame(this.chatFrame);
-
-            foreach (var chat in chats) 
-            {
-                bool hasRemovedStates = false;
-                foreach (var state in sessionState.PageState.ToList())
-                {
-                    var chatId = state.Value.GetValue<Guid>(nameof(MessagesListViewModel.ChatId));
-                    if (chatId == chat.Id)
-                    {
-                        sessionState.PageState.Remove(state.Key);
-                        hasRemovedStates = true;
-                    }
-                }
-
-                if (hasRemovedStates)
-                {
-                    var i = 0;
-
-                    var states = sessionState.PageState.ToList();
-                    foreach (var state in sessionState.PageState.ToList())
-                    {
-                        var newKey = $"Page-{i}";
-
-                        if (newKey != state.Key)
-                        {
-                            var index = states.IndexOf(state);
-                            states.RemoveAt(index);
-                            states.Insert(index, new KeyValuePair<string, ViewModelState>(newKey, state.Value));
-                        }
-
-                        i ++;
-                    }
-
-                    sessionState.PageState = states.ToDictionary(p => p.Key, p => p.Value);
-                }
-
-                foreach (var stack in this.chatFrame.BackStack.ToList())
-                {
-                    var query = Query.Parse(stack.Parameter);
-                    var chatId = query.GetValue<Guid>("chat-id");
-
-                    if (chatId == chat.Id)
-                    {
-                        this.chatFrame.BackStack.Remove(stack);
-                    }
-                }
-            }
-
-            if (this.chatFrame.Content != null && this.chatFrame.Content is BasePage page)
-            {
-                page.NavigationHelper.SetPageKey();
-            }
-
-            if (this.ViewModel.Result.SelectedElement == null && this.chatFrame.Content != null)
-            {
-                if (this.chatFrame.CanGoBack)
-                {
-                    this.chatFrame.GoBack();
-                }
-                else
-                {
-                    this.RegisterFrame();
-                }
-            }
-
-            foreach (var chat in chats) 
-            {
-                foreach (var stack in this.chatFrame.ForwardStack.ToList())
-                {
-                    var query = Query.Parse(stack.Parameter);
-                    var chatId = query.GetValue<Guid>("chat-id");
-
-                    if (chatId == chat.Id)
-                    {
-                        this.chatFrame.ForwardStack.Remove(stack);
-                    }
-                }
-            }
-
-            this.Shell.UpdateBackState();
-        }
-
         private void RegisterFrame()
         {
             if (this.chatFrame != null)
             {
-                this.Shell.SuspensionManager.UnregisterFrame(this.chatFrame, true);
+                this.RootPage?.SuspensionManager?.UnregisterFrame(this.chatFrame, true);
 
                 this.RootGrid.Children.Remove(this.chatFrame);
             }
@@ -314,7 +284,7 @@ namespace Gpt.Labs
             Grid.SetColumn(this.chatFrame, 1);
             this.RootGrid.Children.Add(this.chatFrame);
 
-            this.Shell.SuspensionManager.RegisterFrame(this.chatFrame, $"ChatFrameState_{this.frameUid}");
+            this.RootPage?.SuspensionManager?.RegisterFrame(this.chatFrame, $"ChatFrameState_{this.frameUid}");
         }
 
         #endregion

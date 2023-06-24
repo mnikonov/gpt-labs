@@ -30,6 +30,7 @@ using Windows.Storage;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
+using Microsoft.UI.Xaml;
 
 namespace Gpt.Labs.ViewModels
 {
@@ -69,7 +70,8 @@ namespace Gpt.Labs.ViewModels
 
         #region Public Constructors
 
-        public MessagesListViewModel()
+        public MessagesListViewModel(Func<BasePage> getBasePage)
+            : base(getBasePage)
         {
             this.openAiClient = new OpenAIClient(new OpenAIAuthentication(ApplicationSettings.Instance.OpenAIApiKey, ApplicationSettings.Instance.OpenAIOrganization ));
             this.mediaCapture = new MediaCapture();       
@@ -142,14 +144,14 @@ namespace Gpt.Labs.ViewModels
             switch (this.Chat.Type)
             {
                 case OpenAIChatType.Chat:
-                    this.messageProcessor = new ChatEndpointProcessor(this.openAiClient, this.Chat, this.ItemsCollection, () => { this.Message = string.Empty; });
+                    this.messageProcessor = new ChatEndpointProcessor(this.openAiClient, this.Chat, this.ItemsCollection, this.DispatcherQueue, () => { this.Message = string.Empty; });
                     break;
                 case OpenAIChatType.Image:
-                    this.messageProcessor = new ImageEndpointProcessor(this.openAiClient, this.Chat, this.ItemsCollection, () => { this.Message = string.Empty; });
+                    this.messageProcessor = new ImageEndpointProcessor(this.openAiClient, this.Chat, this.ItemsCollection, this.DispatcherQueue, () => { this.Message = string.Empty; });
                     break;
             }
 
-            this.dataTransferManager = App.Window.GetDataTransferManager();
+            this.dataTransferManager = this.Window.GetDataTransferManager();
             this.dataTransferManager.DataRequested += this.OnDataTransferManagerDataRequested;
 
             await base.LoadStateAsync(destinationPageType, parameters, state, mode);
@@ -166,7 +168,7 @@ namespace Gpt.Labs.ViewModels
 
         public async Task CancelSettings()
         {
-            var dialog = "Confirm".CreateYesNoDialog("CancellSettingsChanges");
+            var dialog = this.Window.CreateYesNoDialog("Confirm", "CancellSettingsChanges");
             var result = await dialog.ShowAsync();
 
             if (result == ContentDialogResult.Primary)
@@ -252,7 +254,7 @@ namespace Gpt.Labs.ViewModels
             imagePicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
             imagePicker.FileTypeFilter.Add(".png");
 
-            var hwnd = WindowNative.GetWindowHandle(App.Window);
+            var hwnd = WindowNative.GetWindowHandle(this.Window);
             InitializeWithWindow.Initialize(imagePicker, hwnd);
 
             var file = await imagePicker.PickSingleFileAsync();
@@ -266,14 +268,14 @@ namespace Gpt.Labs.ViewModels
 
             if (properties.Size > 4 * 1024 * 1024)
             {
-                var dialog = "Error".CreateOkDialog("ImageVariationValidationError");
+                var dialog = this.Window.CreateOkDialog("Error", "ImageVariationValidationError");
                 await dialog.ShowAsync();
                 return;
             }
 
             try
             {
-                var imageVariationProcessor = new ImageVariationEndpointProcessor(this.openAiClient, this.Chat, this.ItemsCollection, () => { this.Message = string.Empty; });
+                var imageVariationProcessor = new ImageVariationEndpointProcessor(this.openAiClient, this.Chat, this.ItemsCollection, this.DispatcherQueue, () => { this.Message = string.Empty; });
                 await imageVariationProcessor.ProcessAsync(file);
             }
             catch (HttpRequestException ex)
@@ -286,12 +288,12 @@ namespace Gpt.Labs.ViewModels
 
                     if (error != null)
                     {
-                        dialog = error.CreateErrorDialog();
+                        dialog = this.Window.CreateErrorDialog(error);
                     }
                     else
                     {
                         ex.LogError();
-                        dialog = ex.CreateExceptionDialog();
+                        dialog = this.Window.CreateExceptionDialog(ex);
                     }
 
                     await dialog.ShowAsync();
@@ -302,7 +304,7 @@ namespace Gpt.Labs.ViewModels
                 ex.LogError();
                 await this.DispatcherQueue.EnqueueAsync(async () =>
                 {
-                    await ex.CreateExceptionDialog().ShowAsync();
+                    await this.Window.CreateExceptionDialog(ex).ShowAsync();
                 });
             }
         }
@@ -328,12 +330,12 @@ namespace Gpt.Labs.ViewModels
 
                     if (error != null)
                     {
-                        dialog = error.CreateErrorDialog();
+                        dialog = this.Window.CreateErrorDialog(error);
                     }
                     else
                     {
                         ex.LogError();
-                        dialog = ex.CreateExceptionDialog();
+                        dialog = this.Window.CreateExceptionDialog(ex);
                     }
 
                     await dialog.ShowAsync();
@@ -344,7 +346,7 @@ namespace Gpt.Labs.ViewModels
                 ex.LogError();
                 await this.DispatcherQueue.EnqueueAsync(async () =>
                 {
-                    await ex.CreateExceptionDialog().ShowAsync();
+                    await this.Window.CreateExceptionDialog(ex).ShowAsync();
                 });
             }
         }
@@ -355,11 +357,11 @@ namespace Gpt.Labs.ViewModels
 
             if (messages.Length == 1)
             {
-                dialog = "Confirm".CreateYesNoDialog("DeleteMessage");
+                dialog = this.Window.CreateYesNoDialog("Confirm", "DeleteMessage");
             }
             else
             {
-                dialog = "Confirm".CreateYesNoDialog("DeleteMessages");
+                dialog = this.Window.CreateYesNoDialog("Confirm", "DeleteMessages");
             }
 
             var result = await dialog.ShowAsync();
@@ -391,6 +393,11 @@ namespace Gpt.Labs.ViewModels
                     }
                 }
             }
+        }
+
+        public async Task OpenChatInNewWindow()
+        {
+            await this.Chat.OpenChatInNewWindows();
         }
 
         public async Task StartStopRecord()
@@ -487,7 +494,7 @@ namespace Gpt.Labs.ViewModels
 
             this.shareMessages = messages;
 
-            App.Window.ShowShareUI();
+            this.Window.ShowShareUI();
         }
 
         #endregion
@@ -585,7 +592,7 @@ namespace Gpt.Labs.ViewModels
                     this.Message = string.Empty;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 this.Message = string.Empty;
             }

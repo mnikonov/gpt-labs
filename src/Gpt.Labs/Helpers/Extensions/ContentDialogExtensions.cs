@@ -12,9 +12,9 @@
     {
         #region Public Methods
 
-        public static ContentDialog CreateYesNoDialog(this string titleResourceKey, string descriptionResourceKey, params object[] descriptionArgs)
+        public static ContentDialog CreateYesNoDialog(this Window window, string titleResourceKey, string descriptionResourceKey, params object[] descriptionArgs)
         {
-            return new ContentDialogBase
+            return new ContentDialogBase(window)
             {
                 Title = App.ResourceLoader.GetString("DialogTitle/" + titleResourceKey),
                 Content = new TextBlock { Text = string.Format(App.ResourceLoader.GetString("DialogDescription/" + descriptionResourceKey), descriptionArgs), TextWrapping = TextWrapping.Wrap, FontWeight = FontWeights.Normal },
@@ -22,11 +22,10 @@
                 IsSecondaryButtonEnabled = true,
                 PrimaryButtonText = App.ResourceLoader.GetString("Yes"),
                 SecondaryButtonText = App.ResourceLoader.GetString("No"),
-                XamlRoot = App.Window.Content.XamlRoot
             };
         }
 
-        public static ContentDialog CreateExceptionDialog(this Exception ex)
+        public static ContentDialog CreateExceptionDialog(this Window window, Exception ex)
         {
             var title = App.ResourceLoader.GetString("DialogTitle/Error");
             var content = new TextBlock { TextWrapping = TextWrapping.Wrap, FontWeight = FontWeights.Normal };
@@ -40,18 +39,17 @@
             content.Inlines.Add(new Run { Text = ex.StackTrace });
 #endif
 
-            return new ContentDialogBase
+            return new ContentDialogBase(window)
             {
                 Title = title,
                 Content = content,
                 IsPrimaryButtonEnabled = true,
                 IsSecondaryButtonEnabled = false,
                 PrimaryButtonText = App.ResourceLoader.GetString("Ok"),
-                XamlRoot = App.Window.Content.XamlRoot
             };
         }
 
-        public static ContentDialog CreateErrorDialog(this OpenAIError error)
+        public static ContentDialog CreateErrorDialog(this Window window, OpenAIError error)
         {
             var title = App.ResourceLoader.GetString("DialogTitle/Error");
             var content = new TextBlock { TextWrapping = TextWrapping.Wrap, FontWeight = FontWeights.Normal };
@@ -59,32 +57,31 @@
             content.Inlines.Add(new Run { Text = error.Message });
 
 
-            return new ContentDialogBase
+            return new ContentDialogBase(window)
             {
                 Title = title,
                 Content = content,
                 IsPrimaryButtonEnabled = true,
                 IsSecondaryButtonEnabled = false,
                 PrimaryButtonText = App.ResourceLoader.GetString("Ok"),
-                XamlRoot = App.Window.Content.XamlRoot
             };
         }
 
-        public static ContentDialog CreateOkDialog(this string titleResourceKey, string descriptionResourceKey, params object[] descriptionArgs)
+        public static ContentDialog CreateOkDialog(this Window window, string titleResourceKey, string descriptionResourceKey, params object[] descriptionArgs)
         {
-            return new ContentDialogBase
+            return new ContentDialogBase(window)
             {
                 Title = App.ResourceLoader.GetString("DialogTitle/" + titleResourceKey),
                 Content = new TextBlock { Text = string.Format(App.ResourceLoader.GetString("DialogDescription/" + descriptionResourceKey), descriptionArgs), TextWrapping = TextWrapping.Wrap, FontWeight = FontWeights.Normal },
                 IsPrimaryButtonEnabled = true,
                 IsSecondaryButtonEnabled = false,
                 PrimaryButtonText = App.ResourceLoader.GetString("Ok"),
-                XamlRoot = App.Window.Content.XamlRoot
             };
         }
 
         public static ContentDialog CreateDialog(
-            this string titleResourceKey,
+            this Window window,
+            string titleResourceKey,
             string descriptionResourceKey,
             string primaryButtonTextKey,
             string secondaryButtonTextKey,
@@ -99,7 +96,7 @@
             var secondaryButtonText = isSecondaryButtonEnabled ? App.ResourceLoader.GetString(secondaryButtonTextKey) : string.Empty;
             var closeButtonText = isCloseButtonEnabled ? App.ResourceLoader.GetString(closeButtonTextKey) : string.Empty;
 
-            return new ContentDialogBase
+            return new ContentDialogBase(window)
             {
                 Title = App.ResourceLoader.GetString("DialogTitle/" + titleResourceKey),
                 Content = new TextBlock { Text = string.Format(App.ResourceLoader.GetString("DialogDescription/" + descriptionResourceKey), descriptionArgs), TextWrapping = TextWrapping.Wrap, FontWeight = FontWeights.Normal },
@@ -107,8 +104,7 @@
                 IsSecondaryButtonEnabled = isSecondaryButtonEnabled,
                 PrimaryButtonText = primaryButtonText,
                 SecondaryButtonText = secondaryButtonText,
-                CloseButtonText = closeButtonText,
-                XamlRoot = App.Window.Content.XamlRoot
+                CloseButtonText = closeButtonText
             };
         }
 

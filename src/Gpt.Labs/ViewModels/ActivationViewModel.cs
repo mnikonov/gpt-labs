@@ -23,7 +23,8 @@ namespace Gpt.Labs.ViewModels
 
         #region Constructors
 
-        public ActivationViewModel(Func<object[], Task> executeAndContinue)
+        public ActivationViewModel(Func<BasePage> getBasePage, Func<object[], Task> executeAndContinue)
+            : base(getBasePage)
         {
             this.executeAndContinue = executeAndContinue;
             this.step = this.GetInitializationStep();
@@ -108,10 +109,10 @@ namespace Gpt.Labs.ViewModels
 
             await InitAiModelsCollection(); 
 
-            ((Frame)App.Window.Content).Navigate(
+            ((Frame)this.Window.Content).Navigate(
                 typeof(ShellPage),
                 this.NavigationParameter.ToString(),
-                new SlideNavigationTransitionInfo { Effect = SlideNavigationTransitionEffect.FromRight });
+                new SlideNavigationTransitionInfo { Effect = SlideNavigationTransitionEffect.FromLeft });
         }
 
         private async Task InitAiModelsCollection()

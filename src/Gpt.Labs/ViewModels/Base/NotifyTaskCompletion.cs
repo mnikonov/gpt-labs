@@ -69,7 +69,7 @@ namespace Gpt.Labs.ViewModels.Base
             } 
         }
 
-        public void Start(bool showProgress = true)
+        public void Start()
         {
             var previousTask = this.currentTask;
 
@@ -82,14 +82,14 @@ namespace Gpt.Labs.ViewModels.Base
 
             this.cancellation = new CancellationTokenSource();
 
-            this.currentTask = this.StartNewTask(showProgress, previousTask, this.cancellation.Token);
+            this.currentTask = this.StartNewTask(previousTask, this.cancellation.Token);
         }
 
         #endregion
 
         #region Private Methods
 
-        private async Task StartNewTask(bool showProgress, Task previousTask, CancellationToken token)
+        private async Task StartNewTask(Task previousTask, CancellationToken token)
         {
             if (previousTask != null)
             {
@@ -105,15 +105,6 @@ namespace Gpt.Labs.ViewModels.Base
 
             try
             {
-                if (showProgress)
-                {
-                    var shell = ShellPage.Current;
-                    if (shell != null)
-                    {
-                        shell.IsProgressActive = true;
-                    }
-                }
-
                 this.Result = await this.Function(this.cancellation.Token);
                 this.IsCompleted = true;
 
@@ -140,17 +131,6 @@ namespace Gpt.Labs.ViewModels.Base
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsFaulted)));
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Exception)));
                 this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(ErrorMessage)));
-            }
-            finally
-            {
-                if (showProgress)
-                {
-                    var shell = ShellPage.Current;
-                    if (shell != null)
-                    {
-                        shell.IsProgressActive = false;
-                    }
-                }
             }
         }
 

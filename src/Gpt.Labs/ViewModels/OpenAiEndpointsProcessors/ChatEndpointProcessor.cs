@@ -4,6 +4,7 @@ using Gpt.Labs.Models.Enums;
 using Gpt.Labs.Models.Extensions;
 using Gpt.Labs.ViewModels.Collections;
 using Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base;
+using Microsoft.UI.Dispatching;
 using OpenAI;
 using OpenAI.Chat;
 using System;
@@ -15,8 +16,8 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
     {
         #region Constructors
 
-        public ChatEndpointProcessor(OpenAIClient openAiClient, OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, Action cleanUserMessage) 
-            : base(openAiClient, chat, messagesCollection, cleanUserMessage)
+        public ChatEndpointProcessor(OpenAIClient openAiClient, OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, DispatcherQueue dispatcher, Action cleanUserMessage) 
+            : base(openAiClient, chat, messagesCollection, dispatcher, cleanUserMessage)
         {
         }
 
@@ -73,7 +74,7 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
                 {
                     var responseMessage = await GetMessageAsync(responseMessages, choise.Index);
 
-                    await App.Window.DispatcherQueue.EnqueueAsync(() =>
+                    await this.dispatcher.EnqueueAsync(() =>
                     {
                         responseMessage.Content = responseMessage.Content + content;
                     });

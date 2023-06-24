@@ -1,4 +1,4 @@
-<local:BasePage
+<local:StatePage
     xmlns:local="using:Gpt.Labs"
     x:Class="Gpt.Labs.ChatsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
@@ -6,108 +6,19 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:models="using:Gpt.Labs.Models" 
-    xmlns:controls="using:Gpt.Labs.Controls" 
-    xmlns:datatemplateselectors="using:Gpt.Labs.Helpers.DataTemplateSelectors"
+    xmlns:controls="using:Gpt.Labs.Controls"
     mc:Ignorable="d">
 
-    <local:BasePage.AppTitleBarContent>
+    <local:StatePage.AppTitleBarContent>
         <TextBlock TextLineBounds="Tight" FontSize="12" Grid.Column="0" Margin="10 6 0 0" VerticalAlignment="Center">
             <Run Text="{x:Bind ViewModel.Result.ChatType, Converter={StaticResource ChatTypeToCaptionConverter}, Mode=OneWay}" />
             <Run Text="{x:Bind ViewModel.Result.SelectedElement.Title, Converter={StaticResource StringFormatConverter}, ConverterParameter='- {0}', Mode=OneWay}"/>
         </TextBlock>
-    </local:BasePage.AppTitleBarContent>
-    
-    <local:BasePage.Resources>
-         <DataTemplate x:Key="ChatDataTemplate" x:DataType="models:OpenAIChat">
-            <Grid x:Name="RootChatGrid" Background="Transparent" Padding="18 12"
-                  RightTapped="OnRootChatGridRightTapped">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                               
-                
-                <TextBlock Grid.Row="0" Grid.Column="0" FontSize="14"  
-                           TextTrimming="CharacterEllipsis" FontWeight="Bold"
-                           TextLineBounds="TrimToCapHeight"
-                           Text="{x:Bind Title, Mode=OneWay}"
-                           ToolTipService.ToolTip="{x:Bind Title, Mode=OneWay}"/>
-                
-                <TextBlock Grid.Row="1" Grid.ColumnSpan="2" Margin="0 6 0 0"
-                           FontWeight="Normal" FontSize="12"  
-                           TextLineBounds="TrimToCapHeight"
-                           TextWrapping="Wrap"
-                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                           Text="{x:Bind ((models:OpenAIChatSettings)Settings).SystemMessage, Mode=OneWay}"/>
-                
-                <TextBlock Grid.Row="2" Grid.ColumnSpan="2" Margin="0 8 0 0"
-                           FontWeight="Light" 
-                           TextLineBounds="TrimToCapHeight"
-                           FontSize="11" HorizontalAlignment="Left"
-                           Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
-                           Text="{x:Bind ((models:OpenAIChatSettings)Settings).ModelId, Mode=OneWay}" />
- 
-            </Grid>
-             
-        </DataTemplate>
-        
-        <DataTemplate x:Key="ImageDataTemplate" x:DataType="models:OpenAIChat">
-            <Grid x:Name="RootChatGrid" Background="Transparent" Padding="18 12"
-                  RightTapped="OnRootChatGridRightTapped">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                               
-                
-                <TextBlock Grid.Row="0" Grid.Column="0" FontSize="14"  
-                           TextTrimming="CharacterEllipsis" FontWeight="Bold"
-                           TextLineBounds="TrimToCapHeight"
-                           Text="{x:Bind Title, Mode=OneWay}"
-                           ToolTipService.ToolTip="{x:Bind Title, Mode=OneWay}"/>
-                
-                
-                <TextBlock Grid.Row="2" Grid.ColumnSpan="2" Margin="0 8 0 0"
-                           FontWeight="Light" 
-                           TextLineBounds="TrimToCapHeight"
-                           FontSize="11" HorizontalAlignment="Left"
-                           Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
-                           Text="{x:Bind ((models:OpenAIImageSettings)Settings).Size, Converter={StaticResource OpenAIImageSizeConverter}, Mode=OneWay}" />
- 
-            </Grid>
-             
-        </DataTemplate>
-        
-        <datatemplateselectors:ChatTypeDataTemplateSelector x:Key="ChatTypeDataTemplateSelector" 
-                ChatDataTemplate="{StaticResource ChatDataTemplate}"
-                ImageDataTemplate="{StaticResource ImageDataTemplate}"/>
-        
-        <MenuFlyout x:Name="ChatActionsMenu">
-            <MenuFlyoutItem x:Name="EditChat" x:Uid="EditMenu" Text="Edit"
-                            Click="OnEditChatClick">
-                <MenuFlyoutItem.Icon>
-                    <FontIcon Glyph="&#xe70f;"/>
-                </MenuFlyoutItem.Icon>
-            </MenuFlyoutItem>
-            
-            <MenuFlyoutSeparator/>
-            
-            <MenuFlyoutItem x:Name="DeleteChat" x:Uid="DeleteMenu" Text="Delete"
-                            Click="OnDeleteChatClick">
-                <MenuFlyoutItem.Icon>
-                    <FontIcon Glyph="&#xe74d;"/>
-                </MenuFlyoutItem.Icon>
-            </MenuFlyoutItem>
-        </MenuFlyout>
-
-        
-    </local:BasePage.Resources>
+    </local:StatePage.AppTitleBarContent>
 
     <Grid x:Name="RootGrid">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="280"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
@@ -186,12 +97,17 @@
                       SelectionMode="{x:Bind ViewModel.Result.MultiSelectModeEnabled, Converter={StaticResource ListViewSelectionModeConverter}, Mode=OneWay}"
                       
                       ItemsSource="{x:Bind ViewModel.Result.ItemsCollection, Mode=OneWay}"
-                      ItemTemplateSelector="{StaticResource ChatTypeDataTemplateSelector}"
                       SelectedItem="{x:Bind ViewModel.Result.SelectedElement, Mode=OneWay}"
                                  
                       ItemClick="OnChatListItemClick"
                       DragItemsCompleted="OnChatListDragItemsCompleted"
                       SelectionChanged="OnChatListSelectionChanged">
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="models:OpenAIChat">
+                        <controls:OpenAiChatControl Style="{x:Bind Type, Converter={StaticResource OpenAiChatStyleConverter}}"/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+                
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
                         <Setter Property="Margin" Value="2,1" />
@@ -215,4 +131,4 @@
         </StackPanel>
         
     </Grid>
-</local:BasePage>
+</local:StatePage>

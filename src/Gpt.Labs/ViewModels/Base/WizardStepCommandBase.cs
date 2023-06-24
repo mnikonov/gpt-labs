@@ -48,8 +48,6 @@ namespace Gpt.Labs.ViewModels.Base
                 ? App.ResourceLoader.GetString(this.secondaryButtonTextResource)
                 : string.Empty;
 
-        protected DispatcherQueue DispatcherQueue => App.Window.DispatcherQueue;
-        
         #endregion
 
         #region Public Methods

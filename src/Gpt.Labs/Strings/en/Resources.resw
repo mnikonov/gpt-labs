@@ -586,4 +586,7 @@ We understand the significance of community contributions, and we highly appreci
   <data name="SuggesNewLabel.Text" xml:space="preserve">
     <value>Sugges new</value>
   </data>
+  <data name="OpenChatInNewWindowToolTip.Content" xml:space="preserve">
+    <value>Open chat in new window (Ctrl+W)</value>
+  </data>
 </root>

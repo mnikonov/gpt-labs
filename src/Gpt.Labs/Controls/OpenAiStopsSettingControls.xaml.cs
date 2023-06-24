@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Gpt.Labs.Controls
 {
-    public sealed partial class OpenAiStopsSettingsControl : UserControl
+    public sealed partial class OpenAiStopsSettingsControl : BaseUserControl
     {
         #region Fields
 
@@ -60,7 +60,7 @@ namespace Gpt.Labs.Controls
 
         private async Task AddEditStop(OpenAIStop token)
         {
-            var dialog = new EditStopDialog(new OpenAIStop() { Token = token?.Token });
+            var dialog = new EditStopDialog(this.Window, new OpenAIStop() { Token = token?.Token });
             var result = await dialog.ShowAsync();
 
             if (result == ContentDialogResult.Primary)
@@ -83,7 +83,7 @@ namespace Gpt.Labs.Controls
 
         private async Task DeleteStop(OpenAIStop token)
         {
-            var dialog = "Confirm".CreateYesNoDialog("DeleteStopToken", token.Token);
+            var dialog = this.Window.CreateYesNoDialog("Confirm", "DeleteStopToken", token.Token);
             var result = await dialog.ShowAsync();
 
             if (result == ContentDialogResult.Primary)

@@ -14,6 +14,7 @@
             <converters:IntToDoubleConverter x:Key="IntToDoubleConverter" />
             <converters:OpenAiSettingsStyleConverter x:Key="OpenAiSettingsStyleConverter" />
             <converters:OpenAiMessageStyleConverter x:Key="OpenAiMessageStyleConverter" />
+            <converters:OpenAiChatStyleConverter x:Key="OpenAiChatStyleConverter" />
             <converters:StringFormatConverter x:Key="StringFormatConverter" />
             <converters:ChatTypeToCaptionConverter x:Key="ChatTypeToCaptionConverter" />
             <converters:InvertBooleanConverter x:Key="InvertBooleanConverter" />
@@ -30,6 +31,7 @@
                 <ResourceDictionary Source="ms-appx:///Styles/TitledContentPanelResources.xaml"/>
                 <ResourceDictionary Source="ms-appx:///Styles/RadioButtonResources.xaml"/>
                 <ResourceDictionary Source="ms-appx:///Styles/OpenAiMessageResources.xaml"/>
+                <ResourceDictionary Source="ms-appx:///Styles/OpenAiChatResources.xaml"/>
                 <ResourceDictionary Source="ms-appx:///Styles/ContentDialodResources.xaml"/>
                 <ResourceDictionary Source="ms-appx:///Styles/OpenAiSettingsResources.xaml"/>
             </ResourceDictionary.MergedDictionaries>

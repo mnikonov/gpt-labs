@@ -24,7 +24,8 @@
 
         #region Constructors
 
-        public WizardDialogBase()
+        public WizardDialogBase(Window window)
+            : base(window)
         {
             this.Loaded += this.OnDialogLoaded;
 
