@@ -39,7 +39,7 @@ namespace Gpt.Labs.Models
         /// https://platform.openai.com/docs/models/model-endpoint-compatibility
         /// </summary>
         [Required(ErrorMessage = "The 'Model' field is required")]
-        [StringLength(250, ErrorMessage = "The field 'Model' must be a string with a maximum length of {1}.")]
+        [StringLength(250, ErrorMessage = "The 'Model' field must be a string with a maximum length of {1}.")]
         public string ModelId 
         { 
             get => this.modelId;
@@ -47,7 +47,7 @@ namespace Gpt.Labs.Models
         }
 
         [Required(ErrorMessage = "The 'System message' field is required")]
-        [StringLength(2500, ErrorMessage = "The field 'System message' must be a string with a maximum length of {1}.")]
+        [StringLength(2500, ErrorMessage = "The 'System message' field must be a string with a maximum length of {1}.")]
         public string SystemMessage 
         { 
             get => this.systemMessage;

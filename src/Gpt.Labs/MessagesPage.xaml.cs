@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Navigation;
 using System;
 using Gpt.Labs.Helpers;
+using System.Threading.Tasks;
 
 namespace Gpt.Labs
 {
@@ -45,13 +46,13 @@ namespace Gpt.Labs
 
         #region Public Methods
 
-        public override void LoadState(
+        public override async Task LoadState(
             Type destinationPageType,
             Query parameters,
             ViewModelState state,
             NavigationMode mode)
         {
-            base.LoadState(destinationPageType, parameters, state, mode);
+            await base.LoadState(destinationPageType, parameters, state, mode);
 
             ViewModel.Function = async token =>
             {

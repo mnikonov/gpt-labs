@@ -67,41 +67,59 @@
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
                             
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                                
+                            <StackPanel Grid.Column="0">
+                                <TextBlock FontSize="14"  
+                                           TextTrimming="CharacterEllipsis" FontWeight="Bold"
+                                           TextLineBounds="TrimToCapHeight"
+                                           Text="{Binding Title, Mode=OneWay}"
+                                           ToolTipService.ToolTip="{Binding Title, Mode=OneWay}"/>
+                                                                    
+                                <TextBlock Margin="0 6 0 0"
+                                           FontWeight="Normal" FontSize="12"  
+                                           TextTrimming="CharacterEllipsis"
+                                           TextLineBounds="TrimToCapHeight"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"
+                                           Text="{Binding Settings.SystemMessage, Mode=OneWay}"
+                                           ToolTipService.ToolTip="{Binding Settings.SystemMessage, Mode=OneWay}"/>
                 
-                            <TextBlock Grid.Row="0" Grid.Column="0" FontSize="14"  
-                                       TextTrimming="CharacterEllipsis" FontWeight="Bold"
-                                       TextLineBounds="TrimToCapHeight"
-                                       Text="{Binding Title, Mode=OneWay}"
-                                       ToolTipService.ToolTip="{Binding Title, Mode=OneWay}"/>
+                                <TextBlock Margin="0 6 0 0"
+                                           FontWeight="Light" 
+                                           TextTrimming="CharacterEllipsis"
+                                           TextLineBounds="TrimToCapHeight"
+                                           FontSize="11" HorizontalAlignment="Left"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                           Text="{Binding Settings.OpenAIOrganization, Converter={StaticResource OpenAiKeyConverter}, Mode=OneWay}"
+                                           ToolTipService.ToolTip="{Binding Settings.OpenAIOrganization, Mode=OneWay}"
+                                           Visibility="{Binding Settings.OpenAIOrganization, Converter={StaticResource StringToVisibilityConverter}, Mode=OneWay}"/>
                 
-                            <TextBlock Grid.Row="1" Grid.Column="0" Margin="0 6 0 0"
-                                       FontWeight="Normal" FontSize="12"  
-                                       TextTrimming="CharacterEllipsis"
-                                       TextLineBounds="TrimToCapHeight"
-                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
-                                       Text="{Binding Settings.SystemMessage, Mode=OneWay}"
-                                       ToolTipService.ToolTip="{Binding Settings.SystemMessage, Mode=OneWay}"/>
+                                <TextBlock Margin="0 6 0 0"
+                                           FontWeight="Light" 
+                                           TextTrimming="CharacterEllipsis"
+                                           TextLineBounds="TrimToCapHeight"
+                                           FontSize="11" HorizontalAlignment="Left"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
+                                           Text="{Binding Settings.User, Mode=OneWay}"
+                                           ToolTipService.ToolTip="{Binding Settings.User, Mode=OneWay}"
+                                           Visibility="{Binding Settings.User, Converter={StaticResource StringToVisibilityConverter}, Mode=OneWay}"/>
+                                                        
+                                <TextBlock Margin="0 6 0 0"
+                                           FontWeight="Light" 
+                                           TextTrimming="CharacterEllipsis"
+                                           TextLineBounds="TrimToCapHeight"
+                                           FontSize="11" HorizontalAlignment="Left"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
+                                           Text="{Binding Settings.ModelId, Mode=OneWay}"
+                                           ToolTipService.ToolTip="{Binding Settings.ModelId, Mode=OneWay}"/>
+                            </StackPanel>
                 
-                            <TextBlock Grid.Row="2" Grid.Column="0" Margin="0 6 0 0"
-                                       FontWeight="Light" 
-                                       TextTrimming="CharacterEllipsis"
-                                       TextLineBounds="TrimToCapHeight"
-                                       FontSize="11" HorizontalAlignment="Left"
-                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
-                                       Text="{Binding Settings.ModelId, Mode=OneWay}" />
-                
-                            <CommandBar x:Name="ActionsBar" Grid.Row="0" Margin="6 0 0 0" Grid.RowSpan="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Visibility="Collapsed">
+                           
+                            
+                            <CommandBar x:Name="ActionsBar" Margin="6 0 0 0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Visibility="Collapsed">
                     
                                 <CommandBar.RenderTransform>
                                     <CompositeTransform/>
@@ -111,8 +129,7 @@
                                     <ResourceDictionary Source="ms-appx:///Styles/CommandBarMediumResources.xaml"/>
                                 </CommandBar.Resources>                               
                                 
-                                <AppBarButton x:Name="OpenChatInNewWindow"
-                                              Click="OnOpenChatInNewWindowClick">
+                                <AppBarButton x:Name="OpenChatInNewWindow">
                                     <ToolTipService.ToolTip>
                                         <ToolTip x:Uid="OpenChatInNewWindowToolTip" Content="Open chat in new window" />
                                     </ToolTipService.ToolTip>
@@ -130,8 +147,7 @@
                                     </AppBarButton.Icon>
                                     <AppBarButton.Flyout>
                                         <MenuFlyout Placement="BottomEdgeAlignedRight">
-                                           <MenuFlyoutItem x:Name="Edit" x:Uid="EditMenu" Text="Edit"
-                                                           Click="OnEditChatClick">
+                                           <MenuFlyoutItem x:Name="Edit" x:Uid="EditMenu" Text="Edit">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon Glyph="&#xe70f;"/>
                                                 </MenuFlyoutItem.Icon>
@@ -139,8 +155,7 @@
             
                                             <MenuFlyoutSeparator/>
             
-                                            <MenuFlyoutItem x:Name="Delete" x:Uid="DeleteMenu" Text="Delete"
-                                                            Click="OnDeleteChatClick">
+                                            <MenuFlyoutItem x:Name="Delete" x:Uid="DeleteMenu" Text="Delete">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon Glyph="&#xe74d;"/>
                                                 </MenuFlyoutItem.Icon>
@@ -219,33 +234,50 @@
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
                             
-                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                                
+                            <StackPanel Grid.Column="0">
+                                <TextBlock FontSize="14"  
+                                           TextTrimming="CharacterEllipsis" FontWeight="Bold"
+                                           TextLineBounds="TrimToCapHeight"
+                                           Text="{Binding Title, Mode=OneWay}"
+                                           ToolTipService.ToolTip="{Binding Title, Mode=OneWay}"/>
                 
-                            <TextBlock Grid.Row="0" Grid.Column="0" FontSize="14"  
-                                       TextTrimming="CharacterEllipsis" FontWeight="Bold"
-                                       TextLineBounds="TrimToCapHeight"
-                                       Text="{Binding Title, Mode=OneWay}"
-                                       ToolTipService.ToolTip="{Binding Title, Mode=OneWay}"/>
+                                <TextBlock Margin="0 6 0 0"
+                                           FontWeight="Light" 
+                                           TextTrimming="CharacterEllipsis"
+                                           TextLineBounds="TrimToCapHeight"
+                                           FontSize="11" HorizontalAlignment="Left"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                           Text="{Binding Settings.OpenAIOrganization, Converter={StaticResource OpenAiKeyConverter}, Mode=OneWay}"
+                                           ToolTipService.ToolTip="{Binding Settings.OpenAIOrganization, Mode=OneWay}"
+                                           Visibility="{Binding Settings.OpenAIOrganization, Converter={StaticResource StringToVisibilityConverter}, Mode=OneWay}"/>
                 
-                
-                            <TextBlock Grid.Row="1" Grid.Column="0" Margin="0 6 0 0"
-                                       FontWeight="Light" 
-                                       TextTrimming="CharacterEllipsis"
-                                       TextLineBounds="TrimToCapHeight"
-                                       FontSize="11" HorizontalAlignment="Left"
-                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
-                                       Text="{Binding Settings.Size, Converter={StaticResource OpenAIImageSizeConverter}, Mode=OneWay}" />
+                                <TextBlock Margin="0 6 0 0"
+                                           FontWeight="Light" 
+                                           TextTrimming="CharacterEllipsis"
+                                           TextLineBounds="TrimToCapHeight"
+                                           FontSize="11" HorizontalAlignment="Left"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
+                                           Text="{Binding Settings.User, Mode=OneWay}"
+                                           ToolTipService.ToolTip="{Binding Settings.User, Mode=OneWay}"
+                                           Visibility="{Binding Settings.User, Converter={StaticResource StringToVisibilityConverter}, Mode=OneWay}"/>
+
                             
-                            <CommandBar x:Name="ActionsBar" Grid.Row="0" Margin="6 0 0 0" Grid.RowSpan="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Visibility="Collapsed">
+                                <TextBlock Margin="0 6 0 0"
+                                           FontWeight="Light" 
+                                           TextTrimming="CharacterEllipsis"
+                                           TextLineBounds="TrimToCapHeight"
+                                           FontSize="11" HorizontalAlignment="Left"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
+                                           Text="{Binding Settings.Size, Converter={StaticResource OpenAIImageSizeConverter}, Mode=OneWay}" />                                
+                            </StackPanel>
+
+                            
+                            <CommandBar x:Name="ActionsBar" Margin="6 0 0 0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Visibility="Collapsed">
                     
                                 <CommandBar.RenderTransform>
                                     <CompositeTransform/>
@@ -255,8 +287,7 @@
                                     <ResourceDictionary Source="ms-appx:///Styles/CommandBarMediumResources.xaml"/>
                                 </CommandBar.Resources>                               
                                 
-                                <AppBarButton x:Name="OpenChatInNewWindow"
-                                              Click="OnOpenChatInNewWindowClick">
+                                <AppBarButton x:Name="OpenChatInNewWindow">
                                     <ToolTipService.ToolTip>
                                         <ToolTip x:Uid="OpenChatInNewWindowToolTip" Content="Open chat in new window" />
                                     </ToolTipService.ToolTip>
@@ -274,8 +305,7 @@
                                     </AppBarButton.Icon>
                                     <AppBarButton.Flyout>
                                         <MenuFlyout Placement="BottomEdgeAlignedRight">
-                                           <MenuFlyoutItem x:Name="EditChat" x:Uid="EditMenu" Text="Edit"
-                                                           Click="OnEditChatClick">
+                                           <MenuFlyoutItem x:Name="Edit" x:Uid="EditMenu" Text="Edit">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon Glyph="&#xe70f;"/>
                                                 </MenuFlyoutItem.Icon>
@@ -283,8 +313,7 @@
             
                                             <MenuFlyoutSeparator/>
             
-                                            <MenuFlyoutItem x:Name="DeleteChat" x:Uid="DeleteMenu" Text="Delete"
-                                                            Click="OnDeleteChatClick">
+                                            <MenuFlyoutItem x:Name="Delete" x:Uid="DeleteMenu" Text="Delete">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon Glyph="&#xe74d;"/>
                                                 </MenuFlyoutItem.Icon>

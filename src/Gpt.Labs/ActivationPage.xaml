@@ -14,7 +14,7 @@
         <Border x:Name="WizartInfoStepContainer" VerticalAlignment="Center" HorizontalAlignment="Center" Visibility="Collapsed">
         </Border>
 
-        <UserControl Margin="24 88 24 24" x:Name="WizardFormContent" VerticalAlignment="Center" Grid.Row="0" Width="500" Visibility="Collapsed">
+        <UserControl Margin="24 88 24 24" x:Name="WizardFormContent" VerticalAlignment="Center" Grid.Row="0" Width="560" Visibility="Collapsed">
             <Border Padding="0 16" Style="{StaticResource PivotItemContainerBorderStyle}">
                 <Grid>
                     <Grid.RowDefinitions>

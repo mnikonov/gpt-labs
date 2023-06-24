@@ -112,7 +112,7 @@ namespace Gpt.Labs.Controls
         {
             await this.ParentViewViewModel.DeleteChats(this.ViewModel);
 
-            ParentPage.ClearBackState(this.ViewModel);
+            await ParentPage.ClearBackState(this.ViewModel);
         }
 
         #endregion

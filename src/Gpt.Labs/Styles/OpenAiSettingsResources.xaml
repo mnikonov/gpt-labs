@@ -184,7 +184,18 @@
                             <TextBlock x:Uid="UserDescription" Style="{StaticResource DescriptionStyle}">
                                 <Run x:Uid="UserDescription1"/><Hyperlink NavigateUri="https://platform.openai.com/docs/guides/safety-best-practices/end-user-ids"><Run x:Uid="UserDescription2"/></Hyperlink>
                             </TextBlock>
+                            
+                            
+                            <TextBlock x:Name="OpenAIOrganizationLabel" x:Uid="ChatOpenAIOrganizationLabel" Text="Organization ID" 
+                                       Style="{StaticResource LabelStyle}"/>
 
+                            <PasswordBox x:Name="OpenAIOrganizationTextBox" x:Uid="OpenAIOrganizationTextBox" MaxLength="50"
+                                         Password="{Binding ChatSettings.OpenAIOrganization, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                         PlaceholderText="Enter OpenAI organization ID..."></PasswordBox>
+         
+                            <TextBlock Style="{StaticResource DescriptionStyle}">
+                                <Run x:Uid="OpenAIOrganizationDescription4"/>
+                            </TextBlock>
 
 
                             <TextBlock x:Uid="StreamLabel" Text="Stream" Style="{StaticResource LabelStyle}" />
@@ -248,9 +259,21 @@
                                      Text="{Binding ChatSettings.User, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
                                      PlaceholderText="Enter user">
                             </TextBox>
-
+                                                        
                             <TextBlock x:Uid="UserDescription" Style="{StaticResource DescriptionStyle}">
                                 <Run x:Uid="UserDescription1"/><Hyperlink NavigateUri="https://platform.openai.com/docs/guides/safety-best-practices/end-user-ids"><Run x:Uid="UserDescription2"/></Hyperlink>
+                            </TextBlock>
+                            
+                            
+                            <TextBlock x:Name="OpenAIOrganizationLabel" x:Uid="ChatOpenAIOrganizationLabel" Text="Organization ID" 
+                                       Style="{StaticResource LabelStyle}"/>
+
+                            <PasswordBox x:Name="OpenAIOrganizationTextBox" x:Uid="OpenAIOrganizationTextBox" MaxLength="50"
+                                         Password="{Binding ChatSettings.OpenAIOrganization, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                         PlaceholderText="Enter OpenAI organization ID..."></PasswordBox>
+         
+                            <TextBlock Style="{StaticResource DescriptionStyle}">
+                                <Run x:Uid="OpenAIOrganizationDescription4"/>
                             </TextBlock>
 
                         </StackPanel>

@@ -178,6 +178,11 @@ namespace Gpt.Labs
 
         private void OnBasePageUnloaded(object sender, RoutedEventArgs e)
         {
+            if (this.Window == null)
+            {
+                return;
+            }
+
             var popups = VisualTreeHelper.GetOpenPopups(this.Window);
             foreach (var popup in popups)
             {

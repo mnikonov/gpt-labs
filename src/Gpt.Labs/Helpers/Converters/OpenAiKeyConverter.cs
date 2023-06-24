@@ -11,7 +11,7 @@ namespace Gpt.Labs.Helpers.Converters
 
             if (string.IsNullOrEmpty(val))
             {
-                return string.Empty;
+                return App.ResourceLoader.GetString("NotSpecified");
             }
 
             var keyParts = val.Split('-');

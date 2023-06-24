@@ -40,7 +40,7 @@ namespace Gpt.Labs.ViewModels
         { 
             get
             {
-                return !string.IsNullOrEmpty(ApplicationSettings.Instance.OpenAIOrganization) && !string.IsNullOrEmpty(ApplicationSettings.Instance.OpenAIApiKey);
+                return !string.IsNullOrEmpty(ApplicationSettings.Instance.OpenAIApiKey);
             } 
         }
 

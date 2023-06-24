@@ -9,7 +9,6 @@ using Gpt.Labs.Models.Attributes;
 using Gpt.Labs.Models.Base;
 using OpenAI.Models;
 using System.Collections.Generic;
-using Gpt.Labs.ViewModels.Enums;
 
 namespace Gpt.Labs.ViewModels
 {
