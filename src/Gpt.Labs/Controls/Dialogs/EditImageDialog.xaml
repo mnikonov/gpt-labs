@@ -23,6 +23,8 @@
             PlaceholderText="Enter title">
         </TextBox>
             
+         
+         
         <TextBlock x:Uid="SizeLabel" Style="{StaticResource LabelStyle}" Text="Size"/>
                 
         <ComboBox x:Name="SizeComboBox" HorizontalAlignment="Stretch"
@@ -34,6 +36,32 @@
 
         <TextBlock x:Uid="SizeMessageDescription" Style="{StaticResource DescriptionStyle}" />
 
+         
+        <TextBlock x:Uid="UserLabel" Style="{StaticResource LabelStyle}"
+                    Text="User"/>
+
+        <TextBox x:Name="UserTextBox" x:Uid="UserTextBox" MaxLength="250"
+                    Text="{x:Bind ViewModel.Settings.User, Mode=TwoWay}"
+                    PlaceholderText="Enter user">
+        </TextBox>
+
+        <TextBlock x:Uid="UserDescription" Style="{StaticResource DescriptionStyle}">
+            <Run x:Uid="UserDescription1"/><Hyperlink NavigateUri="https://platform.openai.com/docs/guides/safety-best-practices/end-user-ids"><Run x:Uid="UserDescription2"/></Hyperlink>
+        </TextBlock>
+         
+        
+        <TextBlock x:Name="OpenAIOrganizationLabel" x:Uid="ChatOpenAIOrganizationLabel" Text="Organization ID" 
+                   Style="{StaticResource LabelStyle}"/>
+
+        <PasswordBox x:Name="OpenAIOrganizationTextBox" x:Uid="OpenAIOrganizationTextBox" MaxLength="50"
+                     Password="{x:Bind ViewModel.Settings.OpenAIOrganization, Mode=TwoWay}"
+                     PlaceholderText="Enter OpenAI organization ID..."></PasswordBox>
+         
+        <TextBlock Style="{StaticResource DescriptionStyle}">
+            <Run x:Uid="OpenAIOrganizationDescription4"/>
+        </TextBlock>
+         
+         
         <StackPanel Margin="0 24 0 0" Grid.Row="1" >
             <controls:ErrorsListPanel
                 ViewModel="{x:Bind ViewModel.Errors, Mode=OneWay}"

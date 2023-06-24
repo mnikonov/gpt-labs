@@ -19,8 +19,8 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
     {
         #region Constructors
 
-        public ImageEndpointProcessor(OpenAIClient openAiClient, OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, DispatcherQueue dispatcher, Action cleanUserMessage) 
-            : base(openAiClient, chat, messagesCollection, dispatcher, cleanUserMessage)
+        public ImageEndpointProcessor(OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, DispatcherQueue dispatcher, Action cleanUserMessage) 
+            : base(chat, messagesCollection, dispatcher, cleanUserMessage)
         {
         }
 
@@ -36,7 +36,9 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
 
             var chatRequest = settings.ToImageGenerationRequest(userMessage);
 
-            var result = await openAiClient.ImagesEndPoint.GenerateImageAsync(chatRequest);
+            var client = new OpenAIClient(this.authentication);
+
+            var result = await client.ImagesEndPoint.GenerateImageAsync(chatRequest);
             await this.HandleChatResponseAsync(userMessage, result, responseMessages);
 
             await SaveChatMessagesAsync(responseMessages);

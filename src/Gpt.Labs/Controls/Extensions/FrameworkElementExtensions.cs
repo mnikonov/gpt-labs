@@ -21,7 +21,19 @@ namespace Gpt.Labs.Controls.Extensions
             {
                 RoutedEventHandler loaded = (s, e) =>
                     {
-                        action();
+                        try
+                        {
+                            action();
+
+                            if (!token.IsCancellationRequested)
+                            {
+                                tcs.SetResult(null);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            tcs.SetException(ex);
+                        }
                     };
 
                 try

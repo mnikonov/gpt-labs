@@ -142,7 +142,7 @@
     <value>Enter OpenAI secret key...</value>
   </data>
   <data name="OpenAIOrganizationLabel.Text" xml:space="preserve">
-    <value>Organization ID</value>
+    <value>Organization ID (optional)</value>
   </data>
   <data name="OpenAIOrganizationTextBox.PlaceholderText" xml:space="preserve">
     <value>Enter OpenAI organization ID...</value>
@@ -511,7 +511,7 @@ Accepts a json object that maps tokens (specified by their token ID in the token
     <value>Edit</value>
   </data>
   <data name="SelectAllToolTip.Content" xml:space="preserve">
-    <value>Select all</value>
+    <value>Select all (Crtl+A)</value>
   </data>
   <data name="ImageCaption" xml:space="preserve">
     <value>Image</value>
@@ -540,26 +540,8 @@ Accepts a json object that maps tokens (specified by their token ID in the token
   <data name="OpenAIApiKeyDescription3.Text" xml:space="preserve">
     <value> page</value>
   </data>
-  <data name="OpenAIOrganizationDescription1.Text" xml:space="preserve">
-    <value>Get your Organization ID from </value>
-  </data>
-  <data name="OpenAIOrganizationDescription2.Text" xml:space="preserve">
-    <value>Organization settings</value>
-  </data>
-  <data name="OpenAIOrganizationDescription3.Text" xml:space="preserve">
-    <value> page</value>
-  </data>
   <data name="AboutCaption.Title" xml:space="preserve">
     <value>About</value>
-  </data>
-  <data name="AboutDescription1.Text" xml:space="preserve">
-    <value>For detailed information about the project, please visit our </value>
-  </data>
-  <data name="AboutDescription2.Text" xml:space="preserve">
-    <value>GitHub repository</value>
-  </data>
-  <data name="AboutDescription3.Text" xml:space="preserve">
-    <value>. GPT Labs is open source, and we welcome contributions from the community.</value>
   </data>
   <data name="BecomeLabel.Text" xml:space="preserve">
     <value>Become</value>
@@ -588,5 +570,35 @@ We understand the significance of community contributions, and we highly appreci
   </data>
   <data name="OpenChatInNewWindowToolTip.Content" xml:space="preserve">
     <value>Open chat in new window (Ctrl+W)</value>
+  </data>
+  <data name="AboutDescription1.Text" xml:space="preserve">
+    <value>For detailed information about the project, please visit our </value>
+  </data>
+  <data name="AboutDescription2.Text" xml:space="preserve">
+    <value>GitHub repository</value>
+  </data>
+  <data name="AboutDescription3.Text" xml:space="preserve">
+    <value>. GPT Labs is open source, and we welcome contributions from the community.</value>
+  </data>
+  <data name="AboutDescription4.Text" xml:space="preserve">
+    <value>is an open source application that utilizes powerful content generative API from </value>
+  </data>
+  <data name="NotSpecified" xml:space="preserve">
+    <value>Not specified...</value>
+  </data>
+  <data name="ChatOpenAIOrganizationLabel.Text" xml:space="preserve">
+    <value>Organization ID</value>
+  </data>
+  <data name="OpenAIOrganizationDescription1.Text" xml:space="preserve">
+    <value>Get your Organization ID from </value>
+  </data>
+  <data name="OpenAIOrganizationDescription2.Text" xml:space="preserve">
+    <value>Organization settings</value>
+  </data>
+  <data name="OpenAIOrganizationDescription3.Text" xml:space="preserve">
+    <value> page. </value>
+  </data>
+  <data name="OpenAIOrganizationDescription4.Text" xml:space="preserve">
+    <value>For users who belong to organization, you can pass a Organization ID to specify which organization is used for an API request. Usage from these API requests will count against the specified organization subscription quota.</value>
   </data>
 </root>

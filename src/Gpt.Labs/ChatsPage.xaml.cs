@@ -1,3 +1,4 @@
+using Gpt.Labs.Controls.Extensions;
 using Gpt.Labs.Helpers;
 using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Helpers.Navigation;
@@ -12,6 +13,7 @@ using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Gpt.Labs
 {
@@ -54,7 +56,7 @@ namespace Gpt.Labs
 
         #region Public Methods
 
-        public override void LoadState(
+        public override async Task LoadState(
             Type destinationPageType,
             Query parameters,
             ViewModelState state,
@@ -62,9 +64,9 @@ namespace Gpt.Labs
         {
             this.frameUid = parameters.GetValue<Guid>("frame-uid");
 
-            this.RegisterFrame();
+            await this.RegisterFrame();
             
-            base.LoadState(destinationPageType, parameters, state, mode);
+            await base.LoadState(destinationPageType, parameters, state, mode);
 
             ViewModel.Function = async token =>
             {
@@ -96,7 +98,7 @@ namespace Gpt.Labs
             return this.chatFrame;
         }
 
-        public void ClearBackState(params OpenAIChat[] chats)
+        public async Task ClearBackState(params OpenAIChat[] chats)
         {
             if (this.ViewModel.Result.MultiSelectModeEnabled && this.ViewModel.Result.ItemsCollection.Count == 0)
             {
@@ -165,7 +167,7 @@ namespace Gpt.Labs
                 }
                 else
                 {
-                    this.RegisterFrame();
+                    await this.RegisterFrame();
                 }
             }
 
@@ -268,10 +270,10 @@ namespace Gpt.Labs
             var chats = this.ChatList.SelectedItems.OfType<OpenAIChat>().ToArray();
             await this.ViewModel.Result.DeleteChats(chats);
 
-            ClearBackState(chats);
+            await ClearBackState(chats);
         }
 
-        private void RegisterFrame()
+        private async Task RegisterFrame()
         {
             if (this.chatFrame != null)
             {
@@ -284,7 +286,10 @@ namespace Gpt.Labs
             Grid.SetColumn(this.chatFrame, 1);
             this.RootGrid.Children.Add(this.chatFrame);
 
-            this.RootPage?.SuspensionManager?.RegisterFrame(this.chatFrame, $"ChatFrameState_{this.frameUid}");
+            await this.chatFrame.ExecuteOnLoaded(() =>
+            {              
+                this.RootPage?.SuspensionManager?.RegisterFrame(this.chatFrame, $"ChatFrameState_{this.frameUid}");
+            });
         }
 
         #endregion

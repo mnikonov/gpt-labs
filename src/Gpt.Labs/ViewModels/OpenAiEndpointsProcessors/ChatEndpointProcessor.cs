@@ -16,8 +16,8 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
     {
         #region Constructors
 
-        public ChatEndpointProcessor(OpenAIClient openAiClient, OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, DispatcherQueue dispatcher, Action cleanUserMessage) 
-            : base(openAiClient, chat, messagesCollection, dispatcher, cleanUserMessage)
+        public ChatEndpointProcessor(OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, DispatcherQueue dispatcher, Action cleanUserMessage) 
+            : base(chat, messagesCollection, dispatcher, cleanUserMessage)
         {
         }
 
@@ -34,16 +34,18 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
 
             var chatRequest = settings.ToChatRequest(this.messagesCollection, userMessage);
 
+            var client = new OpenAIClient(this.authentication);
+
             if (settings.Stream)
             {
-                await foreach (var result in openAiClient.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest))
+                await foreach (var result in client.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest))
                 {
                     userMessageInitialized = await this.HandleChatResponseAsync(userMessage, result, responseMessages, userMessageInitialized);
                 }
             }
             else
             {
-                var result = await openAiClient.ChatEndpoint.GetCompletionAsync(chatRequest);
+                var result = await client.ChatEndpoint.GetCompletionAsync(chatRequest);
                 await this.HandleChatResponseAsync(userMessage, result, responseMessages, userMessageInitialized);
             }
 

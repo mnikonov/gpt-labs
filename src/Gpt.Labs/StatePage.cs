@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml;
 using System;
 using Gpt.Labs.Helpers;
 using Gpt.Labs.Controls.Extensions;
+using System.Threading.Tasks;
 
 namespace Gpt.Labs
 {
@@ -54,12 +55,13 @@ namespace Gpt.Labs
             return null;
         }
 
-        public virtual void LoadState(
+        public virtual Task LoadState(
             Type destinationPageType,
             Query parameters,
             ViewModelState state,
             NavigationMode mode)
         {
+            return Task.CompletedTask;  
         }
 
         public virtual void SaveState(
@@ -74,11 +76,11 @@ namespace Gpt.Labs
 
         #region Protected Methods
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        protected override async void OnNavigatedTo(NavigationEventArgs e)
         {            
             base.OnNavigatedTo(e);
 
-            this.NavigationHelper.OnNavigatedTo(e);
+            await this.NavigationHelper.OnNavigatedTo(e);
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)

@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
 using Windows.Storage.Streams;
-using OpenAI;
 using OpenAI.Audio;
 using System.IO;
 using System.Threading;
@@ -30,7 +29,7 @@ using Windows.Storage;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
-using Microsoft.UI.Xaml;
+using OpenAI;
 
 namespace Gpt.Labs.ViewModels
 {
@@ -45,8 +44,6 @@ namespace Gpt.Labs.ViewModels
         private bool disposed;
 
         private Stopwatch watch = new Stopwatch();
-
-        private OpenAIClient openAiClient;
 
         private OpenAIChat chat;
 
@@ -73,7 +70,6 @@ namespace Gpt.Labs.ViewModels
         public MessagesListViewModel(Func<BasePage> getBasePage)
             : base(getBasePage)
         {
-            this.openAiClient = new OpenAIClient(new OpenAIAuthentication(ApplicationSettings.Instance.OpenAIApiKey, ApplicationSettings.Instance.OpenAIOrganization ));
             this.mediaCapture = new MediaCapture();       
         }
 
@@ -144,10 +140,10 @@ namespace Gpt.Labs.ViewModels
             switch (this.Chat.Type)
             {
                 case OpenAIChatType.Chat:
-                    this.messageProcessor = new ChatEndpointProcessor(this.openAiClient, this.Chat, this.ItemsCollection, this.DispatcherQueue, () => { this.Message = string.Empty; });
+                    this.messageProcessor = new ChatEndpointProcessor(this.Chat, this.ItemsCollection, this.DispatcherQueue, () => { this.Message = string.Empty; });
                     break;
                 case OpenAIChatType.Image:
-                    this.messageProcessor = new ImageEndpointProcessor(this.openAiClient, this.Chat, this.ItemsCollection, this.DispatcherQueue, () => { this.Message = string.Empty; });
+                    this.messageProcessor = new ImageEndpointProcessor(this.Chat, this.ItemsCollection, this.DispatcherQueue, () => { this.Message = string.Empty; });
                     break;
             }
 
@@ -275,7 +271,7 @@ namespace Gpt.Labs.ViewModels
 
             try
             {
-                var imageVariationProcessor = new ImageVariationEndpointProcessor(this.openAiClient, this.Chat, this.ItemsCollection, this.DispatcherQueue, () => { this.Message = string.Empty; });
+                var imageVariationProcessor = new ImageVariationEndpointProcessor(this.Chat, this.ItemsCollection, this.DispatcherQueue, () => { this.Message = string.Empty; });
                 await imageVariationProcessor.ProcessAsync(file);
             }
             catch (HttpRequestException ex)
@@ -582,8 +578,9 @@ namespace Gpt.Labs.ViewModels
                 {
                     this.mediaMemoryBuffer.Seek(0);
 
+                    var client = new OpenAIClient(new OpenAIAuthentication(ApplicationSettings.Instance.OpenAIApiKey, !string.IsNullOrEmpty(this.chat.Settings.OpenAIOrganization) ? this.chat.Settings.OpenAIOrganization : ApplicationSettings.Instance.OpenAIOrganization ));
                     var request = new AudioTranscriptionRequest(this.mediaMemoryBuffer.AsStream(), "voice.mp3");
-                    var result = await openAiClient.AudioEndpoint.CreateTranscriptionAsync(request);
+                    var result = await client.AudioEndpoint.CreateTranscriptionAsync(request);
                                 
                     this.Message = result;
                 }

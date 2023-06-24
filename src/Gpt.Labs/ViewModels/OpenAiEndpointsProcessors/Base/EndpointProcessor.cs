@@ -14,13 +14,13 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base
     {
         #region Fields
 
-        protected OpenAIClient openAiClient;
-
         protected OpenAIChat chat;
 
         protected ObservableList<OpenAIMessage, Guid> messagesCollection;
 
         protected DispatcherQueue dispatcher;
+
+        protected OpenAIAuthentication authentication;
 
         private Action cleanUserMessage;
 
@@ -28,13 +28,14 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base
 
         #region Constructors
 
-        public EndpointProcessor(OpenAIClient openAiClient, OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, DispatcherQueue dispatcher, Action cleanUserMessage) 
+        public EndpointProcessor(OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, DispatcherQueue dispatcher, Action cleanUserMessage) 
         { 
-            this.openAiClient = openAiClient; 
             this.chat = chat;
             this.messagesCollection = messagesCollection;
             this.cleanUserMessage = cleanUserMessage;
             this.dispatcher = dispatcher;
+
+            this.authentication = new OpenAIAuthentication(ApplicationSettings.Instance.OpenAIApiKey, !string.IsNullOrEmpty(this.chat.Settings.OpenAIOrganization) ? this.chat.Settings.OpenAIOrganization : ApplicationSettings.Instance.OpenAIOrganization );
         }
 
         #endregion

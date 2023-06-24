@@ -68,6 +68,9 @@ namespace Gpt.Labs.ViewModels
                     break;
             }
 
+            settings.User = chat?.Settings.User;
+            settings.OpenAIOrganization = chat?.Settings.OpenAIOrganization;
+
             dialogModel.Settings = settings;
 
             ContentDialogBase dialog = null;
@@ -91,6 +94,8 @@ namespace Gpt.Labs.ViewModels
                 if (chat != null)
                 {
                     chat.Title = dialogModel.Title;
+                    chat.Settings.User = settings.User;
+                    chat.Settings.OpenAIOrganization = settings.OpenAIOrganization;
 
                     switch (ChatType)
                     {

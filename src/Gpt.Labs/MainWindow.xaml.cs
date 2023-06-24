@@ -42,6 +42,8 @@ namespace Gpt.Labs
         {
             this.Closed -= OnMainWindowClosed;
             this.uISettings.ColorValuesChanged -= OnUISettingsColorValuesChanged;
+
+            WindowManager.UnregisterWindow(this.WindowId);
         }
 
         private void OnUISettingsColorValuesChanged(UISettings sender, object args)
