@@ -4,19 +4,13 @@
     xmlns:controls="using:Gpt.Labs.Controls"
     xmlns:toolkit="using:CommunityToolkit.WinUI.UI.Controls">
 
-    <Style x:Key="UserMessageStyle" TargetType="controls:OpenAiMessageControl">
+    <Style x:Key="ChatStyle" TargetType="controls:OpenAiChatControl">
         <Style.Setters>
-            <Setter Property="Background" Value="{StaticResource ChatUserMessageBrush}" />
-            <Setter Property="BorderBrush" Value="{ThemeResource PanelBordersBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="18 4" />
-            <Setter Property="Margin" Value="0" />
-            <Setter Property="HorizontalAlignment" Value="Right" />
-            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="18 12" />
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="controls:OpenAiMessageControl">
-                        <Grid x:Name="RootGrid" Background="Transparent">
+                    <ControlTemplate TargetType="controls:OpenAiChatControl">
+                        <Grid x:Name="RootGrid" Background="Transparent" Padding="{TemplateBinding Padding}">
                             
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroup x:Name="CommonStates">
@@ -73,26 +67,57 @@
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
                             
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="66"/>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-
-                            <CommandBar x:Name="ActionsBar" Grid.Column="0" Margin="0 2 6 0" Visibility="Collapsed">
+                               
+                
+                            <TextBlock Grid.Row="0" Grid.Column="0" FontSize="14"  
+                                       TextTrimming="CharacterEllipsis" FontWeight="Bold"
+                                       TextLineBounds="TrimToCapHeight"
+                                       Text="{Binding Title, Mode=OneWay}"
+                                       ToolTipService.ToolTip="{Binding Title, Mode=OneWay}"/>
+                
+                            <TextBlock Grid.Row="1" Grid.Column="0" Margin="0 6 0 0"
+                                       FontWeight="Normal" FontSize="12"  
+                                       TextTrimming="CharacterEllipsis"
+                                       TextLineBounds="TrimToCapHeight"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                       Text="{Binding Settings.SystemMessage, Mode=OneWay}"
+                                       ToolTipService.ToolTip="{Binding Settings.SystemMessage, Mode=OneWay}"/>
+                
+                            <TextBlock Grid.Row="2" Grid.Column="0" Margin="0 6 0 0"
+                                       FontWeight="Light" 
+                                       TextTrimming="CharacterEllipsis"
+                                       TextLineBounds="TrimToCapHeight"
+                                       FontSize="11" HorizontalAlignment="Left"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
+                                       Text="{Binding Settings.ModelId, Mode=OneWay}" />
+                
+                            <CommandBar x:Name="ActionsBar" Grid.Row="0" Margin="6 0 0 0" Grid.RowSpan="3" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Visibility="Collapsed">
+                    
                                 <CommandBar.RenderTransform>
                                     <CompositeTransform/>
                                 </CommandBar.RenderTransform>
-                                
+                    
                                 <CommandBar.Resources>
                                     <ResourceDictionary Source="ms-appx:///Styles/CommandBarMediumResources.xaml"/>
                                 </CommandBar.Resources>                               
                                 
-                                <AppBarButton x:Name="Copy" Label="Copy">
+                                <AppBarButton x:Name="OpenChatInNewWindow"
+                                              Click="OnOpenChatInNewWindowClick">
                                     <ToolTipService.ToolTip>
-                                        <ToolTip x:Uid="CopyToolTip" Content="Copy" />
+                                        <ToolTip x:Uid="OpenChatInNewWindowToolTip" Content="Open chat in new window" />
                                     </ToolTipService.ToolTip>
                                     <AppBarButton.Icon>
-                                        <FontIcon Glyph="&#xe8c8;"/>
+                                        <FontIcon Glyph="&#xe78b;"/>
                                     </AppBarButton.Icon>
                                 </AppBarButton>
                                 
@@ -105,15 +130,17 @@
                                     </AppBarButton.Icon>
                                     <AppBarButton.Flyout>
                                         <MenuFlyout Placement="BottomEdgeAlignedRight">
-                                            <MenuFlyoutItem x:Name="Share" x:Uid="ShareMenu" Text="Share">
+                                           <MenuFlyoutItem x:Name="Edit" x:Uid="EditMenu" Text="Edit"
+                                                           Click="OnEditChatClick">
                                                 <MenuFlyoutItem.Icon>
-                                                    <FontIcon Glyph="&#xe72d;"/>
+                                                    <FontIcon Glyph="&#xe70f;"/>
                                                 </MenuFlyoutItem.Icon>
                                             </MenuFlyoutItem>
-                                            
-                                            <MenuFlyoutSeparator />
-                                            
-                                            <MenuFlyoutItem x:Name="Delete" x:Uid="DeleteMenu" Text="Delete">
+            
+                                            <MenuFlyoutSeparator/>
+            
+                                            <MenuFlyoutItem x:Name="Delete" x:Uid="DeleteMenu" Text="Delete"
+                                                            Click="OnDeleteChatClick">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon Glyph="&#xe74d;"/>
                                                 </MenuFlyoutItem.Icon>
@@ -122,19 +149,6 @@
                                     </AppBarButton.Flyout>
                                 </AppBarButton>
                             </CommandBar>
-                            
-                            <Border Grid.Column="1"
-                                    Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    Padding="{TemplateBinding Padding}"
-                                    CornerRadius="{TemplateBinding CornerRadius}">
-                                <toolkit:MarkdownTextBlock x:Name="MessageTextBlock" Grid.Column="0"
-                                    Background="Transparent"
-                                    Text="{Binding Content, Mode=OneWay}"
-                                    LinkForeground="{ThemeResource MarkdownLinkForeground}">
-                                </toolkit:MarkdownTextBlock> 
-                            </Border>
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>
@@ -142,20 +156,13 @@
         </Style.Setters>
     </Style>
     
-    
-    <Style x:Key="AssistantMessageStyle" TargetType="controls:OpenAiMessageControl">
+     <Style x:Key="ImageChatStyle" TargetType="controls:OpenAiChatControl">
         <Style.Setters>
-            <Setter Property="Background" Value="{ThemeResource AssistantMessageBackgroundBrush}" />
-            <Setter Property="BorderBrush" Value="{ThemeResource PanelBordersBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="18 4" />
-            <Setter Property="Margin" Value="0" />
-            <Setter Property="HorizontalAlignment" Value="Left" />
-            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Padding" Value="18 12" />
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="controls:OpenAiMessageControl">
-                        <Grid x:Name="RootGrid" Background="Transparent">
+                    <ControlTemplate TargetType="controls:OpenAiChatControl">
+                        <Grid x:Name="RootGrid" Background="Transparent" Padding="{TemplateBinding Padding}">
                             
                             <VisualStateManager.VisualStateGroups>
                                 <VisualStateGroup x:Name="CommonStates">
@@ -167,7 +174,7 @@
                                             </DoubleAnimationUsingKeyFrames>
                                             <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" Storyboard.TargetName="ActionsBar">
                                                 <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
-                                                <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="-60"/>
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="60"/>
                                             </DoubleAnimationUsingKeyFrames>
                                             <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="ActionsBar">
                                                 <DiscreteObjectKeyFrame KeyTime="0">
@@ -192,7 +199,7 @@
                                                 <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="1"/>
                                             </DoubleAnimationUsingKeyFrames>
                                             <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" Storyboard.TargetName="ActionsBar">
-                                                <EasingDoubleKeyFrame KeyTime="0" Value="-60"/>
+                                                <EasingDoubleKeyFrame KeyTime="0" Value="60"/>
                                                 <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="0"/>
                                             </DoubleAnimationUsingKeyFrames>
                                             <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="ActionsBar">
@@ -212,39 +219,49 @@
                                 </VisualStateGroup>
                             </VisualStateManager.VisualStateGroups>
                             
+                             <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="66"/>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
-                                                        
-                            <Border Grid.Column="0"
-                                    Background="{TemplateBinding Background}"
-                                    BorderBrush="{TemplateBinding BorderBrush}"
-                                    BorderThickness="{TemplateBinding BorderThickness}"
-                                    Padding="{TemplateBinding Padding}"
-                                    CornerRadius="{TemplateBinding CornerRadius}">
-                                <toolkit:MarkdownTextBlock x:Name="MessageTextBlock" Grid.Column="0"
-                                    Background="Transparent"
-                                    Text="{Binding Content, Mode=OneWay}"
-                                    LinkForeground="{ThemeResource MarkdownLinkForeground}">
-                                </toolkit:MarkdownTextBlock> 
-                            </Border>
-                           
-                            <CommandBar x:Name="ActionsBar" Grid.Column="1" Margin="6 2 0 0" Visibility="Collapsed">
+                               
+                
+                            <TextBlock Grid.Row="0" Grid.Column="0" FontSize="14"  
+                                       TextTrimming="CharacterEllipsis" FontWeight="Bold"
+                                       TextLineBounds="TrimToCapHeight"
+                                       Text="{Binding Title, Mode=OneWay}"
+                                       ToolTipService.ToolTip="{Binding Title, Mode=OneWay}"/>
+                
+                
+                            <TextBlock Grid.Row="1" Grid.Column="0" Margin="0 6 0 0"
+                                       FontWeight="Light" 
+                                       TextTrimming="CharacterEllipsis"
+                                       TextLineBounds="TrimToCapHeight"
+                                       FontSize="11" HorizontalAlignment="Left"
+                                       Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
+                                       Text="{Binding Settings.Size, Converter={StaticResource OpenAIImageSizeConverter}, Mode=OneWay}" />
+                            
+                            <CommandBar x:Name="ActionsBar" Grid.Row="0" Margin="6 0 0 0" Grid.RowSpan="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Visibility="Collapsed">
+                    
                                 <CommandBar.RenderTransform>
                                     <CompositeTransform/>
                                 </CommandBar.RenderTransform>
-                                
+                    
                                 <CommandBar.Resources>
                                     <ResourceDictionary Source="ms-appx:///Styles/CommandBarMediumResources.xaml"/>
-                                </CommandBar.Resources>
+                                </CommandBar.Resources>                               
                                 
-                                <AppBarButton x:Name="Copy" Label="Copy">
+                                <AppBarButton x:Name="OpenChatInNewWindow"
+                                              Click="OnOpenChatInNewWindowClick">
                                     <ToolTipService.ToolTip>
-                                        <ToolTip x:Uid="CopyToolTip" Content="Copy" />
+                                        <ToolTip x:Uid="OpenChatInNewWindowToolTip" Content="Open chat in new window" />
                                     </ToolTipService.ToolTip>
                                     <AppBarButton.Icon>
-                                        <FontIcon Glyph="&#xe8c8;"/>
+                                        <FontIcon Glyph="&#xe78b;"/>
                                     </AppBarButton.Icon>
                                 </AppBarButton>
                                 
@@ -257,15 +274,17 @@
                                     </AppBarButton.Icon>
                                     <AppBarButton.Flyout>
                                         <MenuFlyout Placement="BottomEdgeAlignedRight">
-                                            <MenuFlyoutItem x:Name="Share" x:Uid="ShareMenu" Text="Share">
+                                           <MenuFlyoutItem x:Name="EditChat" x:Uid="EditMenu" Text="Edit"
+                                                           Click="OnEditChatClick">
                                                 <MenuFlyoutItem.Icon>
-                                                    <FontIcon Glyph="&#xe72d;"/>
+                                                    <FontIcon Glyph="&#xe70f;"/>
                                                 </MenuFlyoutItem.Icon>
                                             </MenuFlyoutItem>
-                                            
-                                            <MenuFlyoutSeparator />
-                                            
-                                            <MenuFlyoutItem x:Name="Delete" x:Uid="DeleteMenu" Text="Delete">
+            
+                                            <MenuFlyoutSeparator/>
+            
+                                            <MenuFlyoutItem x:Name="DeleteChat" x:Uid="DeleteMenu" Text="Delete"
+                                                            Click="OnDeleteChatClick">
                                                 <MenuFlyoutItem.Icon>
                                                     <FontIcon Glyph="&#xe74d;"/>
                                                 </MenuFlyoutItem.Icon>
@@ -274,7 +293,6 @@
                                     </AppBarButton.Flyout>
                                 </AppBarButton>
                             </CommandBar>
-                            
                         </Grid>
                     </ControlTemplate>
                 </Setter.Value>

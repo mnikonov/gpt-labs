@@ -38,6 +38,7 @@
     <None Remove="splash.png" />
     <None Remove="Styles\AppResources.xaml" />
     <None Remove="Styles\Colors.xaml" />
+    <None Remove="Styles\OpenAiChatResources.xaml" />
     <None Remove="Styles\OpenAiSettingsResources.xaml" />
     <None Remove="Styles\PageHeaderResources.xaml" />
     <None Remove="Styles\TitledContentPanelResources.xaml" />
@@ -123,6 +124,9 @@
   <ItemGroup>
     <Page Update="Controls\OpenAiSettingsPanel.xaml">
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Styles\OpenAiChatResources.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
     </Page>
   </ItemGroup>
   <ItemGroup>

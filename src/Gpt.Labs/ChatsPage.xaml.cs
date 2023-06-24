@@ -96,130 +96,7 @@ namespace Gpt.Labs
             return this.chatFrame;
         }
 
-        #endregion
-
-        #region Private Methods
-
-        private async void OnAddChatClick(object sender, RoutedEventArgs e)
-        {
-            await this.ViewModel.Result.AddEditChat(null);
-        }
-
-        private void OnRootChatGridRightTapped(object sender, RightTappedRoutedEventArgs e)
-        {
-            var element = (FrameworkElement)sender;
-
-            foreach (FrameworkElement item in element.GetDescendantsOfType<MenuFlyoutItem>())
-            {
-                item.DataContext = element.DataContext;
-            }           
-
-            this.ChatActionsMenu.ShowAt(element, e.GetPosition(element));
-        }
-
-        private async void OnEditChatClick(object sender, RoutedEventArgs e)
-        {
-            var chat = (OpenAIChat)((FrameworkElement)sender).DataContext;
-            var result = await this.ViewModel.Result.AddEditChat((OpenAIChat)((FrameworkElement)sender).DataContext);
-
-            if (result && this.ViewModel.Result.SelectedElement != null && chat.Id == this.ViewModel.Result.SelectedElement.Id)
-            {
-                ((MessagesPage)this.chatFrame.Content).ViewModel.Result.Chat = this.ViewModel.Result.SelectedElement;
-            }
-        }
-                
-        private void OnChatListItemClick(object sender, ItemClickEventArgs e)
-        {
-            var chat = (OpenAIChat)e.ClickedItem;
-
-            if (this.ViewModel.Result.SelectedElement?.Id != chat?.Id)
-            {
-                this.ViewModel.Result.SelectChat(chat);
-
-                var query = new Query
-                {
-                    { "chat-id", chat.Id }
-                };
-
-                this.chatFrame.Navigate(typeof(MessagesPage), query.ToString(), new EntranceNavigationTransitionInfo());
-            }
-        }
-
-        private async void OnChatListDragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
-        {
-            var chat = args.Items.OfType<OpenAIChat>().FirstOrDefault();
-
-            if (chat != null)
-            {
-                await this.ViewModel.Result.UpdateChatPosition(chat);
-            }
-        }
-
-        private void OnSelectMultiClick(object sender, RoutedEventArgs e)
-        {
-            this.ViewModel.Result.MultiSelectModeEnabled = !this.ViewModel.Result.MultiSelectModeEnabled;
-
-            if (!this.ViewModel.Result.MultiSelectModeEnabled)
-            {
-                this.Bindings.Update();
-            }
-            else
-            {
-                this.SelectAll.IsChecked = false;
-                this.DeleteMulti.IsEnabled = false;
-            }
-        }
-
-        private void OnSelectAllClick(object sender, RoutedEventArgs e)
-        {
-            if (this.SelectAll.IsChecked == true)
-            {
-                this.ChatList.SelectedItems.Clear();
-
-                foreach (var item in this.ViewModel.Result.ItemsCollection)
-                {
-                    this.ChatList.SelectedItems.Add(item);
-                }
-            }
-            else
-            {
-                this.ChatList.SelectedItems.Clear();
-            }
-        }
-
-        private void OnChatListSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (this.ViewModel.Result.MultiSelectModeEnabled)
-            {
-                this.DeleteMulti.IsEnabled = this.ChatList.SelectedItems.Count > 0;
-                this.SelectAll.IsChecked = this.ChatList.SelectedItems.Count > 0 && this.ChatList.SelectedItems.Count == this.ViewModel.Result.ItemsCollection.Count;
-            }
-        }
-
-        private async void OnDeleteChatClick(object sender, RoutedEventArgs e)
-        {
-            var chat = (OpenAIChat)((FrameworkElement)sender).DataContext;
-            await this.ViewModel.Result.DeleteChats(chat);
-
-            ClearBackState(chat);
-        }
-
-        private async void OnDeleteMultiClick(object sender, RoutedEventArgs e)
-        {
-            var chats = this.ChatList.SelectedItems.OfType<OpenAIChat>().ToArray();
-            await this.ViewModel.Result.DeleteChats(chats);
-
-            ClearBackState(chats);
-        }
-
-        private async void OnOpenChatInNewWindowClick(object sender, RoutedEventArgs e)
-        {
-            var chat = (OpenAIChat)((FrameworkElement)sender).DataContext;
-            
-            await chat.OpenChatInNewWindows();
-        }
-
-        private void ClearBackState(params OpenAIChat[] chats)
+        public void ClearBackState(params OpenAIChat[] chats)
         {
             if (this.ViewModel.Result.MultiSelectModeEnabled && this.ViewModel.Result.ItemsCollection.Count == 0)
             {
@@ -307,6 +184,91 @@ namespace Gpt.Labs
             }
 
             this.RootPage?.UpdateBackState();
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private async void OnAddChatClick(object sender, RoutedEventArgs e)
+        {
+            await this.ViewModel.Result.AddEditChat(null);
+        }
+                
+        private void OnChatListItemClick(object sender, ItemClickEventArgs e)
+        {
+            var chat = (OpenAIChat)e.ClickedItem;
+
+            if (this.ViewModel.Result.SelectedElement?.Id != chat?.Id)
+            {
+                this.ViewModel.Result.SelectChat(chat);
+
+                var query = new Query
+                {
+                    { "chat-id", chat.Id }
+                };
+
+                this.chatFrame.Navigate(typeof(MessagesPage), query.ToString(), new EntranceNavigationTransitionInfo());
+            }
+        }
+
+        private async void OnChatListDragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+        {
+            var chat = args.Items.OfType<OpenAIChat>().FirstOrDefault();
+
+            if (chat != null)
+            {
+                await this.ViewModel.Result.UpdateChatPosition(chat);
+            }
+        }
+
+        private void OnSelectMultiClick(object sender, RoutedEventArgs e)
+        {
+            this.ViewModel.Result.MultiSelectModeEnabled = !this.ViewModel.Result.MultiSelectModeEnabled;
+
+            if (!this.ViewModel.Result.MultiSelectModeEnabled)
+            {
+                this.Bindings.Update();
+            }
+            else
+            {
+                this.SelectAll.IsChecked = false;
+                this.DeleteMulti.IsEnabled = false;
+            }
+        }
+
+        private void OnSelectAllClick(object sender, RoutedEventArgs e)
+        {
+            if (this.SelectAll.IsChecked == true)
+            {
+                this.ChatList.SelectedItems.Clear();
+
+                foreach (var item in this.ViewModel.Result.ItemsCollection)
+                {
+                    this.ChatList.SelectedItems.Add(item);
+                }
+            }
+            else
+            {
+                this.ChatList.SelectedItems.Clear();
+            }
+        }
+
+        private void OnChatListSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (this.ViewModel.Result.MultiSelectModeEnabled)
+            {
+                this.DeleteMulti.IsEnabled = this.ChatList.SelectedItems.Count > 0;
+                this.SelectAll.IsChecked = this.ChatList.SelectedItems.Count > 0 && this.ChatList.SelectedItems.Count == this.ViewModel.Result.ItemsCollection.Count;
+            }
+        }
+
+        private async void OnDeleteMultiClick(object sender, RoutedEventArgs e)
+        {
+            var chats = this.ChatList.SelectedItems.OfType<OpenAIChat>().ToArray();
+            await this.ViewModel.Result.DeleteChats(chats);
+
+            ClearBackState(chats);
         }
 
         private void RegisterFrame()

@@ -7,6 +7,7 @@ using System;
 using Windows.System;
 using Microsoft.UI.Xaml.Input;
 using Gpt.Labs.Helpers;
+using Gpt.Labs.ViewModels;
 
 namespace Gpt.Labs.Controls
 {
@@ -32,6 +33,14 @@ namespace Gpt.Labs.Controls
         {
             this.DefaultStyleKey = typeof(OpenAiMessageControl);
         }
+
+        #endregion
+
+        #region Properties
+
+        private MessagesListViewModel ParentViewViewModel => this.GetParent<MessagesControl>()?.ViewModel;
+
+        private OpenAIMessage ViewModel => this.DataContext as OpenAIMessage;
 
         #endregion
 
@@ -87,27 +96,29 @@ namespace Gpt.Labs.Controls
 
         private void OnRootGridPointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            VisualStateManager.GoToState(this, "PointerOver", false);
+            this.ParentViewViewModel.HoveredElement = this.ViewModel;
+            VisualStateManager.GoToState(this, "PointerEntered", true);
         }
 
         private void OnRootGridPointerExited(object sender, PointerRoutedEventArgs e)
         {
-            VisualStateManager.GoToState(this, "Normal", false);
+            this.ParentViewViewModel.HoveredElement = null;
+            VisualStateManager.GoToState(this, "PointerExited", true);
         }
 
         private async void OnCopyButtonClick(object sender, RoutedEventArgs e)
         {
-            await this.GetParent<MessagesControl>().ViewModel.CopyMessages((OpenAIMessage)this.DataContext);
+            await this.ParentViewViewModel.CopyMessages(this.ViewModel);
         }
 
         private void OnShareButtonClick(object sender, RoutedEventArgs e)
         {
-            this.GetParent<MessagesControl>().ViewModel.ShareMessages((OpenAIMessage)this.DataContext);
+            this.ParentViewViewModel.ShareMessages(this.ViewModel);
         }
 
         private async void OnDeleteButtonClick(object sender, RoutedEventArgs e)
         {
-            await this.GetParent<MessagesControl>().ViewModel.DeleteMessages((OpenAIMessage)this.DataContext);
+            await this.ParentViewViewModel.DeleteMessages(this.ViewModel);
         }
 
         private async void OnMarkdownTextBlockLinkClicked(object sender, LinkClickedEventArgs e)

@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace Gpt.Labs.Models
 {
-    public class OpenAIChat : TitledEntity, ISelectable
+    public class OpenAIChat : TitledEntity, ISelectable, IHover
     {
         #region Fields
 
@@ -16,6 +16,8 @@ namespace Gpt.Labs.Models
         private OpenAISettings settings;
 
         private bool isSelected;
+
+        private bool isHovered;
 
         private int position;
 
@@ -48,7 +50,15 @@ namespace Gpt.Labs.Models
             get => this.isSelected;
             set => this.Set(ref this.isSelected, value);
         }
-                
+
+        [JsonIgnore]
+        [NotMapped]
+        public bool IsHovered 
+        {
+            get => this.isHovered;
+            set => this.Set(ref this.isHovered, value);
+        }
+
         [JsonIgnore]
         public ICollection<OpenAIMessage> Messages { get; set; }
 
