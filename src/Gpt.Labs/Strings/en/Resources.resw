@@ -601,4 +601,10 @@ We understand the significance of community contributions, and we highly appreci
   <data name="OpenAIOrganizationDescription4.Text" xml:space="preserve">
     <value>For users who belong to organization, you can pass a Organization ID to specify which organization is used for an API request. Usage from these API requests will count against the specified organization subscription quota.</value>
   </data>
+  <data name="LeaveLabel.Text" xml:space="preserve">
+    <value>Leave positive</value>
+  </data>
+  <data name="ReviewLabel.Text" xml:space="preserve">
+    <value>Review</value>
+  </data>
 </root>

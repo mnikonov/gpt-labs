@@ -8,7 +8,7 @@
     xmlns:controls="using:Gpt.Labs.Controls"
     mc:Ignorable="d">
 
-   <Grid>
+   <Grid Background="{ThemeResource PanelBackgroundBrush}">
         <controls:PageHeader Height="40" x:Name="TitleBar" VerticalAlignment="Top">
             <TextBlock x:Name="Title" x:FieldModifier="public" TextLineBounds="Tight" FontSize="12" Grid.Column="0" Margin="16 6 0 0" VerticalAlignment="Center" />
         </controls:PageHeader>
