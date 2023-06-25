@@ -7,7 +7,8 @@ using Gpt.Labs.Controls.Dialogs;
 using Gpt.Labs.Helpers.Extensions;
 using Windows.ApplicationModel;
 using Windows.System;
-using Windows.Security.Isolation;
+using Windows.Services.Store;
+using WinRT.Interop;
 
 namespace Gpt.Labs
 {
@@ -70,6 +71,15 @@ namespace Gpt.Labs
         private async void OnSponsorButtonClick(object sender, RoutedEventArgs e)
         {
             await Launcher.LaunchUriAsync(new Uri("https://github.com/sponsors/mnikonov")); 
+        }
+
+        private async void OnRatingButtonClick(object sender, RoutedEventArgs e)
+        {
+            var context = StoreContext.GetDefault();
+            var hwnd = WindowNative.GetWindowHandle(this.Window);
+            InitializeWithWindow.Initialize(context, hwnd);
+            
+            await context.RequestRateAndReviewAppAsync();
         }
 
         #endregion

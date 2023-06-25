@@ -7,6 +7,7 @@
     <SolidColorBrush x:Key="OrangeBrush" Color="#F3A740"></SolidColorBrush>
     <SolidColorBrush x:Key="VioletBrush" Color="#7A4FDF"></SolidColorBrush>
     <SolidColorBrush x:Key="PinkBrush" Color="#db61a2"></SolidColorBrush>
+    <SolidColorBrush x:Key="GoldenBrush" Color="#CFB53B"></SolidColorBrush>
     
     <LinearGradientBrush x:Key="ChatUserMessageBrush" StartPoint="0,0" EndPoint="1,1" Opacity="0.5">
         <GradientStop Color="{ThemeResource SystemAccentColorLight2}" Offset="0"/>
