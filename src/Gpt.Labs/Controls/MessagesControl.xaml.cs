@@ -35,12 +35,6 @@ namespace Gpt.Labs.Controls
             typeof(MessagesPage),
             new PropertyMetadata(true, null));
 
-        public static readonly DependencyProperty IsMessagePanelEnabledProperty = DependencyProperty.Register(
-            nameof(IsMessagePanelEnabled),
-            typeof(bool),
-            typeof(MessagesPage),
-            new PropertyMetadata(true, null));
-
         #endregion
 
         #region Public Constructors
@@ -72,12 +66,6 @@ namespace Gpt.Labs.Controls
             set => SetValue(ShowOpenNewWindowButtonProperty, value);
         }
 
-        public bool IsMessagePanelEnabled
-        {
-            get => (bool)GetValue(IsMessagePanelEnabledProperty);
-            set => SetValue(IsMessagePanelEnabledProperty, value);
-        }
-
         #endregion
 
         #region Private Methods
@@ -98,7 +86,7 @@ namespace Gpt.Labs.Controls
                         e.Handled = true;
                         return;
 
-                    case VirtualKey.S:
+                    case VirtualKey.I:
                         ViewModel.ExpandCollapsePanel(ChatPanelTypes.ChatSettings);
                         e.Handled = true;
                         return;
@@ -108,7 +96,7 @@ namespace Gpt.Labs.Controls
                         e.Handled = true;
                         return;
 
-                    case VirtualKey.D:
+                    case VirtualKey.Delete:
                         await this.DeleteChats();
                         e.Handled = true;
                         return;
@@ -119,14 +107,24 @@ namespace Gpt.Labs.Controls
                         e.Handled = true;
                         return;
 
-                    case VirtualKey.E:
+                    case VirtualKey.H:
                         var shareMessages = this.MessagesList.SelectedItems.OfType<OpenAIMessage>().ToArray();
                         this.ViewModel.ShareMessages(shareMessages);
                         e.Handled = true;
                         return;
 
-                    case VirtualKey.W:
+                    case VirtualKey.N:
                         await ViewModel.OpenChatInNewWindow();
+                        e.Handled = true;
+                        return;
+
+                    case VirtualKey.G:
+                        await ViewModel.RegenerateResponse();
+                        e.Handled = true;
+                        return;
+
+                    case VirtualKey.D:
+                        await ViewModel.DeleteLastMessages();
                         e.Handled = true;
                         return;
                 }
@@ -239,40 +237,12 @@ namespace Gpt.Labs.Controls
 
         private async Task SendChatMessage()
         {
-            try
-            {
-                this.MessageProgress.Visibility = Visibility.Visible;
-                this.IsMessagePanelEnabled = false;
-
-                await ViewModel.SendMessage();
-            }
-            finally
-            {
-                await this.DispatcherQueue.EnqueueAsync(() =>
-                {
-                    this.MessageProgress.Visibility = Visibility.Collapsed;
-                    this.IsMessagePanelEnabled = true;
-                });
-            }
+            await ViewModel.SendMessage();
         }
 
         private async Task CreateImageVariation()
         {
-            try
-            {
-                this.MessageProgress.Visibility = Visibility.Visible;
-                this.IsMessagePanelEnabled = false;
-
-                await ViewModel.CreateImageVariation();
-            }
-            finally
-            {
-                await this.DispatcherQueue.EnqueueAsync(() =>
-                {
-                    this.MessageProgress.Visibility = Visibility.Collapsed;
-                    this.IsMessagePanelEnabled = true;
-                });
-            }
+            await ViewModel.CreateImageVariation();
         }
 
         private async Task DeleteChats()
@@ -284,7 +254,7 @@ namespace Gpt.Labs.Controls
                 return;
             }
 
-            await this.ViewModel.DeleteMessages(messages);
+            await this.ViewModel.DeleteMessages(true, messages);
 
             if (this.ViewModel.MultiSelectModeEnabled && this.ViewModel.ItemsCollection.Count == 0)
             {
