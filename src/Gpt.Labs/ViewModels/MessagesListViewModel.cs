@@ -30,6 +30,7 @@ using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
 using OpenAI;
+using OpenAI.Chat;
 
 namespace Gpt.Labs.ViewModels
 {
@@ -47,7 +48,7 @@ namespace Gpt.Labs.ViewModels
 
         private OpenAIChat chat;
 
-        private EndpointProcessor<string> messageProcessor;
+        private EndpointProcessor<OpenAIMessage> messageProcessor;
 
         private MediaCapture mediaCapture;
 
@@ -62,6 +63,10 @@ namespace Gpt.Labs.ViewModels
         private DataTransferManager dataTransferManager;
 
         private OpenAIMessage[] shareMessages;
+
+        private CancellationTokenSource cancellation;
+
+        private bool processingMessage;
 
         #endregion
 
@@ -107,6 +112,12 @@ namespace Gpt.Labs.ViewModels
         { 
             get => this.multiSelectModeEnabled; 
             set => this.Set(ref this.multiSelectModeEnabled, value); 
+        }
+
+        public bool ProcessingMessage 
+        { 
+            get => this.processingMessage; 
+            set => this.Set(ref this.processingMessage, value); 
         }
 
         #endregion
@@ -269,40 +280,10 @@ namespace Gpt.Labs.ViewModels
                 return;
             }
 
-            try
-            {
+            await this.WrapOpenAiRequest(async () => {
                 var imageVariationProcessor = new ImageVariationEndpointProcessor(this.Chat, this.ItemsCollection, this.DispatcherQueue, () => { this.Message = string.Empty; });
-                await imageVariationProcessor.ProcessAsync(file);
-            }
-            catch (HttpRequestException ex)
-            {
-                var error = ex.ToOpenAiError();
-
-                await this.DispatcherQueue.EnqueueAsync(async () =>
-                {
-                    ContentDialog dialog = null;
-
-                    if (error != null)
-                    {
-                        dialog = this.Window.CreateErrorDialog(error);
-                    }
-                    else
-                    {
-                        ex.LogError();
-                        dialog = this.Window.CreateExceptionDialog(ex);
-                    }
-
-                    await dialog.ShowAsync();
-                });
-            }
-            catch (Exception ex)
-            {
-                ex.LogError();
-                await this.DispatcherQueue.EnqueueAsync(async () =>
-                {
-                    await this.Window.CreateExceptionDialog(ex).ShowAsync();
-                });
-            }
+                await imageVariationProcessor.ProcessAsync(file, cancellation.Token);
+            });
         }
 
         public async Task SendMessage()
@@ -312,80 +293,126 @@ namespace Gpt.Labs.ViewModels
                 return;
             }
 
-            try
+            await this.WrapOpenAiRequest(() => {
+                return this.messageProcessor.ProcessAsync(new OpenAIMessage { Role = OpenAIRole.User, Content = this.Message, ChatId = this.ChatId }, cancellation.Token);
+            });
+        }
+               
+        public void CancelChatRequest()
+        {
+            if (!this.ProcessingMessage || this.cancellation == null || this.cancellation.IsCancellationRequested)
             {
-                await this.messageProcessor.ProcessAsync(this.Message);
+                return;
             }
-            catch (HttpRequestException ex)
-            {
-                var error = ex.ToOpenAiError();
 
-                await this.DispatcherQueue.EnqueueAsync(async () =>
-                {
-                    ContentDialog dialog = null;
-
-                    if (error != null)
-                    {
-                        dialog = this.Window.CreateErrorDialog(error);
-                    }
-                    else
-                    {
-                        ex.LogError();
-                        dialog = this.Window.CreateExceptionDialog(ex);
-                    }
-
-                    await dialog.ShowAsync();
-                });
-            }
-            catch (Exception ex)
-            {
-                ex.LogError();
-                await this.DispatcherQueue.EnqueueAsync(async () =>
-                {
-                    await this.Window.CreateExceptionDialog(ex).ShowAsync();
-                });
-            }
+            this.cancellation.Cancel();
         }
 
-        public async Task DeleteMessages(params OpenAIMessage[] messages)
+        public async Task RegenerateResponse()
         {
-            ContentDialog dialog;
-
-            if (messages.Length == 1)
+            if (this.ProcessingMessage || this.ItemsCollection.Count == 0)
             {
-                dialog = this.Window.CreateYesNoDialog("Confirm", "DeleteMessage");
-            }
-            else
-            {
-                dialog = this.Window.CreateYesNoDialog("Confirm", "DeleteMessages");
+                return;
             }
 
-            var result = await dialog.ShowAsync();
+            var messagesToDelete = new List<OpenAIMessage>();
 
-            if (result == ContentDialogResult.Primary)
+            OpenAIMessage userMessage = null;
+
+            for (int i = this.ItemsCollection.Count - 1; i >= 0; i--)
             {
-                using (var context = new DataContext())
+                if (this.ItemsCollection[i].Role == OpenAIRole.User)
                 {
-                    foreach (var message in messages)
-                    {
-                        context.Entry(message).State = EntityState.Deleted;
-
-                        await context.SaveChangesAsync();
-
-                        this.ItemsCollection.Remove(message);
-                    } 
+                    userMessage = this.ItemsCollection[i];
+                    break;
                 }
 
-                if (this.Chat.Type == OpenAIChatType.Image)
-                {
-                    foreach(var message in messages)
-                    {
-                        var imageFile = await ApplicationData.Current.LocalCacheFolder.TryGetItemAsync($"{message.ChatId}\\{message.Id}.png");
+                messagesToDelete.Add(this.ItemsCollection[i]);
+            }
 
-                        if (imageFile != null)
-                        {
-                            await imageFile.DeleteAsync();
-                        }
+            if (userMessage == null)
+            {
+                return;
+            }
+
+            await this.DeleteMessages(false, messagesToDelete.ToArray());
+
+            await this.WrapOpenAiRequest(() => {
+                return this.messageProcessor.ProcessAsync(userMessage, cancellation.Token);
+            });
+        }
+
+        public async Task DeleteLastMessages()
+        {
+            if (this.ProcessingMessage || this.ItemsCollection.Count == 0)
+            {
+                return;
+            }
+
+            var messagesToDelete = new List<OpenAIMessage>();
+
+            for (int i = this.ItemsCollection.Count - 1; i >= 0; i--)
+            {
+                messagesToDelete.Add(this.ItemsCollection[i]);
+
+                if (this.ItemsCollection[i].Role == OpenAIRole.User)
+                {
+                    break;
+                }
+            }
+
+            await this.DeleteMessages(true, messagesToDelete.ToArray());
+        }
+
+        public async Task DeleteMessages(bool showConfirmationDialog, params OpenAIMessage[] messages)
+        {
+            if (messages.Length == 0)
+            {
+                return;
+            }
+
+            if (showConfirmationDialog)
+            {
+                ContentDialog dialog;
+
+                if (messages.Length == 1)
+                {
+                    dialog = this.Window.CreateYesNoDialog("Confirm", "DeleteMessage");
+                }
+                else
+                {
+                    dialog = this.Window.CreateYesNoDialog("Confirm", "DeleteMessages", messages.Length);
+                }
+
+                var result = await dialog.ShowAsync();
+
+                if (result != ContentDialogResult.Primary)
+                {
+                    return;
+                }
+            }
+
+            using (var context = new DataContext())
+            {
+                foreach (var message in messages)
+                {
+                    context.Entry(message).State = EntityState.Deleted;
+
+                    await context.SaveChangesAsync();
+
+                    this.ItemsCollection.Remove(message);
+                } 
+            }
+
+            if (this.Chat.Type == OpenAIChatType.Image)
+            {
+                foreach(var message in messages)
+                {
+                    var imageFile = await ApplicationData.Current.LocalCacheFolder.TryGetItemAsync($"{message.ChatId}\\{message.Id}.png");
+
+                    if (imageFile != null)
+                    {
+                        await imageFile.DeleteAsync();
                     }
                 }
             }
@@ -519,6 +546,49 @@ namespace Gpt.Labs.ViewModels
             base.Dispose(disposing);
         }
 
+        private async Task StopRecord()
+        {
+            try
+            {
+                await this.mediaCapture.StopRecordAsync();
+                
+                this.watch.Stop();
+
+                if (watch.ElapsedMilliseconds > 2000)
+                {
+                    this.mediaMemoryBuffer.Seek(0);
+
+                    await this.WrapOpenAiRequest(async () => {
+                        var client = new OpenAIClient(new OpenAIAuthentication(ApplicationSettings.Instance.OpenAIApiKey, !string.IsNullOrEmpty(this.chat.Settings.OpenAIOrganization) ? this.chat.Settings.OpenAIOrganization : ApplicationSettings.Instance.OpenAIOrganization ));
+                        var request = new AudioTranscriptionRequest(this.mediaMemoryBuffer.AsStream(), "voice.mp3");
+                        var result = await client.AudioEndpoint.CreateTranscriptionAsync(request, cancellation.Token);
+                                
+                        this.Message = result;
+                    });
+                }
+                else
+                {
+                    this.Message = string.Empty;
+                }
+            }
+            catch (Exception)
+            {
+                this.Message = string.Empty;
+            }
+            finally 
+            {                 
+                this.mediaMemoryBuffer?.Dispose();
+                this.mediaMemoryBuffer = null;
+                                
+                await this.DispatcherQueue.EnqueueAsync(async () =>
+                {
+                    this.IsRecording = false;
+                });
+
+                this.watch.Reset();
+            }
+        }
+
         private async void OnDataTransferManagerDataRequested(DataTransferManager sender, DataRequestedEventArgs args)
         {
             var requestData = args.Request.Data;
@@ -566,44 +636,6 @@ namespace Gpt.Labs.ViewModels
             await this.mediaCapture.StartRecordToStreamAsync(MediaEncodingProfile.CreateMp3(AudioEncodingQuality.Low), this.mediaMemoryBuffer);
         }
 
-        private async Task StopRecord()
-        {
-            try
-            {
-                await this.mediaCapture.StopRecordAsync();
-                
-                this.watch.Stop();
-
-                if (watch.ElapsedMilliseconds > 2000)
-                {
-                    this.mediaMemoryBuffer.Seek(0);
-
-                    var client = new OpenAIClient(new OpenAIAuthentication(ApplicationSettings.Instance.OpenAIApiKey, !string.IsNullOrEmpty(this.chat.Settings.OpenAIOrganization) ? this.chat.Settings.OpenAIOrganization : ApplicationSettings.Instance.OpenAIOrganization ));
-                    var request = new AudioTranscriptionRequest(this.mediaMemoryBuffer.AsStream(), "voice.mp3");
-                    var result = await client.AudioEndpoint.CreateTranscriptionAsync(request);
-                                
-                    this.Message = result;
-                }
-                else
-                {
-                    this.Message = string.Empty;
-                }
-            }
-            catch (Exception)
-            {
-                this.Message = string.Empty;
-            }
-            finally 
-            {                 
-                this.mediaMemoryBuffer?.Dispose();
-                this.mediaMemoryBuffer = null;
-
-                this.IsRecording = false;
-
-                this.watch.Reset();
-            }
-        }
-
         private async Task LoadChatInfo()
         {
             using (var context = new DataContext())
@@ -629,6 +661,64 @@ namespace Gpt.Labs.ViewModels
 
                         break;
                 }
+            }
+        }
+
+        private async Task WrapOpenAiRequest(Func<Task> action)
+        {
+            try
+            {
+                this.ProcessingMessage = true;
+                this.cancellation = new CancellationTokenSource();
+
+                await action();
+            }
+            catch (HttpRequestException ex)
+            {
+                var error = ex.ToOpenAiError();
+
+                await this.DispatcherQueue.EnqueueAsync(async () =>
+                {
+                    ContentDialog dialog = null;
+
+                    if (error != null)
+                    {
+                        dialog = this.Window.CreateErrorDialog(error);
+                    }
+                    else
+                    {
+                        ex.LogError();
+                        dialog = this.Window.CreateExceptionDialog(ex);
+                    }
+
+                    await dialog.ShowAsync();
+                });
+            }
+            catch (TaskCanceledException)
+            {
+                // no need to handle
+            }
+            catch (OperationCanceledException)
+            {
+                // no need to handle
+            }
+            catch (Exception ex)
+            {
+                ex.LogError();
+                await this.DispatcherQueue.EnqueueAsync(async () =>
+                {
+                    await this.Window.CreateExceptionDialog(ex).ShowAsync();
+                });
+            }
+            finally 
+            { 
+                this.cancellation?.Dispose();
+                this.cancellation = null;
+
+                await this.DispatcherQueue.EnqueueAsync(async () =>
+                {
+                    this.ProcessingMessage = false; 
+                });
             }
         }
 

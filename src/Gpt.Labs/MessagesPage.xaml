@@ -23,7 +23,7 @@
 
             <controls:MessagesControl x:Name="Messages"
                 ViewModel="{x:Bind ViewModel.Result, Mode=OneWay}"
-                IsMessagePanelEnabled="{x:Bind ViewModel.IsCompleted, Mode=OneWay}">
+                IsEnabled="{x:Bind ViewModel.IsCompleted, Mode=OneWay}">
             </controls:MessagesControl>
         </Border>
 

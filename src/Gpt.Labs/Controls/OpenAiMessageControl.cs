@@ -118,7 +118,7 @@ namespace Gpt.Labs.Controls
 
         private async void OnDeleteButtonClick(object sender, RoutedEventArgs e)
         {
-            await this.ParentViewViewModel.DeleteMessages(this.ViewModel);
+            await this.ParentViewViewModel.DeleteMessages(true, this.ViewModel);
         }
 
         private async void OnMarkdownTextBlockLinkClicked(object sender, LinkClickedEventArgs e)
