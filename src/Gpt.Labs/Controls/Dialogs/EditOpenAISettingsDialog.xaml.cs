@@ -1,5 +1,7 @@
 using Gpt.Labs.Controls.Dialogs.Base;
 using Gpt.Labs.Models;
+using Gpt.Labs.ViewModels;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace Gpt.Labs.Controls.Dialogs
@@ -8,9 +10,10 @@ namespace Gpt.Labs.Controls.Dialogs
     {
         #region Constructors
 
-        public EditOpenAISettingsDialog()
+        public EditOpenAISettingsDialog(Window window)
+            : base(window)
         {           
-            this.ViewModel = new OpenAIApiSettings();
+            this.ViewModel = new OpenAIApiSettings(ApplicationSettings.Instance.OpenAIOrganization, ApplicationSettings.Instance.OpenAIApiKey);
 
             this.InitializeComponent();
         }

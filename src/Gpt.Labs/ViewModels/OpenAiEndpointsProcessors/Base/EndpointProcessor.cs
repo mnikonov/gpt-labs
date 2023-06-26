@@ -3,10 +3,11 @@ using Gpt.Labs.Models;
 using Gpt.Labs.Models.Enums;
 using Gpt.Labs.ViewModels.Collections;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.UI.Dispatching;
 using OpenAI;
+using OpenAI.Chat;
 using System;
-using System.Collections;
-using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base
@@ -15,11 +16,13 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base
     {
         #region Fields
 
-        protected OpenAIClient openAiClient;
-
         protected OpenAIChat chat;
 
         protected ObservableList<OpenAIMessage, Guid> messagesCollection;
+
+        protected DispatcherQueue dispatcher;
+
+        protected OpenAIAuthentication authentication;
 
         private Action cleanUserMessage;
 
@@ -27,47 +30,51 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base
 
         #region Constructors
 
-        public EndpointProcessor(OpenAIClient openAiClient, OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, Action cleanUserMessage) 
+        public EndpointProcessor(OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, DispatcherQueue dispatcher, Action cleanUserMessage) 
         { 
-            this.openAiClient = openAiClient; 
             this.chat = chat;
             this.messagesCollection = messagesCollection;
             this.cleanUserMessage = cleanUserMessage;
+            this.dispatcher = dispatcher;
+
+            this.authentication = new OpenAIAuthentication(ApplicationSettings.Instance.OpenAIApiKey, !string.IsNullOrEmpty(this.chat.Settings.OpenAIOrganization) ? this.chat.Settings.OpenAIOrganization : ApplicationSettings.Instance.OpenAIOrganization );
         }
 
         #endregion
 
         #region Methods
 
-        public abstract Task ProcessAsync(TMessage message);
+        public abstract Task ProcessAsync(TMessage message, CancellationToken token);
 
         #endregion
 
         #region Protected Methods
 
-        protected async Task<OpenAIMessage> AddMessageToCollectionAsync(string message, OpenAIRole role)
+        protected async Task<OpenAIMessage> AddMessageToCollectionAsync(OpenAIMessage message, CancellationToken token)
         {
-            var aiMessage = new OpenAIMessage() { Role = role, Content = message, ChatId = chat.Id };
+            await SaveChatMessagesAsync(token, message);
 
-            await SaveChatMessagesAsync(aiMessage);
-
-            await App.Window.DispatcherQueue.EnqueueAsync(() =>
+            await this.dispatcher.EnqueueAsync(() =>
             {
-                messagesCollection.Add(aiMessage);
-            });
+                messagesCollection.Add(message);
+            }, 
+            DispatcherQueuePriority.Normal, 
+            token);
 
-            return messagesCollection[messagesCollection.IndexOf(aiMessage)];
+            return messagesCollection[messagesCollection.IndexOf(message)];
         }
 
-        protected Task CleanUserMessageAsync()
+        protected Task CleanUserMessageAsync(CancellationToken token)
         {
-            return App.Window.DispatcherQueue.EnqueueAsync(() =>
+            return this.dispatcher.EnqueueAsync(() =>
             {
                 cleanUserMessage();
-            });
+            }, 
+            DispatcherQueuePriority.Normal, 
+            token);
         }
 
-        protected async Task SaveChatMessagesAsync(params OpenAIMessage[] messages)
+        protected async Task SaveChatMessagesAsync(CancellationToken token, params OpenAIMessage[] messages)
         {
             using (var context = new DataContext())
             {
@@ -83,8 +90,39 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base
                     }
                 }
 
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(token);
             }
+        }
+
+        protected async Task<OpenAIMessage> GetMessageAsync(OpenAIMessage[] messages, int index, CancellationToken token)
+        {
+            if (messages[index] == null)
+            {
+                messages[index] = await AddMessageToCollectionAsync(new OpenAIMessage() { Role = OpenAIRole.Assistant, Content = string.Empty, ChatId = chat.Id }, token);
+
+                if (messages.Length > 1)
+                {
+                    for (var i = 0; i < messages.Length; i++)
+                    {
+                        if (i == index || messages[i] == null)
+                        {
+                            continue;
+                        }
+
+                        var collectionMessage = messagesCollection.GetById(messages[i].Id);
+
+                        token.ThrowIfCancellationRequested();
+
+                        if (messages[i] != collectionMessage)
+                        {
+                            collectionMessage.Content = messages[i].Content;
+                            messages[i] = collectionMessage;
+                        }
+                    }
+                }
+            }
+
+            return messages[index];
         }
 
         #endregion

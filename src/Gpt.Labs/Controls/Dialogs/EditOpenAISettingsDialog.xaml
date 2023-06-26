@@ -16,27 +16,28 @@
     mc:Ignorable="d">
 
      <StackPanel Width="480" Margin="0 6 0 0" Spacing="4">
+                 
+        <TextBlock x:Name="OpenAIApiKeyLabel" x:Uid="OpenAIApiKeyLabel" Text="Secret key" 
+                   Style="{StaticResource LabelStyle}"/>
+
+        <PasswordBox x:Name="OpenAIApiKeyTextBox" x:Uid="OpenAIApiKeyTextBox" 
+                     Password="{x:Bind ViewModel.ApiKey, Mode=TwoWay}"
+                     PlaceholderText="Enter OpenAI secret key..."></PasswordBox>
+         
+        <TextBlock Style="{StaticResource DescriptionStyle}">
+            <Run x:Uid="OpenAIApiKeyDescription1"/><Hyperlink NavigateUri="https://platform.openai.com/account/api-keys"><Run x:Uid="OpenAIApiKeyDescription2"/></Hyperlink><Run x:Uid="OpenAIApiKeyDescription3"/>
+        </TextBlock>
+         
          
         <TextBlock x:Name="OpenAIOrganizationLabel" x:Uid="OpenAIOrganizationLabel" Text="Organization ID" 
                    Style="{StaticResource LabelStyle}"/>
 
-        <TextBox x:Name="OpenAIOrganizationTextBox" x:Uid="OpenAIOrganizationTextBox" 
-                 Text="{x:Bind ViewModel.Organization, Mode=TwoWay}"
-                 PlaceholderText="Enter OpenAI organization ID..."></TextBox>
+        <PasswordBox x:Name="OpenAIOrganizationTextBox" x:Uid="OpenAIOrganizationTextBox" MaxLength="50"
+                     Password="{x:Bind ViewModel.Organization, Mode=TwoWay}"
+                     PlaceholderText="Enter OpenAI organization ID..."></PasswordBox>
          
         <TextBlock Style="{StaticResource DescriptionStyle}">
-            <Run x:Uid="OpenAIOrganizationDescription1"/><Hyperlink NavigateUri="https://platform.openai.com/account/org-settings"><Run x:Uid="OpenAIOrganizationDescription2"/></Hyperlink><Run x:Uid="OpenAIOrganizationDescription3"/>
-        </TextBlock>
-        
-        <TextBlock x:Name="OpenAIApiKeyLabel" x:Uid="OpenAIApiKeyLabel" Text="Secret key" 
-                   Style="{StaticResource LabelStyle}"/>
-
-        <TextBox x:Name="OpenAIApiKeyTextBox" x:Uid="OpenAIApiKeyTextBox" 
-                 Text="{x:Bind ViewModel.ApiKey, Mode=TwoWay}"
-                 PlaceholderText="Enter OpenAI secret key..."></TextBox>
-         
-        <TextBlock Style="{StaticResource DescriptionStyle}">
-            <Run x:Uid="OpenAIApiKeyDescription1"/><Hyperlink NavigateUri="https://platform.openai.com/account/api-keys"><Run x:Uid="OpenAIApiKeyDescription2"/></Hyperlink><Run x:Uid="OpenAIApiKeyDescription3"/>
+            <Run x:Uid="OpenAIOrganizationDescription1"/><Hyperlink NavigateUri="https://platform.openai.com/account/org-settings"><Run x:Uid="OpenAIOrganizationDescription2"/></Hyperlink><Run x:Uid="OpenAIOrganizationDescription3"/><Run x:Uid="OpenAIOrganizationDescription4"/>
         </TextBlock>
 
         <controls:ErrorsListPanel Margin="0 24 0 0"

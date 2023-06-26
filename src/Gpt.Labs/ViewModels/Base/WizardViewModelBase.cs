@@ -1,10 +1,21 @@
-﻿namespace Gpt.Labs.ViewModels.Base
+﻿using System;
+
+namespace Gpt.Labs.ViewModels.Base
 {
     public class WizardViewModelBase : ViewModelBase
     {
         #region Fields
 
         protected WizardStepCommandBase step;
+
+        #endregion
+
+        #region Constructors
+
+        protected WizardViewModelBase(Func<BasePage> getBasePage)
+            : base(getBasePage)
+        {
+        }
 
         #endregion
 

@@ -4,22 +4,24 @@ using Gpt.Labs.Models.Enums;
 using Gpt.Labs.Models.Extensions;
 using Gpt.Labs.ViewModels.Collections;
 using Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base;
+using Microsoft.UI.Dispatching;
 using OpenAI;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
 
 namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
 {
-    public class ImageEndpointProcessor : EndpointProcessor<string>
+    public class ImageEndpointProcessor : EndpointProcessor<OpenAIMessage>
     {
         #region Constructors
 
-        public ImageEndpointProcessor(OpenAIClient openAiClient, OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, Action cleanUserMessage) 
-            : base(openAiClient, chat, messagesCollection, cleanUserMessage)
+        public ImageEndpointProcessor(OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, DispatcherQueue dispatcher, Action cleanUserMessage) 
+            : base(chat, messagesCollection, dispatcher, cleanUserMessage)
         {
         }
 
@@ -27,7 +29,7 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
 
         #region Public Methods
 
-        public override async Task ProcessAsync(string userMessage)
+        public override async Task ProcessAsync(OpenAIMessage userMessage, CancellationToken token)
         {
             var settings = this.chat.GetSettings<OpenAIImageSettings>();
 
@@ -35,23 +37,27 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
 
             var chatRequest = settings.ToImageGenerationRequest(userMessage);
 
-            var result = await openAiClient.ImagesEndPoint.GenerateImageAsync(chatRequest);
-            await this.HandleChatResponseAsync(userMessage, result, responseMessages);
+            var client = new OpenAIClient(this.authentication);
 
-            await SaveChatMessagesAsync(responseMessages);
+            var result = await client.ImagesEndPoint.GenerateImageAsync(chatRequest, token);
+            await this.HandleChatResponseAsync(userMessage, result, responseMessages, token);
         }
 
         #endregion
 
         #region Private Methods
 
-        private async Task HandleChatResponseAsync(string userMessage, IReadOnlyList<string> images, OpenAIMessage[] responseMessages)
+        private async Task HandleChatResponseAsync(OpenAIMessage userMessage, IReadOnlyList<string> images, OpenAIMessage[] responseMessages, CancellationToken token)
         {
-            var message = await AddMessageToCollectionAsync(userMessage, OpenAIRole.User);
+            if (userMessage.IsNew)
+            {
+                await AddMessageToCollectionAsync(userMessage, token);
+                await CleanUserMessageAsync(token);
+            }
 
-            await CleanUserMessageAsync();
+            await CleanUserMessageAsync(token);
 
-            var chatFolder = await this.GetChatFolder();
+            var chatFolder = await this.GetChatFolder(token);
 
             using (var client = new HttpClient())
             {
@@ -59,67 +65,42 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
                 {
                     string imageUrl = images[i];
 
-                    var responseMessage = await GetMessageAsync(responseMessages, i);
-                    await this.SaveImageAsync(client, chatFolder, responseMessage, imageUrl);
+                    var responseMessage = await GetMessageAsync(responseMessages, i, token);
+                    await this.SaveImageAsync(client, chatFolder, responseMessage, imageUrl, token);
+                    
+                    await SaveChatMessagesAsync(token, responseMessage);
                 }
             }
         }
 
-        private async Task<OpenAIMessage> GetMessageAsync(OpenAIMessage[] messages, int index)
+        public async Task SaveImageAsync(HttpClient client, StorageFolder chatFolder, OpenAIMessage message, string imageUrl, CancellationToken token)
         {
-            if (messages[index] == null)
+            using(var imageData = await client.GetStreamAsync(imageUrl, token))
             {
-                messages[index] = await AddMessageToCollectionAsync(string.Empty, OpenAIRole.Assistant);
-
-                if (messages.Length > 1)
-                {
-                    for (var i = 0; i < messages.Length; i++)
-                    {
-                        if (i == index || messages[i] == null)
-                        {
-                            continue;
-                        }
-
-                        var collectionMessage = messagesCollection.GetById(messages[i].Id);
-
-                        if (messages[i] != collectionMessage)
-                        {
-                            collectionMessage.Content = messages[i].Content;
-                            messages[i] = collectionMessage;
-                        }
-                    }
-                }
-            }
-
-            return messages[index];
-        }
-
-        public async Task SaveImageAsync(HttpClient client, StorageFolder chatFolder, OpenAIMessage message, string imageUrl)
-        {
-            using(var imageData = await client.GetStreamAsync(imageUrl))
-            {
-                var file = await chatFolder.CreateFileAsync($"{message.Id}.png", CreationCollisionOption.ReplaceExisting);
+                var file = await chatFolder.CreateFileAsync($"{message.Id}.png", CreationCollisionOption.ReplaceExisting).AsTask(token);
 
                 using (var writeStream = await file.OpenStreamForWriteAsync())
                 {
-                    await imageData.CopyToAsync(writeStream);
-                    await writeStream.FlushAsync();
+                    await imageData.CopyToAsync(writeStream, token);
+                    await writeStream.FlushAsync(token);
                 }
 
-                await App.Window.DispatcherQueue.EnqueueAsync(() =>
+                await this.dispatcher.EnqueueAsync(() =>
                 {
                     message.Content = $"![Image]({file.Path})";
-                });
+                },
+                DispatcherQueuePriority.Normal,
+                token);
             }
         }
 
-        private async Task<StorageFolder> GetChatFolder()
+        private async Task<StorageFolder> GetChatFolder(CancellationToken token)
         {
-            var chatFolder = (await ApplicationData.Current.LocalCacheFolder.TryGetItemAsync(chat.Id.ToString()));
+            var chatFolder = await ApplicationData.Current.LocalCacheFolder.TryGetItemAsync(chat.Id.ToString()).AsTask(token);
 
             if (chatFolder == null)
             {
-                chatFolder = await ApplicationData.Current.LocalCacheFolder.CreateFolderAsync(chat.Id.ToString());
+                chatFolder = await ApplicationData.Current.LocalCacheFolder.CreateFolderAsync(chat.Id.ToString()).AsTask(token);
             }
 
             return (StorageFolder)chatFolder;

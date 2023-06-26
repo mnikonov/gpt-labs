@@ -15,7 +15,7 @@
     x:Uid="EditChatDialog"
     mc:Ignorable="d">
 
-     <StackPanel Width="480" Margin="0 6 0 0" Spacing="4">
+    <StackPanel Width="480" Margin="0 6 0 0" Spacing="4">
         <TextBlock x:Uid="TitleLabel" Style="{StaticResource LabelStyle}" Text="Title"/>
 
         <TextBox x:Name="TitleTextBox" x:Uid="TitleTextBox" MaxLength="255"
@@ -49,6 +49,32 @@
             <Run x:Uid="ModelDescription4"/><Hyperlink NavigateUri="https://platform.openai.com/docs/models/model-endpoint-compatibility"><Run x:Uid="ModelDescription5"/></Hyperlink><Run x:Uid="ModelDescription7"/>
         </TextBlock>
 
+         
+        <TextBlock x:Uid="UserLabel" Style="{StaticResource LabelStyle}"
+                    Text="User"/>
+
+        <TextBox x:Name="UserTextBox" x:Uid="UserTextBox" MaxLength="250"
+                    Text="{x:Bind ViewModel.Settings.User, Mode=TwoWay}"
+                    PlaceholderText="Enter user">
+        </TextBox>
+
+        <TextBlock x:Uid="UserDescription" Style="{StaticResource DescriptionStyle}">
+            <Run x:Uid="UserDescription1"/><Hyperlink NavigateUri="https://platform.openai.com/docs/guides/safety-best-practices/end-user-ids"><Run x:Uid="UserDescription2"/></Hyperlink>
+        </TextBlock>
+         
+        
+        <TextBlock x:Name="OpenAIOrganizationLabel" x:Uid="ChatOpenAIOrganizationLabel" Text="Organization ID" 
+                   Style="{StaticResource LabelStyle}"/>
+
+        <PasswordBox x:Name="OpenAIOrganizationTextBox" x:Uid="OpenAIOrganizationTextBox" MaxLength="50"
+                     Password="{x:Bind ViewModel.Settings.OpenAIOrganization, Mode=TwoWay}"
+                     PlaceholderText="Enter OpenAI organization ID..."></PasswordBox>
+         
+        <TextBlock Style="{StaticResource DescriptionStyle}">
+            <Run x:Uid="OpenAIOrganizationDescription4"/>
+        </TextBlock>
+        
+        
         <StackPanel Margin="0 24 0 0" Grid.Row="1" >
             <controls:ErrorsListPanel
                 ViewModel="{x:Bind ViewModel.Errors, Mode=OneWay}"

@@ -19,11 +19,13 @@ namespace Gpt.Labs.ViewModels.Base
 
         #region Public Constructors
 
-        protected StateViewModelBase()
+        protected StateViewModelBase(Func<BasePage> getBasePage)
+            : base(getBasePage)
         {
         }
 
-        protected StateViewModelBase(string stateExtension)
+        protected StateViewModelBase(Func<BasePage> getBasePage, string stateExtension)
+            : this(getBasePage)
         {
             this.stateExtension = stateExtension;
         }

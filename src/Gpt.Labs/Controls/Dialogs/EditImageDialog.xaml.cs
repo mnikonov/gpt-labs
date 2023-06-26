@@ -1,5 +1,6 @@
 using Gpt.Labs.Controls.Dialogs.Base;
 using Gpt.Labs.Models;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
 namespace Gpt.Labs.Controls.Dialogs
@@ -8,7 +9,8 @@ namespace Gpt.Labs.Controls.Dialogs
     {
         #region Constructors
 
-        public EditImageDialog(OpenAIChat viewModel)
+        public EditImageDialog(Window window, OpenAIChat viewModel)
+            : base(window)
         {           
             this.ViewModel = viewModel;
 

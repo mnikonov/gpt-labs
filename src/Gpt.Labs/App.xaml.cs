@@ -1,4 +1,5 @@
-﻿using Gpt.Labs.Helpers.Extensions;
+﻿using Gpt.Labs.Helpers;
+using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Helpers.Navigation;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -27,8 +28,6 @@ namespace Gpt.Labs
 
         #region Properties
 
-        public static Window Window { get; private set; }
-
         public static ResourceLoader ResourceLoader { get; } = new ();
 
         #endregion
@@ -36,36 +35,32 @@ namespace Gpt.Labs
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
             this.ActivateAsync(args.UWPLaunchActivatedEventArgs);
-
-            var appWindow = Window.GetAppWindow();
-            appWindow.Title = ResourceLoader.GetString("AppDisplayName");
-
-            if (AppWindowTitleBar.IsCustomizationSupported())
-            {
-                appWindow.TitleBar.ExtendsContentIntoTitleBar = true;
-            }
         }
-
 
         #region Private Methods
 
         private void ActivateAsync(IActivatedEventArgs args)
         {
-            Window = new MainWindow();
+            var window = WindowManager.CreateWindow();
 
-            if (!(Window.Content is Frame rootFrame))
+            if (!(window.Content is Frame rootFrame))
             {
                 rootFrame = new Frame();
                 rootFrame.NavigationFailed += this.OnNavigationFailed;
 
-                Window.Content = rootFrame;
+                window.Content = rootFrame;
             }
+
+            window.SetTitle(ResourceLoader.GetString("AppDisplayName"));
+            window.SetExtendsContentIntoTitleBar();
+            window.ApplyTheme();
 
             if (rootFrame.Content == null)
             {
                 var query = new Query
                 {
-                    ["IsTerminated"] = args.PreviousExecutionState == ApplicationExecutionState.Terminated
+                    ["IsTerminated"] = args.PreviousExecutionState == ApplicationExecutionState.Terminated,
+                    ["WindowId"] = window.WindowId
                 };
 
                 if (args is ProtocolActivatedEventArgs protocolArgs && protocolArgs.Uri != null)
@@ -76,7 +71,7 @@ namespace Gpt.Labs
                 rootFrame.Navigate(typeof(ActivationPage), query.ToString(), new CommonNavigationTransitionInfo());
             }
 
-            Window.Activate();
+            window.Activate();
         }
 
         private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)

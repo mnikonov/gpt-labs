@@ -6,10 +6,10 @@ namespace Gpt.Labs.Models.Extensions
 {
     public static class OpenAiImageSettingsExtensions
     {
-        public static ImageGenerationRequest ToImageGenerationRequest(this OpenAIImageSettings settings, string userMessage)
+        public static ImageGenerationRequest ToImageGenerationRequest(this OpenAIImageSettings settings, OpenAIMessage userMessage)
         {
             return new ImageGenerationRequest(
-                userMessage, 
+                userMessage.Content, 
                 settings.N,
                 settings.Size.ConvertImageType(),
                 settings.User,

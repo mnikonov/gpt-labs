@@ -1,106 +1,201 @@
-﻿using Gpt.Labs.Common.Interfaces;
+﻿using Gpt.Labs.Helpers;
 using Gpt.Labs.Helpers.Navigation;
-using Gpt.Labs.Models;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Navigation;
 using System;
 
 namespace Gpt.Labs
 {
-    public abstract partial class BasePage : Page, IPageStateStore
+    public abstract partial class BasePage : Page
     {
-        #region Public Static Dependency Propertys
+        #region Fields
 
-        public static readonly DependencyProperty AppTitleBarContentProperty = DependencyProperty.Register(
-            "AppTitleBarContent",
-            typeof(UIElement),
-            typeof(BasePage),
-            new PropertyMetadata(null, AppTitleBarContentChangedCallback));
+        private Guid windowId = Guid.Empty;
+
+        private Frame frame;
 
         #endregion
 
-        #region Public Constructors
+        #region Constructors
 
-        protected BasePage()
+        public BasePage()
         {
-            this.NavigationHelper = new NavigationHelper(this);
+            this.Unloaded += this.OnBasePageUnloaded;
         }
 
         #endregion
 
         #region Properties
 
-        public UIElement AppTitleBarContent
-        {
-            get => (UIElement)this.GetValue(AppTitleBarContentProperty);
-            set => this.SetValue(AppTitleBarContentProperty, value);
-        }
+        public SuspensionManager SuspensionManager { get; private set; }
 
-        public ShellPage Shell => ShellPage.Current;
-                
-        public NavigationHelper NavigationHelper { get; }
+        public bool HasFrame => this.frame != null;
+
+        public MainWindow Window => WindowManager.GetWindow(this.windowId);
 
         #endregion
 
         #region Public Methods
 
-        public static T GetCurrentPage<T>()
-            where T : class
+        public void SetWindowId(Guid windowId)
         {
-            return ShellPage.Current.ShellFrame.Content as T;
+            this.windowId = windowId;
         }
 
-        public static BasePage GetCurrent()
+        public void RegisterFrame(Frame frame, string sessionStateKey, bool initSuspensionManager)
         {
-            return ShellPage.Current.ShellFrame.Content as BasePage;
+            if (frame == null)
+            {
+                return;
+            }
+
+            this.frame = frame;
+
+            if (initSuspensionManager)
+            {
+                this.SuspensionManager = new SuspensionManager();
+                this.SuspensionManager.RegisterFrame(frame, sessionStateKey);
+            }
         }
 
-        public virtual Frame GetInnerFrame()
+        public bool IsFrameHasContent()
         {
-            return null;
+            return this.HasFrame && this.frame.Content != null;
         }
 
-        public virtual void LoadState(
-            Type destinationPageType,
-            Query parameters,
-            ViewModelState state,
-            NavigationMode mode)
+        public Type GetFrameContentType()
+        {
+            return frame?.Content?.GetType();
+        }
+
+        public bool CanGoBack()
+        {
+            if (!this.HasFrame)
+            {
+                return false;
+            }
+
+            var innerFrame = this.GetPageInnerFrame();
+            return this.frame.CanGoBack || (innerFrame != null && innerFrame.CanGoBack);
+        }
+
+        public bool CanGoForward()
+        {
+            if (!this.HasFrame)
+            {
+                return false;
+            }
+
+            var innerFrame = this.GetPageInnerFrame();
+            return this.frame.CanGoForward || (innerFrame != null && innerFrame.CanGoForward);
+        }
+
+        public void GoBack()
+        {
+            if (!this.HasFrame)
+            {
+                return;
+            }
+
+            var innerFrame = this.GetPageInnerFrame();
+
+            if (innerFrame != null && innerFrame.CanGoBack)
+            {
+                innerFrame.GoBack();
+                return;
+            }
+
+            if (this.frame.CanGoBack)
+            {
+                this.frame.GoBack();
+            }
+        }
+
+        public void GoForward()
+        {
+            var innerFrame = this.GetPageInnerFrame();
+
+            if (innerFrame != null && innerFrame.CanGoForward)
+            {
+                innerFrame.GoForward();
+                return;
+            }
+
+            if (this.frame.CanGoForward)
+            {
+                this.frame.GoForward();
+            }
+        }
+
+        public bool Navigate(Type page)
+        {
+            return this.Navigate(page, new Query());
+        }
+
+        public bool Navigate(Type page, Query parameter)
+        {
+            return this.Navigate(page, parameter, new DrillInNavigationTransitionInfo());
+        }
+
+        public bool Navigate(Type page, Query parameter, NavigationTransitionInfo infoOverride)
+        {
+            if (page == null)
+            {
+                throw new ArgumentNullException("The page to navigate should be specified.");
+            }
+
+            var queryParam = parameter?.ToString();
+
+            return this.frame.Navigate(page, queryParam, infoOverride);
+        }
+
+        public virtual void UpdateBackState()
         {
         }
 
-        public virtual void SaveState(
-            Type destinationPageType,
-            Query parameters,
-            ViewModelState state,
-            NavigationMode mode)
+        public virtual void UpdateTitleBarContent(UIElement content)
         {
-        } 
-
-        #endregion
-
-        #region Protected Methods
-
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            this.NavigationHelper.OnNavigatedTo(e);
         }
 
-        protected override void OnNavigatedFrom(NavigationEventArgs e)
-        {
-            this.NavigationHelper.OnNavigatedFrom(e);
-        }
-        
         #endregion
 
         #region Private Methods
 
-        private static void AppTitleBarContentChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (e.NewValue is UIElement element)
+            base.OnNavigatedTo(e);
+
+            var query = Query.Parse(e.Parameter);
+
+            if (query.TryGetValue("WindowId", out Guid windowId))
             {
-                ShellPage.Current.AppTitleBar.Content = element;
+                this.windowId = windowId;
             }
+        }
+
+        private void OnBasePageUnloaded(object sender, RoutedEventArgs e)
+        {
+            if (this.Window == null)
+            {
+                return;
+            }
+
+            var popups = VisualTreeHelper.GetOpenPopups(this.Window);
+            foreach (var popup in popups)
+            {
+                if (popup.IsOpen)
+                {
+                    popup.IsOpen = false;
+                }
+            }
+        }
+
+        private Frame GetPageInnerFrame()
+        {
+            return (this.frame?.Content as StatePage)?.GetInnerFrame();
         }
 
         #endregion

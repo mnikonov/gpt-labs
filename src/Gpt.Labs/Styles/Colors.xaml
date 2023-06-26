@@ -7,28 +7,42 @@
     <SolidColorBrush x:Key="OrangeBrush" Color="#F3A740"></SolidColorBrush>
     <SolidColorBrush x:Key="VioletBrush" Color="#7A4FDF"></SolidColorBrush>
     <SolidColorBrush x:Key="PinkBrush" Color="#db61a2"></SolidColorBrush>
+    <SolidColorBrush x:Key="GoldenBrush" Color="#CFB53B"></SolidColorBrush>
     
     <LinearGradientBrush x:Key="ChatUserMessageBrush" StartPoint="0,0" EndPoint="1,1" Opacity="0.5">
-        <GradientStop Color="#1BBF82" Offset="0"/>
-        <GradientStop Color="#7A4FDF" Offset="1"/>
+        <GradientStop Color="{ThemeResource SystemAccentColorLight2}" Offset="0"/>
+        <GradientStop Color="{ThemeResource SystemAccentColorLight1}" Offset="1"/>
     </LinearGradientBrush>
 
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Default">
-            <Color x:Key="LayerFillColorDefault">#272727</Color>
+            <Color x:Key="PanelBordersColor">#19000000</Color>
+            <Color x:Key="PanelBackgroundColor">#0DFFFFFF</Color>
+            <Color x:Key="AssistantMessageBackgroundColorDefault">#4D000000</Color>
             
-            <SolidColorBrush x:Key="LayerFillColorDefaultBrush" Color="{StaticResource LayerFillColorDefault}" />
             <SolidColorBrush x:Key="MarkdownLinkForeground" Color="{ThemeResource SystemAccentColorLight2}" />
+            
+            <SolidColorBrush x:Key="PanelBordersBrush" Color="{StaticResource PanelBordersColor}" />
+            <SolidColorBrush x:Key="PanelBackgroundBrush" Color="{StaticResource PanelBackgroundColor}" />
+            <SolidColorBrush x:Key="AssistantMessageBackgroundBrush" Color="{StaticResource AssistantMessageBackgroundColorDefault}" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Light">
-             <Color x:Key="LayerFillColorDefault">#F9F9F9</Color>
-             
-             <SolidColorBrush x:Key="LayerFillColorDefaultBrush" Color="{StaticResource LayerFillColorDefault}" />
-             <SolidColorBrush x:Key="MarkdownLinkForeground" Color="{ThemeResource SystemAccentColorDark1}" />
+            <Color x:Key="PanelBordersColor">#0F000000</Color>
+            <Color x:Key="PanelBackgroundColor">#B3FFFFFF</Color>
+            <Color x:Key="AssistantMessageBackgroundColorDefault">#80F6F6F6</Color>
+            
+            <SolidColorBrush x:Key="MarkdownLinkForeground" Color="{ThemeResource SystemAccentColorDark1}" />
+            
+            <SolidColorBrush x:Key="PanelBordersBrush" Color="{StaticResource PanelBordersColor}" />
+            <SolidColorBrush x:Key="PanelBackgroundBrush" Color="{StaticResource PanelBackgroundColor}" />
+            <SolidColorBrush x:Key="AssistantMessageBackgroundBrush" Color="{StaticResource AssistantMessageBackgroundColorDefault}" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="HighContrast">
-             <SolidColorBrush x:Key="LayerFillColorDefaultBrush" Color="{ThemeResource SystemColorWindowColor}" />
-             <SolidColorBrush x:Key="MarkdownLinkForeground" Color="{ThemeResource SystemAccentColorDark1}" />
+            <SolidColorBrush x:Key="MarkdownLinkForeground" Color="{ThemeResource SystemAccentColorDark1}" />
+            
+            <SolidColorBrush x:Key="PanelBordersBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="PanelBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />
+            <SolidColorBrush x:Key="AssistantMessageBackgroundBrush" Color="{StaticResource SystemColorWindowColor}" />
         </ResourceDictionary>
      </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>

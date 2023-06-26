@@ -1,10 +1,10 @@
+using Gpt.Labs.Controls.Extensions;
 using Gpt.Labs.Helpers;
 using Gpt.Labs.Helpers.Navigation;
 using Gpt.Labs.Models.Enums;
 using Gpt.Labs.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
@@ -13,32 +13,18 @@ using System.Linq;
 
 namespace Gpt.Labs
 {
-    public sealed partial class ShellPage : Page
+    public sealed partial class ShellPage : BasePage
     {
-        #region Fields
-
-        public static readonly DependencyProperty IsProgressActiveProperty = DependencyProperty.Register(
-            "IsProgressActive",
-            typeof(bool),
-            typeof(ShellPage),
-            new PropertyMetadata(false, OnIsProgressActiveChanged));
-
-        #endregion
-
         #region Constructors
 
         public ShellPage()
         {
             this.InitializeComponent();
 
-            Current = this;
-
-            this.SuspensionManager.RegisterFrame(this.ShellFrame, "ShellFrameState");
+            this.RegisterFrame(this.ShellFrame, "ShellFrameState", true);
 
             this.ViewModel = new ShellViewModel();
 
-            this.Unloaded += this.OnShellUnloaded;
-            
             this.ShellFrame.Navigated += this.OnFrameNavigated;
 
             this.MainNavigationView.BackRequested += this.OnBackRequested;
@@ -48,18 +34,7 @@ namespace Gpt.Labs
 
         #region Properties
 
-        public static ShellPage Current { get; private set; }
-
         public ShellViewModel ViewModel { get; }
-
-        public SuspensionManager SuspensionManager { get; } = new SuspensionManager();
-
-        public bool IsProgressActive
-        {
-            get => (bool)this.GetValue(IsProgressActiveProperty);
-
-            set => this.SetValue(IsProgressActiveProperty, value);
-        }
 
         public ApplicationSettings Settings { get; } = ApplicationSettings.Instance;
         
@@ -72,86 +47,15 @@ namespace Gpt.Labs
         #endregion
 
         #region Public Methods
-
-        public bool IsFrameHasContent()
-        {
-            return this.ShellFrame.Content != null;
-        }
-
-        public Type GetFrameContentType()
-        {
-            return ShellFrame.Content?.GetType();
-        }
-
-        public bool CanGoBack()
-        {
-            var innerFrame = this.GetPageInnerFrame();
-            return this.ShellFrame.CanGoBack || (innerFrame != null && innerFrame.CanGoBack);
-        }
-
-        public bool CanGoForward()
-        {
-            var innerFrame = this.GetPageInnerFrame();
-            return this.ShellFrame.CanGoForward || (innerFrame != null && innerFrame.CanGoForward);
-        }
-
-        public void GoBack()
-        {
-            var innerFrame = this.GetPageInnerFrame();
-
-            if (innerFrame != null && innerFrame.CanGoBack)
-            {
-                innerFrame.GoBack();
-                return;
-            }
-
-            if (this.ShellFrame.CanGoBack)
-            {
-                this.ShellFrame.GoBack();
-            }
-        }
-
-        public void GoForward()
-        {
-            var innerFrame = this.GetPageInnerFrame();
-
-            if (innerFrame != null && innerFrame.CanGoForward)
-            {
-                innerFrame.GoForward();
-                return;
-            }
-
-            if (this.ShellFrame.CanGoForward)
-            {
-                this.ShellFrame.GoForward();
-            }
-        }
-
-        public bool Navigate(Type page)
-        {
-            return this.Navigate(page, new Query());
-        }
-
-        public bool Navigate(Type page, Query parameter)
-        {
-            return this.Navigate(page, parameter, new DrillInNavigationTransitionInfo());
-        }
-
-        public bool Navigate(Type page, Query parameter, NavigationTransitionInfo infoOverride)
-        {
-            if (page == null)
-            {
-                throw new ArgumentNullException("The page to navigate should be specified.");
-            }
-
-            var queryParam = parameter?.ToString();
-
-            return this.ShellFrame.Navigate(page, queryParam, infoOverride);
-        }
-
-        public void UpdateBackState()
+                
+        public override void UpdateBackState()
         {
             this.MainNavigationView.IsBackEnabled = this.CanGoBack();
+        }
+
+        public override void UpdateTitleBarContent(UIElement content)
+        {
+            this.AppTitleBar.Content = content;
         }
 
         #endregion
@@ -169,71 +73,48 @@ namespace Gpt.Labs
                 await this.SuspensionManager.RestoreAsync();
             }
 
-            if (!this.IsFrameHasContent())
+            await this.ExecuteOnLoaded(() =>
             {
-                //this.Navigate(typeof(TestPage));
-                var chatQuery = new Query
+                if (!this.IsFrameHasContent())
                 {
-                    { "chat-type", (int)OpenAIChatType.Chat },
-                    { "frame-uid", Guid.NewGuid() }
-                };
+                    //this.Navigate(typeof(TestPage));
+                    var chatQuery = new Query
+                    {
+                        { "chat-type", (int)OpenAIChatType.Chat },
+                        { "frame-uid", Guid.NewGuid() }
+                    };
 
-                this.Navigate(typeof(ChatsPage), chatQuery);
-            }
-            else
-            {
-                this.MainNavigationView.IsBackEnabled = this.CanGoBack();
-                this.MainNavigationView.IsPaneOpen = true;
-                this.MainNavigationView.IsPaneOpen = false;
-                this.ViewModel.ApplyMenuSelection(this.MainNavigationView, this.GetFrameContentType(), string.Empty);
-            }
-
-            if (query.TryGetValue("ProtocolActivatedUrl", out string activationUrl) && !string.IsNullOrEmpty(activationUrl))
-            {
-                var uri = new Uri(activationUrl);
-
-                var navigationMap = new Dictionary<string, Type>();
-
-                if (navigationMap.ContainsKey(uri.LocalPath))
-                {
-                    this.Navigate(
-                        navigationMap[uri.LocalPath],
-                        Query.Parse(uri.Query));
+                    this.Navigate(typeof(ChatsPage), chatQuery);
                 }
-            }
-        }
-
-        private static void OnIsProgressActiveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var shell = d as ShellPage;
-            var newValue = (bool)e.NewValue;
-            var oldValue = (bool)e.OldValue;
-
-            if (shell != null && newValue != oldValue)
-            {
-                shell.MainNavigationView.IsEnabled = !newValue;
-
-                shell.Progress.Visibility = newValue ? Visibility.Visible : Visibility.Collapsed;
-            }
-        }
-
-        private void OnShellUnloaded(object sender, RoutedEventArgs e)
-        {
-            var popups = VisualTreeHelper.GetOpenPopups(App.Window);
-            foreach (var popup in popups)
-            {
-                if (popup.IsOpen)
+                else
                 {
-                    popup.IsOpen = false;
+                    this.MainNavigationView.IsBackEnabled = this.CanGoBack();
+                    this.MainNavigationView.IsPaneOpen = true;
+                    this.MainNavigationView.IsPaneOpen = false;
+                    this.ViewModel.ApplyMenuSelection(this.MainNavigationView, this.GetFrameContentType(), string.Empty);
                 }
-            }
+
+                if (query.TryGetValue("ProtocolActivatedUrl", out string activationUrl) && !string.IsNullOrEmpty(activationUrl))
+                {
+                    var uri = new Uri(activationUrl);
+
+                    var navigationMap = new Dictionary<string, Type>();
+
+                    if (navigationMap.ContainsKey(uri.LocalPath))
+                    {
+                        this.Navigate(
+                            navigationMap[uri.LocalPath],
+                            Query.Parse(uri.Query));
+                    }
+                }
+            });
         }
-        
+
         private void OnMainNavigationViewItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
         {
             if (args.IsSettingsInvoked)
             {
-                this.Navigate(typeof(SettingsPage));
+                this.Navigate(typeof(SettingsPage), null, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromBottom });
                 return;
             }
 
@@ -260,7 +141,7 @@ namespace Gpt.Labs
             //    return;
             //}
 
-            this.Navigate(pageType, query);
+            this.Navigate(pageType, query, new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromLeft } );
         }
 
         private void OnBackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args)
@@ -282,11 +163,6 @@ namespace Gpt.Labs
         private void OnMainNavigationViewLoaded(object sender, RoutedEventArgs e)
         {
             this.PageHeader = (Grid)this.MainNavigationView.GetDescendantOfType<Grid>("PageHeader");
-        }
-
-        private Frame GetPageInnerFrame()
-        {
-            return (this.ShellFrame.Content as BasePage)?.GetInnerFrame();
         }
 
         #endregion

@@ -20,6 +20,8 @@ namespace Gpt.Labs.Models
 
         private OpenAIChatType type;
 
+        private string openAIOrganization;
+
         #endregion
 
         #region Properties
@@ -64,6 +66,14 @@ namespace Gpt.Labs.Models
         { 
             get => this.user;
             set => this.Set(ref this.user, value);
+        }
+
+        [StringLength(50, ErrorMessage = "The field 'Organization ID' must be a string with a maximum length of {1}.")]
+        [RegularExpression(@"^org-.*$",  ErrorMessage = "The field 'Organization ID' must start with 'org-' prefix.")]
+        public string OpenAIOrganization
+        { 
+            get => this.openAIOrganization;
+            set => this.Set(ref this.openAIOrganization, value);
         }
 
         #endregion

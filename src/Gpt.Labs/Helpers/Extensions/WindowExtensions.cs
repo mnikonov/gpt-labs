@@ -1,9 +1,15 @@
-﻿using Microsoft.UI;
+﻿using Gpt.Labs.Controls.Extensions;
+using Gpt.Labs.Helpers.Navigation;
+using Gpt.Labs.Models;
+using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media.Animation;
 using System;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.Graphics;
 using WinRT;
 using WinRT.Interop;
 
@@ -45,6 +51,15 @@ namespace Gpt.Labs.Helpers.Extensions
             return scaleFactorPercent / 100.0;
         }
 
+        public static void Resize(this Window window, int width, int height)
+        {
+            var appWindow = window.GetAppWindow();
+
+            var winPosition = new SizeInt32(width, height);
+
+            appWindow.Resize(winPosition);
+        }
+
         public static DataTransferManager GetDataTransferManager(this Window window)
         {
             IntPtr result;
@@ -61,6 +76,52 @@ namespace Gpt.Labs.Helpers.Extensions
         public static IntPtr GetHwndForWindow(this Window window)
         {
             return WindowNative.GetWindowHandle(window);
+        }
+
+        public static void SetExtendsContentIntoTitleBar(this Window window, bool extendsContentIntoTitleBar = true)
+        {
+            var appWindow = window.GetAppWindow();
+
+            if (AppWindowTitleBar.IsCustomizationSupported())
+            {
+                appWindow.TitleBar.ExtendsContentIntoTitleBar = extendsContentIntoTitleBar;
+            }
+        }
+
+        public static void SetTitle(this Window window, string title)
+        {
+            var appWindow = window.GetAppWindow();
+
+            appWindow.Title = title;
+        }
+
+        public static async Task OpenChatInNewWindows(this OpenAIChat chat)
+        {
+            var window = WindowManager.CreateWindow();
+
+            var content = new SingleWindowPage();
+            content.Title.Text = chat.Title;
+            content.SetWindowId(window.WindowId);
+
+            window.Content = content;
+
+            window.SetExtendsContentIntoTitleBar();
+
+            window.Resize((int)(600 * window.GetDpiScale()), window.AppWindow.Size.Height);
+
+            window.ApplyTheme();
+
+            window.Activate();
+
+            await content.ExecuteOnLoaded(() =>
+            {
+                var query = new Query
+                {
+                    { "chat-id", chat.Id }
+                };
+
+                content.PageFrame.Navigate(typeof(SingleChatPage), query.ToString(), new DrillInNavigationTransitionInfo());
+            });
         }
 
         #endregion

@@ -17,6 +17,17 @@ namespace Gpt.Labs.ViewModels.Base
 
         private TElement selectedElement;
 
+        private TElement hoveredElement;
+
+        #endregion
+
+        #region Constructors
+
+        protected ListViewModel(Func<BasePage> getBasePage)
+            : base(getBasePage)
+        {
+        }
+
         #endregion
 
         #region Properties
@@ -45,6 +56,29 @@ namespace Gpt.Labs.ViewModels.Base
                     if (this.selectedElement is ISelectable newElement)
                     {
                         newElement.IsSelected = true;
+                    }
+                }
+            }
+        }
+
+        public TElement HoveredElement
+        {
+            get => this.hoveredElement;
+            set
+            {
+                var oldValue = this.hoveredElement;
+                if (this.Set(ref this.hoveredElement, value) && typeof(IHover).IsAssignableFrom(typeof(TElement)))
+                {
+                    this.OnHoveredElementChanged();
+
+                    if (oldValue is IHover oldElement)
+                    {
+                        oldElement.IsHovered = false;
+                    }
+
+                    if (this.hoveredElement is IHover newElement)
+                    {
+                        newElement.IsHovered = true;
                     }
                 }
             }
@@ -94,6 +128,11 @@ namespace Gpt.Labs.ViewModels.Base
         }
 
         public virtual void OnSelectedElementChanged()
+        {
+
+        }
+
+        public virtual void OnHoveredElementChanged()
         {
 
         }

@@ -1,6 +1,5 @@
 ﻿namespace Gpt.Labs.Controls.Dialogs.Base
 {
-    using Gpt.Labs;
     using Gpt.Labs.ViewModels;
 
     using Microsoft.UI.Xaml;
@@ -8,7 +7,15 @@
 
     public class ContentDialogBase : ContentDialog
     {
-        public ContentDialogBase()
+        #region Fields
+
+        protected readonly Window window;
+
+        #endregion
+
+        #region Constructors
+
+        public ContentDialogBase(Window window)
         {
             switch (ApplicationSettings.Instance.AppTheme)
             {
@@ -20,7 +27,11 @@
                     break;
             }
 
-            this.XamlRoot = App.Window.Content.XamlRoot;
+            this.window = window;
+
+            this.XamlRoot = window.Content.XamlRoot;
         }
+
+        #endregion
     }
 }

@@ -9,7 +9,6 @@ using Gpt.Labs.ViewModels.Collections;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using OpenAI.Chat;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -27,7 +26,8 @@ namespace Gpt.Labs.ViewModels
 
         #region Constructors
 
-        public ChatsListViewModel()
+        public ChatsListViewModel(Func<BasePage> getBasePage)
+            : base(getBasePage)
         {
         }
 
@@ -68,6 +68,9 @@ namespace Gpt.Labs.ViewModels
                     break;
             }
 
+            settings.User = chat?.Settings.User;
+            settings.OpenAIOrganization = chat?.Settings.OpenAIOrganization;
+
             dialogModel.Settings = settings;
 
             ContentDialogBase dialog = null;
@@ -75,10 +78,10 @@ namespace Gpt.Labs.ViewModels
             switch (ChatType)
             {
                 case OpenAIChatType.Chat:
-                    dialog = new EditChatDialog(dialogModel);
+                    dialog = new EditChatDialog(this.Window, dialogModel);
                     break;
                 case OpenAIChatType.Image:
-                    dialog = new EditImageDialog(dialogModel);
+                    dialog = new EditImageDialog(this.Window, dialogModel);
                     break;
             }
 
@@ -91,6 +94,8 @@ namespace Gpt.Labs.ViewModels
                 if (chat != null)
                 {
                     chat.Title = dialogModel.Title;
+                    chat.Settings.User = settings.User;
+                    chat.Settings.OpenAIOrganization = settings.OpenAIOrganization;
 
                     switch (ChatType)
                     {
@@ -143,11 +148,11 @@ namespace Gpt.Labs.ViewModels
 
             if (chats.Length == 1)
             {
-                dialog = "Confirm".CreateYesNoDialog("DeleteChat", chats[0].Title);
+                dialog = this.Window.CreateYesNoDialog("Confirm", "DeleteChat", chats[0].Title);
             }
             else
             {
-                dialog = "Confirm".CreateYesNoDialog("DeleteChats");
+                dialog = this.Window.CreateYesNoDialog("Confirm", "DeleteChats");
             }
 
             var result = await dialog.ShowAsync();

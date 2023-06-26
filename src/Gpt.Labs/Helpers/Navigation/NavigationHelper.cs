@@ -3,6 +3,7 @@ using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Models;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using System.Threading.Tasks;
 
 namespace Gpt.Labs.Helpers.Navigation
 {
@@ -64,7 +65,7 @@ namespace Gpt.Labs.Helpers.Navigation
         /// <param name="page">A reference to the current page used for navigation.
         /// This reference allows for frame manipulation.
         /// </param>
-        public NavigationHelper(Page page)
+        public NavigationHelper(StatePage page)
         {
             this.Page = page;
         }
@@ -75,7 +76,7 @@ namespace Gpt.Labs.Helpers.Navigation
 
         private Frame Frame => this.Page.Frame;
 
-        private Page Page { get; }
+        private StatePage Page { get; }
 
         #endregion
 
@@ -95,7 +96,7 @@ namespace Gpt.Labs.Helpers.Navigation
         /// property provides the group to be displayed.</param>
         public void OnNavigatedFrom(NavigationEventArgs e)
         {
-            var frameState = ShellPage.Current.SuspensionManager.SessionStateForFrame(this.Frame);
+            var frameState = this.Page.RootPage.SuspensionManager.SessionStateForFrame(this.Frame);
             var pageState = new ViewModelState();
 
 #if SHOW_DEBUG_NOTIFICATIONS
@@ -126,9 +127,9 @@ namespace Gpt.Labs.Helpers.Navigation
         /// </summary>
         /// <param name="e">Event data that describes how this page was reached.  The Parameter
         /// property provides the group to be displayed.</param>
-        public void OnNavigatedTo(NavigationEventArgs e)
+        public async Task OnNavigatedTo(NavigationEventArgs e)
         {
-            var frameState = ShellPage.Current.SuspensionManager.SessionStateForFrame(this.Frame);
+            var frameState = this.Page.RootPage.SuspensionManager.SessionStateForFrame(this.Frame);
             this.pageKey = "Page-" + this.Frame.BackStackDepth;
 
 #if SHOW_DEBUG_NOTIFICATIONS
@@ -150,7 +151,7 @@ namespace Gpt.Labs.Helpers.Navigation
             }
             else
             {
-                state = (ViewModelState)frameState.PageState[this.pageKey];
+                state = frameState.PageState[this.pageKey];
             }
 
             var eventProperties = new ViewModelState()
@@ -167,13 +168,13 @@ namespace Gpt.Labs.Helpers.Navigation
 
             "PageNavigation".LogEvent(eventProperties);
             
-            (this.Page as IPageStateStore)?.LoadState(
+            await (this.Page as IPageStateStore)?.LoadState(
                 e.SourcePageType,
                 Query.Parse(e.Parameter),
                 state,
                 e.NavigationMode);
 
-            ShellPage.Current.UpdateBackState();
+            this.Page.RootPage?.UpdateBackState();
 
 #if SHOW_DEBUG_NOTIFICATIONS
             watch.Stop();

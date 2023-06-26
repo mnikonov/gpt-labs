@@ -1,0 +1,331 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Gpt.Labs.Controls"
+    xmlns:toolkit="using:CommunityToolkit.WinUI.UI.Controls">
+
+    <Style x:Key="ChatStyle" TargetType="controls:OpenAiChatControl">
+        <Style.Setters>
+            <Setter Property="Padding" Value="18 12" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="controls:OpenAiChatControl">
+                        <Grid x:Name="RootGrid" Background="Transparent" Padding="{TemplateBinding Padding}">
+                            
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="PointerExited">
+                                        <Storyboard>
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="ActionsBar">
+                                                <EasingDoubleKeyFrame KeyTime="0" Value="1"/>
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" Storyboard.TargetName="ActionsBar">
+                                                <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="60"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="ActionsBar">
+                                                <DiscreteObjectKeyFrame KeyTime="0">
+                                                    <DiscreteObjectKeyFrame.Value>
+                                                        <Visibility>Visible</Visibility>
+                                                    </DiscreteObjectKeyFrame.Value>
+                                                </DiscreteObjectKeyFrame>
+                                                <DiscreteObjectKeyFrame KeyTime="0:0:0.2">
+                                                    <DiscreteObjectKeyFrame.Value>
+                                                        <Visibility>Collapsed</Visibility>
+                                                    </DiscreteObjectKeyFrame.Value>
+                                                </DiscreteObjectKeyFrame>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+
+                                    <VisualState x:Name="PointerEntered">
+                                        <Storyboard>
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="ActionsBar">
+                                                <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0"/>
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="1"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" Storyboard.TargetName="ActionsBar">
+                                                <EasingDoubleKeyFrame KeyTime="0" Value="60"/>
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="0"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="ActionsBar">
+                                                <DiscreteObjectKeyFrame KeyTime="0">
+                                                    <DiscreteObjectKeyFrame.Value>
+                                                        <Visibility>Collapsed</Visibility>
+                                                    </DiscreteObjectKeyFrame.Value>
+                                                </DiscreteObjectKeyFrame>
+                                                <DiscreteObjectKeyFrame KeyTime="0:0:0.1">
+                                                    <DiscreteObjectKeyFrame.Value>
+                                                        <Visibility>Visible</Visibility>
+                                                    </DiscreteObjectKeyFrame.Value>
+                                                </DiscreteObjectKeyFrame>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                               
+                            <StackPanel Grid.Column="0">
+                                <TextBlock FontSize="14"  
+                                           TextTrimming="CharacterEllipsis" FontWeight="Bold"
+                                           TextLineBounds="TrimToCapHeight"
+                                           Text="{Binding Title, Mode=OneWay}"
+                                           ToolTipService.ToolTip="{Binding Title, Mode=OneWay}"/>
+                                                                    
+                                <TextBlock Margin="0 6 0 0"
+                                           FontWeight="Normal" FontSize="12"  
+                                           TextTrimming="CharacterEllipsis"
+                                           TextLineBounds="TrimToCapHeight"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumHighBrush}"
+                                           Text="{Binding Settings.SystemMessage, Mode=OneWay}"
+                                           ToolTipService.ToolTip="{Binding Settings.SystemMessage, Mode=OneWay}"/>
+                
+                                <TextBlock Margin="0 6 0 0"
+                                           FontWeight="Light" 
+                                           TextTrimming="CharacterEllipsis"
+                                           TextLineBounds="TrimToCapHeight"
+                                           FontSize="11" HorizontalAlignment="Left"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                           Text="{Binding Settings.OpenAIOrganization, Converter={StaticResource OpenAiKeyConverter}, Mode=OneWay}"
+                                           ToolTipService.ToolTip="{Binding Settings.OpenAIOrganization, Mode=OneWay}"
+                                           Visibility="{Binding Settings.OpenAIOrganization, Converter={StaticResource StringToVisibilityConverter}, Mode=OneWay}"/>
+                
+                                <TextBlock Margin="0 6 0 0"
+                                           FontWeight="Light" 
+                                           TextTrimming="CharacterEllipsis"
+                                           TextLineBounds="TrimToCapHeight"
+                                           FontSize="11" HorizontalAlignment="Left"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
+                                           Text="{Binding Settings.User, Mode=OneWay}"
+                                           ToolTipService.ToolTip="{Binding Settings.User, Mode=OneWay}"
+                                           Visibility="{Binding Settings.User, Converter={StaticResource StringToVisibilityConverter}, Mode=OneWay}"/>
+                                                        
+                                <TextBlock Margin="0 6 0 0"
+                                           FontWeight="Light" 
+                                           TextTrimming="CharacterEllipsis"
+                                           TextLineBounds="TrimToCapHeight"
+                                           FontSize="11" HorizontalAlignment="Left"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
+                                           Text="{Binding Settings.ModelId, Mode=OneWay}"
+                                           ToolTipService.ToolTip="{Binding Settings.ModelId, Mode=OneWay}"/>
+                            </StackPanel>
+                
+                           
+                            
+                            <CommandBar x:Name="ActionsBar" Margin="6 0 0 0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Visibility="Collapsed">
+                    
+                                <CommandBar.RenderTransform>
+                                    <CompositeTransform/>
+                                </CommandBar.RenderTransform>
+                    
+                                <CommandBar.Resources>
+                                    <ResourceDictionary Source="ms-appx:///Styles/CommandBarMediumResources.xaml"/>
+                                </CommandBar.Resources>                               
+                                
+                                <AppBarButton x:Name="OpenChatInNewWindow">
+                                    <ToolTipService.ToolTip>
+                                        <ToolTip x:Uid="OpenChatInNewWindowToolTip" Content="Open chat in new window" />
+                                    </ToolTipService.ToolTip>
+                                    <AppBarButton.Icon>
+                                        <FontIcon Glyph="&#xe78b;"/>
+                                    </AppBarButton.Icon>
+                                </AppBarButton>
+                                
+                                <AppBarButton x:Name="More" Label="More">
+                                    <ToolTipService.ToolTip>
+                                        <ToolTip x:Uid="MoreToolTip" Content="More" />
+                                    </ToolTipService.ToolTip>
+                                    <AppBarButton.Icon>
+                                        <FontIcon Glyph="&#xe712;"/>
+                                    </AppBarButton.Icon>
+                                    <AppBarButton.Flyout>
+                                        <MenuFlyout Placement="BottomEdgeAlignedRight">
+                                           <MenuFlyoutItem x:Name="Edit" x:Uid="EditMenu" Text="Edit">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xe70f;"/>
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+            
+                                            <MenuFlyoutSeparator/>
+            
+                                            <MenuFlyoutItem x:Name="Delete" x:Uid="DeleteMenu" Text="Delete">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xe74d;"/>
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                        </MenuFlyout>
+                                    </AppBarButton.Flyout>
+                                </AppBarButton>
+                            </CommandBar>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
+    </Style>
+    
+     <Style x:Key="ImageChatStyle" TargetType="controls:OpenAiChatControl">
+        <Style.Setters>
+            <Setter Property="Padding" Value="18 12" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="controls:OpenAiChatControl">
+                        <Grid x:Name="RootGrid" Background="Transparent" Padding="{TemplateBinding Padding}">
+                            
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="PointerExited">
+                                        <Storyboard>
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="ActionsBar">
+                                                <EasingDoubleKeyFrame KeyTime="0" Value="1"/>
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.1" Value="0"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" Storyboard.TargetName="ActionsBar">
+                                                <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="60"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="ActionsBar">
+                                                <DiscreteObjectKeyFrame KeyTime="0">
+                                                    <DiscreteObjectKeyFrame.Value>
+                                                        <Visibility>Visible</Visibility>
+                                                    </DiscreteObjectKeyFrame.Value>
+                                                </DiscreteObjectKeyFrame>
+                                                <DiscreteObjectKeyFrame KeyTime="0:0:0.2">
+                                                    <DiscreteObjectKeyFrame.Value>
+                                                        <Visibility>Collapsed</Visibility>
+                                                    </DiscreteObjectKeyFrame.Value>
+                                                </DiscreteObjectKeyFrame>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+
+                                    <VisualState x:Name="PointerEntered">
+                                        <Storyboard>
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="ActionsBar">
+                                                <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.2" Value="0"/>
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="1"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.TranslateX)" Storyboard.TargetName="ActionsBar">
+                                                <EasingDoubleKeyFrame KeyTime="0" Value="60"/>
+                                                <EasingDoubleKeyFrame KeyTime="0:0:0.3" Value="0"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                            <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="ActionsBar">
+                                                <DiscreteObjectKeyFrame KeyTime="0">
+                                                    <DiscreteObjectKeyFrame.Value>
+                                                        <Visibility>Collapsed</Visibility>
+                                                    </DiscreteObjectKeyFrame.Value>
+                                                </DiscreteObjectKeyFrame>
+                                                <DiscreteObjectKeyFrame KeyTime="0:0:0.1">
+                                                    <DiscreteObjectKeyFrame.Value>
+                                                        <Visibility>Visible</Visibility>
+                                                    </DiscreteObjectKeyFrame.Value>
+                                                </DiscreteObjectKeyFrame>
+                                            </ObjectAnimationUsingKeyFrames>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                               
+                            <StackPanel Grid.Column="0">
+                                <TextBlock FontSize="14"  
+                                           TextTrimming="CharacterEllipsis" FontWeight="Bold"
+                                           TextLineBounds="TrimToCapHeight"
+                                           Text="{Binding Title, Mode=OneWay}"
+                                           ToolTipService.ToolTip="{Binding Title, Mode=OneWay}"/>
+                
+                                <TextBlock Margin="0 6 0 0"
+                                           FontWeight="Light" 
+                                           TextTrimming="CharacterEllipsis"
+                                           TextLineBounds="TrimToCapHeight"
+                                           FontSize="11" HorizontalAlignment="Left"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumBrush}"
+                                           Text="{Binding Settings.OpenAIOrganization, Converter={StaticResource OpenAiKeyConverter}, Mode=OneWay}"
+                                           ToolTipService.ToolTip="{Binding Settings.OpenAIOrganization, Mode=OneWay}"
+                                           Visibility="{Binding Settings.OpenAIOrganization, Converter={StaticResource StringToVisibilityConverter}, Mode=OneWay}"/>
+                
+                                <TextBlock Margin="0 6 0 0"
+                                           FontWeight="Light" 
+                                           TextTrimming="CharacterEllipsis"
+                                           TextLineBounds="TrimToCapHeight"
+                                           FontSize="11" HorizontalAlignment="Left"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
+                                           Text="{Binding Settings.User, Mode=OneWay}"
+                                           ToolTipService.ToolTip="{Binding Settings.User, Mode=OneWay}"
+                                           Visibility="{Binding Settings.User, Converter={StaticResource StringToVisibilityConverter}, Mode=OneWay}"/>
+
+                            
+                                <TextBlock Margin="0 6 0 0"
+                                           FontWeight="Light" 
+                                           TextTrimming="CharacterEllipsis"
+                                           TextLineBounds="TrimToCapHeight"
+                                           FontSize="11" HorizontalAlignment="Left"
+                                           Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
+                                           Text="{Binding Settings.Size, Converter={StaticResource OpenAIImageSizeConverter}, Mode=OneWay}" />                                
+                            </StackPanel>
+
+                            
+                            <CommandBar x:Name="ActionsBar" Margin="6 0 0 0" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Visibility="Collapsed">
+                    
+                                <CommandBar.RenderTransform>
+                                    <CompositeTransform/>
+                                </CommandBar.RenderTransform>
+                    
+                                <CommandBar.Resources>
+                                    <ResourceDictionary Source="ms-appx:///Styles/CommandBarMediumResources.xaml"/>
+                                </CommandBar.Resources>                               
+                                
+                                <AppBarButton x:Name="OpenChatInNewWindow">
+                                    <ToolTipService.ToolTip>
+                                        <ToolTip x:Uid="OpenChatInNewWindowToolTip" Content="Open chat in new window" />
+                                    </ToolTipService.ToolTip>
+                                    <AppBarButton.Icon>
+                                        <FontIcon Glyph="&#xe78b;"/>
+                                    </AppBarButton.Icon>
+                                </AppBarButton>
+                                
+                                <AppBarButton x:Name="More" Label="More">
+                                    <ToolTipService.ToolTip>
+                                        <ToolTip x:Uid="MoreToolTip" Content="More" />
+                                    </ToolTipService.ToolTip>
+                                    <AppBarButton.Icon>
+                                        <FontIcon Glyph="&#xe712;"/>
+                                    </AppBarButton.Icon>
+                                    <AppBarButton.Flyout>
+                                        <MenuFlyout Placement="BottomEdgeAlignedRight">
+                                           <MenuFlyoutItem x:Name="Edit" x:Uid="EditMenu" Text="Edit">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xe70f;"/>
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+            
+                                            <MenuFlyoutSeparator/>
+            
+                                            <MenuFlyoutItem x:Name="Delete" x:Uid="DeleteMenu" Text="Delete">
+                                                <MenuFlyoutItem.Icon>
+                                                    <FontIcon Glyph="&#xe74d;"/>
+                                                </MenuFlyoutItem.Icon>
+                                            </MenuFlyoutItem>
+                                        </MenuFlyout>
+                                    </AppBarButton.Flyout>
+                                </AppBarButton>
+                            </CommandBar>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
+    </Style>
+</ResourceDictionary>

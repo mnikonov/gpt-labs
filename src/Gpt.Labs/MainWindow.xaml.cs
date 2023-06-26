@@ -1,19 +1,63 @@
-// Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
-
+using ColorCode.Common;
+using Gpt.Labs.Helpers;
+using Gpt.Labs.ViewModels;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
+using System;
+using Windows.UI.ViewManagement;
+
 namespace Gpt.Labs
 {
     public sealed partial class MainWindow : Window
     {
+        #region Fields
+
+        private UISettings uISettings;
+
+        #endregion
+
+        #region Constructors
+
         public MainWindow()
         {
             this.InitializeComponent();
+
+            this.uISettings = new UISettings();
+            this.uISettings.ColorValuesChanged += OnUISettingsColorValuesChanged;
+
+            this.Closed += OnMainWindowClosed;
         }
+
+        #endregion
+
+        #region Properties
+
+        public Guid WindowId { get; } = Guid.NewGuid();
+
+        #endregion
+
+        #region Private Methods
+
+        private void OnMainWindowClosed(object sender, WindowEventArgs args)
+        {
+            this.Closed -= OnMainWindowClosed;
+            this.uISettings.ColorValuesChanged -= OnUISettingsColorValuesChanged;
+
+            WindowManager.UnregisterWindow(this.WindowId);
+        }
+
+        private void OnUISettingsColorValuesChanged(UISettings sender, object args)
+        {
+            DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
+		        () =>
+		            {
+                        if (ApplicationSettings.Instance.AppTheme == ElementTheme.Default && this.Content != null)
+                        {
+                            this.ApplyTheme();
+                        }
+		            });
+        }
+
+        #endregion
     }
 }

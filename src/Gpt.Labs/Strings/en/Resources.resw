@@ -142,7 +142,7 @@
     <value>Enter OpenAI secret key...</value>
   </data>
   <data name="OpenAIOrganizationLabel.Text" xml:space="preserve">
-    <value>Organization ID</value>
+    <value>Organization ID (optional)</value>
   </data>
   <data name="OpenAIOrganizationTextBox.PlaceholderText" xml:space="preserve">
     <value>Enter OpenAI organization ID...</value>
@@ -193,7 +193,7 @@
     <value>Next</value>
   </data>
   <data name="ChatSettingsToolTip.Content" xml:space="preserve">
-    <value>Chat settings (Ctrl+S)</value>
+    <value>Chat settings (Ctrl+I)</value>
   </data>
   <data name="ChatSettings.Title" xml:space="preserve">
     <value>Settings</value>
@@ -463,13 +463,13 @@ Accepts a json object that maps tokens (specified by their token ID in the token
     <value>Are you shure that you want to delete selected chats?</value>
   </data>
   <data name="DeleteMultiMessagesToolTip.Content" xml:space="preserve">
-    <value>Delete multiple (Ctrl+D)</value>
+    <value>Delete multiple (Ctrl+Del)</value>
   </data>
   <data name="DialogDescription.DeleteMessage" xml:space="preserve">
     <value>Are you shure that you want to delete message?</value>
   </data>
   <data name="DialogDescription.DeleteMessages" xml:space="preserve">
-    <value>Are you shure that you want to delete selected messages?</value>
+    <value>Are you shure that you want to delete {0} messages?</value>
   </data>
   <data name="SelectMultiMessagesToolTip.Content" xml:space="preserve">
     <value>Select multiple (Crtl+M)</value>
@@ -487,7 +487,7 @@ Accepts a json object that maps tokens (specified by their token ID in the token
     <value>Share</value>
   </data>
   <data name="ShareMultiMessagesToolTip.Content" xml:space="preserve">
-    <value>Share multiple (Crtl+E)</value>
+    <value>Share multiple (Crtl+H)</value>
   </data>
   <data name="User" xml:space="preserve">
     <value>USER:</value>
@@ -511,7 +511,7 @@ Accepts a json object that maps tokens (specified by their token ID in the token
     <value>Edit</value>
   </data>
   <data name="SelectAllToolTip.Content" xml:space="preserve">
-    <value>Select all</value>
+    <value>Select all (Crtl+A)</value>
   </data>
   <data name="ImageCaption" xml:space="preserve">
     <value>Image</value>
@@ -540,26 +540,8 @@ Accepts a json object that maps tokens (specified by their token ID in the token
   <data name="OpenAIApiKeyDescription3.Text" xml:space="preserve">
     <value> page</value>
   </data>
-  <data name="OpenAIOrganizationDescription1.Text" xml:space="preserve">
-    <value>Get your Organization ID from </value>
-  </data>
-  <data name="OpenAIOrganizationDescription2.Text" xml:space="preserve">
-    <value>Organization settings</value>
-  </data>
-  <data name="OpenAIOrganizationDescription3.Text" xml:space="preserve">
-    <value> page</value>
-  </data>
   <data name="AboutCaption.Title" xml:space="preserve">
     <value>About</value>
-  </data>
-  <data name="AboutDescription1.Text" xml:space="preserve">
-    <value>For detailed information about the project, please visit our </value>
-  </data>
-  <data name="AboutDescription2.Text" xml:space="preserve">
-    <value>GitHub repository</value>
-  </data>
-  <data name="AboutDescription3.Text" xml:space="preserve">
-    <value>. GPT Labs is open source, and we welcome contributions from the community.</value>
   </data>
   <data name="BecomeLabel.Text" xml:space="preserve">
     <value>Become</value>
@@ -585,5 +567,62 @@ We understand the significance of community contributions, and we highly appreci
   </data>
   <data name="SuggesNewLabel.Text" xml:space="preserve">
     <value>Sugges new</value>
+  </data>
+  <data name="OpenChatInNewWindowToolTip.Content" xml:space="preserve">
+    <value>Open chat in new window (Ctrl+N)</value>
+  </data>
+  <data name="AboutDescription1.Text" xml:space="preserve">
+    <value>For detailed information about the project, please visit our </value>
+  </data>
+  <data name="AboutDescription2.Text" xml:space="preserve">
+    <value>GitHub repository</value>
+  </data>
+  <data name="AboutDescription3.Text" xml:space="preserve">
+    <value>. GPT Labs is open source, and we welcome contributions from the community.</value>
+  </data>
+  <data name="AboutDescription4.Text" xml:space="preserve">
+    <value>is an open source application that utilizes powerful content generative API from </value>
+  </data>
+  <data name="NotSpecified" xml:space="preserve">
+    <value>Not specified...</value>
+  </data>
+  <data name="ChatOpenAIOrganizationLabel.Text" xml:space="preserve">
+    <value>Organization ID</value>
+  </data>
+  <data name="OpenAIOrganizationDescription1.Text" xml:space="preserve">
+    <value>Get your Organization ID from </value>
+  </data>
+  <data name="OpenAIOrganizationDescription2.Text" xml:space="preserve">
+    <value>Organization settings</value>
+  </data>
+  <data name="OpenAIOrganizationDescription3.Text" xml:space="preserve">
+    <value> page. </value>
+  </data>
+  <data name="OpenAIOrganizationDescription4.Text" xml:space="preserve">
+    <value>For users who belong to organization, you can pass a Organization ID to specify which organization is used for an API request. Usage from these API requests will count against the specified organization subscription quota.</value>
+  </data>
+  <data name="LeaveLabel.Text" xml:space="preserve">
+    <value>Leave positive</value>
+  </data>
+  <data name="ReviewLabel.Text" xml:space="preserve">
+    <value>Review</value>
+  </data>
+  <data name="DeleteLast.Label" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="DeleteLastToolTip.Content" xml:space="preserve">
+    <value>Delete request and response messages (Crtl+D)</value>
+  </data>
+  <data name="RegenerateResponse.Label" xml:space="preserve">
+    <value>Regenerate</value>
+  </data>
+  <data name="RegenerateResponseToolTip.Content" xml:space="preserve">
+    <value>Regenerate response message (Crtl+G)</value>
+  </data>
+  <data name="StopGenerating.Label" xml:space="preserve">
+    <value>Stop</value>
+  </data>
+  <data name="StopGeneratingToolTip.Content" xml:space="preserve">
+    <value>Stop generating response message</value>
   </data>
 </root>

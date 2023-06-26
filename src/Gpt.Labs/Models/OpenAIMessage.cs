@@ -8,7 +8,7 @@ using System.Text.Json.Serialization;
 
 namespace Gpt.Labs.Models
 {
-    public partial class OpenAIMessage : AuditableEntity, ISelectable
+    public partial class OpenAIMessage : AuditableEntity, ISelectable, IHover
     {
         #region Fields
 
@@ -19,6 +19,8 @@ namespace Gpt.Labs.Models
         private Guid chatId;
 
         private bool isSelected;
+
+        private bool isHovered;
 
         #endregion
 
@@ -52,6 +54,14 @@ namespace Gpt.Labs.Models
         {
             get => this.isSelected;
             set => this.Set(ref this.isSelected, value);
+        }
+
+        [JsonIgnore]
+        [NotMapped]
+        public bool IsHovered 
+        {
+            get => this.isHovered;
+            set => this.Set(ref this.isHovered, value);
         }
 
         #endregion

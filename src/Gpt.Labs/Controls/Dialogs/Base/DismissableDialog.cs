@@ -1,10 +1,11 @@
-﻿namespace Gpt.Labs.Controls.Dialogs.Base
-{
-    using Microsoft.UI.Xaml;
-    using Microsoft.UI.Xaml.Input;
-    using Microsoft.UI.Xaml.Media;
-    using Microsoft.UI.Xaml.Shapes;
+﻿using Gpt.Labs.ViewModels;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Shapes;
 
+namespace Gpt.Labs.Controls.Dialogs.Base
+{
     public partial class DismissableDialog : ContentDialogBase
     {
         #region Fields
@@ -16,6 +17,15 @@
             new PropertyMetadata(false, CanAutoClosePropertyChangedCallback));
 
         private Rectangle lockRectangle;
+
+        #endregion
+
+        #region Constructors
+
+        public DismissableDialog(Window window)
+            : base(window)
+        {
+        }
 
         #endregion
 
@@ -36,7 +46,7 @@
         {
             base.OnApplyTemplate();
 
-            var popups = VisualTreeHelper.GetOpenPopups(App.Window);
+            var popups = VisualTreeHelper.GetOpenPopups(this.window);
             foreach (var popup in popups)
             {
                 var child = popup.Child as Rectangle;

@@ -1,7 +1,6 @@
 using Gpt.Labs.ViewModels.Base;
 using Gpt.Labs.ViewModels;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using System.Threading.Tasks;
 using Gpt.Labs.Helpers.Navigation;
@@ -11,7 +10,7 @@ using Gpt.Labs.Helpers;
 
 namespace Gpt.Labs
 {
-    public sealed partial class ActivationPage : Page
+    public sealed partial class ActivationPage : BasePage
     {
         #region Fields
         
@@ -27,7 +26,7 @@ namespace Gpt.Labs
 
         public ActivationPage()
         {
-            this.ViewModel = new ActivationViewModel(this.ExecuteStepAndContinue);
+            this.ViewModel = new ActivationViewModel(() => this, this.ExecuteStepAndContinue);
             this.InitializeComponent();
             
             this.Loaded += OnActivationWizardLoaded;
@@ -54,8 +53,6 @@ namespace Gpt.Labs
             base.OnNavigatedTo(e);
 
             this.ViewModel.NavigationParameter = Query.Parse(e.Parameter);
-
-            SystemThemeHelper.ApplyTheme((FrameworkElement)App.Window.Content);
         }
 
         private async void OnActivationWizardLoaded(object sender, RoutedEventArgs e)

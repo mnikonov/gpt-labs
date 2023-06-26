@@ -9,10 +9,10 @@
 
     <Style TargetType="controls:TitledContentPanel">
         <Style.Setters>
-            <Setter Property="Background" Value="{ThemeResource LayerFillColorDefaultBrush}" />
-            <Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundBaseLowBrush}" />
+            <Setter Property="Background" Value="{ThemeResource PanelBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource PanelBordersBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="CornerRadius" Value="6" />
             <Setter Property="Padding" Value="18" />
             <Setter Property="Template">
                 <Setter.Value>

@@ -48,33 +48,10 @@ namespace Gpt.Labs.Controls.Extensions
             }
             finally
             {
-                await App.Window.DispatcherQueue.EnqueueAsync(() =>
+                await control.DispatcherQueue.EnqueueAsync(() =>
                 {
                     control.IsEnabled = true;
                 });
-            }
-        }
-
-        public static async Task BlockUiAndExecute(this ShellPage shell, Func<CancellationToken, Task> action, bool showProgress = true, CancellationToken token = default)
-        {
-            try
-            {
-                if (showProgress)
-                {
-                    shell.IsProgressActive = true;
-                }
-
-                await action(token);
-            }
-            finally
-            {
-                if (showProgress)
-                {
-                    await App.Window.DispatcherQueue.EnqueueAsync(() =>
-                    {
-                        shell.IsProgressActive = false;
-                    });
-                }
             }
         }
     }
