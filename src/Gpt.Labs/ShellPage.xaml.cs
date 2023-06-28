@@ -3,6 +3,7 @@ using Gpt.Labs.Helpers;
 using Gpt.Labs.Helpers.Navigation;
 using Gpt.Labs.Models.Enums;
 using Gpt.Labs.ViewModels;
+using Microsoft.AppCenter.Crashes;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -28,6 +29,8 @@ namespace Gpt.Labs
             this.ShellFrame.Navigated += this.OnFrameNavigated;
 
             this.MainNavigationView.BackRequested += this.OnBackRequested;
+
+            //Crashes.GenerateTestCrash();
         }
 
         #endregion
