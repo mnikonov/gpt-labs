@@ -36,13 +36,10 @@
 # For a complete CI/CD sample to get started with GitHub Action workflows for Desktop Applications,
 # refer to https://github.com/microsoft/github-actions-for-desktop-apps
 
-name: Generation of build artifact
+name: Manual test build workflow
 
 on:
-  push:
-    branches: [ "face" ] #replace with main
-  pull_request:
-    branches: [ "face" ]
+  workflow_dispatch:
 
 jobs:
 
@@ -57,9 +54,9 @@ jobs:
       Appx_Package_Build_Mode: StoreUpload
       Solution_Name: ${{github.workspace}}\src\Gpt.Labs.sln
       Project_Name: Gpt_Labs
-      #Test_Project_Path: your-test-project-path                  # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
       x64_Packages_Folder_Path: ${{github.workspace}}\packages\x64
       x86_Packages_Folder_Path: ${{github.workspace}}\packages\x86
+      Source_Folder_Path: ${{github.workspace}}\packages\source
       Boundle_Folder_Path: ${{github.workspace}}\packages\bundle
       Project_Folder_Path: ${{github.workspace}}\src\Gpt.Labs
       Pfx_Name: GptLabs_SideloadingKey.pfx
@@ -86,7 +83,8 @@ jobs:
 
     # Restore the application to populate the obj folder with RuntimeIdentifiers
     - name: Restore the application
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
+      run: |
+        msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
 
     - name: Get application version
       id: versionStep
@@ -122,6 +120,7 @@ jobs:
             /p:PackageCertificatePassword=${{ secrets.Pfx_Key }} `
             /p:PackageCertificateThumbprint=${{steps.decodePfxStep.outputs.Thumbprint}} `
             /p:GenerateAppxPackageOnBuild=true `
+            /p:AppxSymbolPackageEnabled=true `
             /p:AppxPackageDir=$env:x64_Packages_Folder_Path\
       env:
         Platform: x64
@@ -141,6 +140,7 @@ jobs:
             /p:PackageCertificatePassword=${{ secrets.Pfx_Key }} `
             /p:PackageCertificateThumbprint=${{steps.decodePfxStep.outputs.Thumbprint}} `
             /p:GenerateAppxPackageOnBuild=true `
+            /p:AppxSymbolPackageEnabled=true `
             /p:AppxPackageDir=$env:x86_Packages_Folder_Path\
       env:
         Platform: x86
