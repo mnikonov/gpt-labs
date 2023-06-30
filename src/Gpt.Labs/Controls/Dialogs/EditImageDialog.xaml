@@ -37,7 +37,7 @@
         <TextBlock x:Uid="SizeMessageDescription" Style="{StaticResource DescriptionStyle}" />
 
          
-        <TextBlock x:Uid="UserLabel" Style="{StaticResource LabelStyle}"
+        <TextBlock x:Uid="OpenAiUserLabel" Style="{StaticResource LabelStyle}"
                     Text="User"/>
 
         <TextBox x:Name="UserTextBox" x:Uid="UserTextBox" MaxLength="250"
@@ -50,7 +50,7 @@
         </TextBlock>
          
         
-        <TextBlock x:Name="OpenAIOrganizationLabel" x:Uid="ChatOpenAIOrganizationLabel" Text="Organization ID" 
+        <TextBlock x:Name="OpenAIOrganizationLabel" x:Uid="OpenAIOrganizationLabel" Text="Organization ID" 
                    Style="{StaticResource LabelStyle}"/>
 
         <PasswordBox x:Name="OpenAIOrganizationTextBox" x:Uid="OpenAIOrganizationTextBox" MaxLength="50"

@@ -132,7 +132,10 @@
                                 <toolkit:MarkdownTextBlock x:Name="MessageTextBlock" Grid.Column="0"
                                     Background="Transparent"
                                     Text="{Binding Content, Mode=OneWay}"
-                                    LinkForeground="{ThemeResource MarkdownLinkForeground}">
+                                    LinkForeground="{ThemeResource MarkdownLinkForeground}"
+                                    CodeBackground="{ThemeResource MarkdownCodeBackground}"
+                                    CodeBorderBrush="{ThemeResource MarkdownCodeBorderBrush}"
+                                    CodeBorderThickness="1">
                                 </toolkit:MarkdownTextBlock> 
                             </Border>
                         </Grid>
@@ -226,7 +229,10 @@
                                 <toolkit:MarkdownTextBlock x:Name="MessageTextBlock" Grid.Column="0"
                                     Background="Transparent"
                                     Text="{Binding Content, Mode=OneWay}"
-                                    LinkForeground="{ThemeResource MarkdownLinkForeground}">
+                                    LinkForeground="{ThemeResource MarkdownLinkForeground}"
+                                    CodeBackground="{ThemeResource MarkdownCodeBackground}"
+                                    CodeBorderBrush="{ThemeResource MarkdownCodeBorderBrush}"
+                                    CodeBorderThickness="1">
                                 </toolkit:MarkdownTextBlock> 
                             </Border>
                            
