@@ -60,10 +60,6 @@ namespace Gpt.Labs.ViewModels
 
         private bool multiSelectModeEnabled;
 
-        private DataTransferManager dataTransferManager;
-
-        private OpenAIMessage[] shareMessages;
-
         private CancellationTokenSource cancellation;
 
         private bool processingMessage;
@@ -158,9 +154,6 @@ namespace Gpt.Labs.ViewModels
                     break;
             }
 
-            this.dataTransferManager = this.Window.GetDataTransferManager();
-            this.dataTransferManager.DataRequested += this.OnDataTransferManagerDataRequested;
-
             await base.LoadStateAsync(destinationPageType, parameters, state, mode);
         }
 
@@ -169,8 +162,6 @@ namespace Gpt.Labs.ViewModels
             base.SaveState(destinationPageType, parameters, state, mode);
 
             state.SetValue(nameof(this.ChatId), this.ChatId);
-
-            this.dataTransferManager.DataRequested -= this.OnDataTransferManagerDataRequested;
         }
 
         public async Task CancelSettings()
@@ -515,8 +506,7 @@ namespace Gpt.Labs.ViewModels
                 return;
             }
 
-            this.shareMessages = messages;
-
+            this.Window.SetShareContent(this.Chat.ShareChatContent(messages));
             this.Window.ShowShareUI();
         }
 
@@ -588,43 +578,7 @@ namespace Gpt.Labs.ViewModels
                 this.watch.Reset();
             }
         }
-
-        private async void OnDataTransferManagerDataRequested(DataTransferManager sender, DataRequestedEventArgs args)
-        {
-            var requestData = args.Request.Data;
-            var differal = args.Request.GetDeferral();
-
-            try
-            {
-                requestData.Properties.Title = this.Chat.Title;
-
-                requestData.SetText(this.shareMessages.Format());
-
-                if (this.Chat.Type == OpenAIChatType.Image)
-                {
-                    var images = new List<IStorageItem>();
-
-                    foreach (var message in this.shareMessages)
-                    {
-                        if (message.Role == OpenAIRole.Assistant)
-                        {
-                            var file = await ApplicationData.Current.LocalCacheFolder.GetFileAsync($"{message.ChatId}\\{message.Id}.png");
-                            images.Add(file);
-                        }
-                    }
-
-                    if (images.Count > 0)
-                    {
-                        requestData.SetStorageItems(images);
-                    }
-                }
-            }
-            finally
-            {
-                differal.Complete();
-            }
-        }
-
+                
         private async Task StartRecord()
         {        
             this.IsRecording = true;

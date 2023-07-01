@@ -5,6 +5,7 @@ using Gpt.Labs.Helpers.Navigation;
 using Gpt.Labs.Models;
 using Gpt.Labs.ViewModels;
 using Gpt.Labs.ViewModels.Base;
+using Gpt.Labs.ViewModels.Enums;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -194,7 +195,12 @@ namespace Gpt.Labs
 
         private async void OnAddChatClick(object sender, RoutedEventArgs e)
         {
-            await this.ViewModel.Result.AddEditChat(null);
+            var result = await this.ViewModel.Result.AddEditChat(null);
+
+            if (result == SaveResult.Added)
+            {
+                this.SelectChat(this.ViewModel.Result.ItemsCollection.FirstOrDefault());
+            }
         }
                 
         private void OnChatListItemClick(object sender, ItemClickEventArgs e)
@@ -203,14 +209,7 @@ namespace Gpt.Labs
 
             if (this.ViewModel.Result.SelectedElement?.Id != chat?.Id)
             {
-                this.ViewModel.Result.SelectChat(chat);
-
-                var query = new Query
-                {
-                    { "chat-id", chat.Id }
-                };
-
-                this.chatFrame.Navigate(typeof(MessagesPage), query.ToString(), new EntranceNavigationTransitionInfo());
+                this.SelectChat(chat);
             }
         }
 
@@ -290,6 +289,23 @@ namespace Gpt.Labs
             {              
                 this.RootPage?.SuspensionManager?.RegisterFrame(this.chatFrame, $"ChatFrameState_{this.frameUid}");
             });
+        }
+
+        private void SelectChat(OpenAIChat chat)
+        {
+            if (chat == null)
+            {
+                return;
+            }
+
+            this.ViewModel.Result.SelectChat(chat);
+
+            var query = new Query
+            {
+                { "chat-id", chat.Id }
+            };
+
+            this.chatFrame.Navigate(typeof(MessagesPage), query.ToString(), new EntranceNavigationTransitionInfo());
         }
 
         #endregion

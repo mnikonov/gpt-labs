@@ -6,6 +6,7 @@ using Gpt.Labs.Models;
 using Gpt.Labs.Models.Enums;
 using Gpt.Labs.ViewModels.Base;
 using Gpt.Labs.ViewModels.Collections;
+using Gpt.Labs.ViewModels.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -47,7 +48,7 @@ namespace Gpt.Labs.ViewModels
 
         #region Public Methods
 
-        public async Task<bool> AddEditChat(OpenAIChat chat)
+        public async Task<SaveResult> AddEditChat(OpenAIChat chat)
         {
             var dialogModel = new OpenAIChat() { Title = chat?.Title, Type = this.ChatType, Position = 0 };
 
@@ -87,59 +88,63 @@ namespace Gpt.Labs.ViewModels
 
             var result = await dialog.ShowAsync();
 
-            var edited = false;
-
-            if (result == ContentDialogResult.Primary)
+            if (result != ContentDialogResult.Primary)
             {
-                if (chat != null)
+                return SaveResult.Cancelled;
+            }
+
+            if (chat != null)
+            {
+                chat.Title = dialogModel.Title;
+                chat.Settings.User = settings.User;
+                chat.Settings.OpenAIOrganization = settings.OpenAIOrganization;
+
+                switch (ChatType)
                 {
-                    chat.Title = dialogModel.Title;
-                    chat.Settings.User = settings.User;
-                    chat.Settings.OpenAIOrganization = settings.OpenAIOrganization;
-
-                    switch (ChatType)
-                    {
-                        case OpenAIChatType.Chat:
-                            ((OpenAIChatSettings)chat.Settings).SystemMessage = ((OpenAIChatSettings)settings).SystemMessage;
-                            ((OpenAIChatSettings)chat.Settings).ModelId = ((OpenAIChatSettings)settings).ModelId;
-                            break;
-                        case OpenAIChatType.Image:
-                            ((OpenAIImageSettings)chat.Settings).Size = ((OpenAIImageSettings)settings).Size;
-                            break;
-                    }
-                }
-
-                using (var context = new DataContext())
-                {
-                    if (chat != null)
-                    {
-                        context.Entry(chat).State = EntityState.Modified;
-                        context.Entry(chat.Settings).State = EntityState.Modified;
-
-                        edited = true;
-                    }
-                    else
-                    {
-                        for (int i = 0; i < this.ItemsCollection.Count; i++)
-                        {
-                            var item = this.ItemsCollection[i];
-                            item.Position = i + 1;
-                            context.Entry(item).State = EntityState.Modified;
-                        }
-
-                        context.Add(dialogModel);
-                    }
-
-                    await context.SaveChangesAsync();
-                }
-
-                if (chat == null)
-                {
-                    this.ItemsCollection.Insert(0, dialogModel);
+                    case OpenAIChatType.Chat:
+                        ((OpenAIChatSettings)chat.Settings).SystemMessage = ((OpenAIChatSettings)settings).SystemMessage;
+                        ((OpenAIChatSettings)chat.Settings).ModelId = ((OpenAIChatSettings)settings).ModelId;
+                        break;
+                    case OpenAIChatType.Image:
+                        ((OpenAIImageSettings)chat.Settings).Size = ((OpenAIImageSettings)settings).Size;
+                        break;
                 }
             }
 
-            return edited;
+            var saveResult = SaveResult.Cancelled;
+
+            using (var context = new DataContext())
+            {
+                if (chat != null)
+                {
+                    context.Entry(chat).State = EntityState.Modified;
+                    context.Entry(chat.Settings).State = EntityState.Modified;
+
+                    saveResult = SaveResult.Edited;
+                }
+                else
+                {
+                    for (int i = 0; i < this.ItemsCollection.Count; i++)
+                    {
+                        var item = this.ItemsCollection[i];
+                        item.Position = i + 1;
+                        context.Entry(item).State = EntityState.Modified;
+                    }
+
+                    context.Add(dialogModel);
+
+                    saveResult = SaveResult.Added;
+                }
+
+                await context.SaveChangesAsync();
+            }
+
+            if (chat == null)
+            {
+                this.ItemsCollection.Insert(0, dialogModel);
+            }
+
+            return saveResult;
         }
 
         public async Task DeleteChats(params OpenAIChat[] chats)
