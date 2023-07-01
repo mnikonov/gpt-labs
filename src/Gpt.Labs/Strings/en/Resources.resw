@@ -642,4 +642,7 @@ Time to add a new one!</value>
     <value>Do you have a question for me?
 I'm available to listen.</value>
   </data>
+  <data name="ShareToolTip.Content" xml:space="preserve">
+    <value>Share</value>
+  </data>
 </root>

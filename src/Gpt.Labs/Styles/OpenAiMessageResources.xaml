@@ -135,6 +135,8 @@
                                     LinkForeground="{ThemeResource MarkdownLinkForeground}"
                                     CodeBackground="{ThemeResource MarkdownCodeBackground}"
                                     CodeBorderBrush="{ThemeResource MarkdownCodeBorderBrush}"
+                                    TableBorderBrush="{ThemeResource MarkdownCodeBorderBrush}"
+                                    CodePadding="16 12"
                                     CodeBorderThickness="1">
                                 </toolkit:MarkdownTextBlock> 
                             </Border>
@@ -232,6 +234,8 @@
                                     LinkForeground="{ThemeResource MarkdownLinkForeground}"
                                     CodeBackground="{ThemeResource MarkdownCodeBackground}"
                                     CodeBorderBrush="{ThemeResource MarkdownCodeBorderBrush}"
+                                    TableBorderBrush="{ThemeResource MarkdownCodeBorderBrush}"
+                                    CodePadding="16 12"
                                     CodeBorderThickness="1">
                                 </toolkit:MarkdownTextBlock> 
                             </Border>
