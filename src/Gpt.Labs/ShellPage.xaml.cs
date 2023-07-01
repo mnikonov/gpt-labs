@@ -29,8 +29,6 @@ namespace Gpt.Labs
             this.ShellFrame.Navigated += this.OnFrameNavigated;
 
             this.MainNavigationView.BackRequested += this.OnBackRequested;
-
-            //Crashes.GenerateTestCrash();
         }
 
         #endregion

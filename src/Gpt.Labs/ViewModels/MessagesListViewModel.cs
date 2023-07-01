@@ -561,9 +561,10 @@ namespace Gpt.Labs.ViewModels
                     this.Message = string.Empty;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 this.Message = string.Empty;
+                ex.LogError("Exception on attempt to stop recording");
             }
             finally 
             {                 
@@ -647,6 +648,8 @@ namespace Gpt.Labs.ViewModels
 
                     await dialog.ShowAsync();
                 });
+
+                ex.LogWarning();
             }
             catch (TaskCanceledException)
             {
