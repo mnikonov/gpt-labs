@@ -102,7 +102,7 @@ namespace Gpt.Labs.Controls
         {
             var result = await this.ParentViewViewModel.AddEditChat(this.ViewModel);
 
-            if (result && this.ParentViewViewModel.SelectedElement != null && this.ViewModel.Id == this.ParentViewViewModel.SelectedElement.Id)
+            if (result == ViewModels.Enums.SaveResult.Edited && this.ParentViewViewModel.SelectedElement != null && this.ViewModel.Id == this.ParentViewViewModel.SelectedElement.Id)
             {
                 ((MessagesPage)this.ParentPage.GetInnerFrame().Content).ViewModel.Result.Chat = this.ParentViewViewModel.SelectedElement;
             }

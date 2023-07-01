@@ -119,15 +119,26 @@
             
             <StackPanel x:Name="AddChatMsg" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="12 12 12 62"
                     x:Load="{x:Bind ViewModel.Result.ItemsCollection.Count, Converter={StaticResource CountToBooleanConverter}, Mode=OneWay}">
-                <FontIcon Glyph="&#xed0e;" FontSize="26"/>
-                <TextBlock x:Uid="AddChatLabel" Text="Add new chat" Margin="0 6 0 0" FontSize="12"></TextBlock>
+                <FontIcon Glyph="&#xe82f;" FontSize="26"/>
+                <TextBlock x:Uid="NoChatsLabel" Text="No chats to display" Margin="0 6 0 0" FontSize="12" TextAlignment="Center"></TextBlock>
             </StackPanel>
         </Grid>
 
         <StackPanel x:Name="SelectChatMsg" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Padding="12"
                     x:Load="{x:Bind ViewModel.Result.SelectedElement, Converter={StaticResource ObjectToBooleanConverter}, ConverterParameter='=', Mode=OneWay}">
-            <FontIcon Glyph="&#xe89b;" FontSize="48"/>
-            <TextBlock x:Uid="SelectChatLabel" Text="Select a chat to start messaging" Margin="0 12 0 0"></TextBlock>
+            <FontIcon Glyph="&#xe89b;" FontSize="48"  HorizontalAlignment="Center"/>
+            
+            <TextBlock x:Uid="SelectChatLabel" Text="Select a chat to start messaging" Margin="0 18 0 0" TextLineBounds="Tight" HorizontalAlignment="Center"></TextBlock>
+            
+            <TextBlock x:Uid="OrLabel" Text="or" Margin="0 18 0 0" HorizontalAlignment="Center" TextLineBounds="Tight"></TextBlock>
+            
+            <Button x:Name="AddNewChat" Margin="0 18 0 0" HorizontalAlignment="Center" Style="{StaticResource AccentButtonStyle}"
+                    Click="OnAddChatClick">
+                <StackPanel Orientation="Horizontal" Spacing="14"> 
+                    <FontIcon Glyph="&#xed0e;" FontSize="24"/>
+                    <TextBlock x:Uid="AddChatLabel" Text="Add a new one" VerticalAlignment="Center" TextLineBounds="Tight" /> 
+                </StackPanel> 
+            </Button>
         </StackPanel>
         
     </Grid>

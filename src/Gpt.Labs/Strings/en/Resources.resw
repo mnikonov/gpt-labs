@@ -430,7 +430,7 @@ Accepts a json object that maps tokens (specified by their token ID in the token
     <value>Select a chat to start messaging</value>
   </data>
   <data name="AddChatLabel.Text" xml:space="preserve">
-    <value>Add new chat</value>
+    <value>Add a new one</value>
   </data>
   <data name="AddChatToolTip.Content" xml:space="preserve">
     <value>Add chat</value>
@@ -624,5 +624,25 @@ We understand the significance of community contributions, and we highly appreci
   </data>
   <data name="StopGeneratingToolTip.Content" xml:space="preserve">
     <value>Stop generating response message</value>
+  </data>
+  <data name="MessageTextBox.PlaceholderText" xml:space="preserve">
+    <value>Write a message...</value>
+  </data>
+  <data name="NoChatsLabel.Text" xml:space="preserve">
+    <value>No chats to display.
+Time to add a new one!</value>
+  </data>
+  <data name="OpenAiUserLabel.Text" xml:space="preserve">
+    <value>User (optional)</value>
+  </data>
+  <data name="OrLabel.Text" xml:space="preserve">
+    <value>or</value>
+  </data>
+  <data name="StartChatLabel.Text" xml:space="preserve">
+    <value>Do you have a question for me?
+I'm available to listen.</value>
+  </data>
+  <data name="ShareToolTip.Content" xml:space="preserve">
+    <value>Share</value>
   </data>
 </root>
