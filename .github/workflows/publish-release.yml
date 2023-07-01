@@ -60,6 +60,11 @@ jobs:
         $thumbprint = (Import-PfxCertificate -FilePath "$certificatePath" -CertStoreLocation Cert:\CurrentUser\My -Password $secure_string_pwd).Thumbprint
         echo "Thumbprint=$thumbprint" >> $env:GITHUB_OUTPUT
     
+    - name: Replace App Center Secret
+      id: replaceAppCenterSecret
+      run: |
+        (Get-Content $env:Project_Folder_Path\App.xaml.cs) | Foreach-Object {$_ -replace "{APP_CENTER_SECRET}", "${{ secrets.App_Center_Secret }}"} | Set-Content $env:Project_Folder_Path\App.xaml.cs
+    
     - name: Create the x64 app package
       run: |
         msbuild `
@@ -75,6 +80,7 @@ jobs:
             /p:PackageCertificatePassword=${{ secrets.Pfx_Key }} `
             /p:PackageCertificateThumbprint=${{steps.decodePfxStep.outputs.Thumbprint}} `
             /p:GenerateAppxPackageOnBuild=true `
+            /p:AppxSymbolPackageEnabled=true `
             /p:AppxPackageDir=$env:x64_Packages_Folder_Path\
       env:
         Platform: x64
@@ -94,6 +100,7 @@ jobs:
             /p:PackageCertificatePassword=${{ secrets.Pfx_Key }} `
             /p:PackageCertificateThumbprint=${{steps.decodePfxStep.outputs.Thumbprint}} `
             /p:GenerateAppxPackageOnBuild=true `
+            /p:AppxSymbolPackageEnabled=true `
             /p:AppxPackageDir=$env:x86_Packages_Folder_Path\
       env:
         Platform: x86
@@ -113,6 +120,7 @@ jobs:
             /p:PackageCertificatePassword=${{ secrets.Pfx_Key }} `
             /p:PackageCertificateThumbprint=${{steps.decodePfxStep.outputs.Thumbprint}} `
             /p:GenerateAppxPackageOnBuild=true `
+            /p:AppxSymbolPackageEnabled=true `
             /p:AppxPackageDir=$env:arm64_Packages_Folder_Path\
       env:
         Platform: arm64

@@ -93,6 +93,11 @@ jobs:
         $version = $xml.Package.Identity.Version
         echo "Version=$version" >> $env:GITHUB_OUTPUT
 
+    - name: Replace App Center Secret
+      id: replaceAppCenterSecret
+      run: |
+        (Get-Content $env:Project_Folder_Path\App.xaml.cs) | Foreach-Object {$_ -replace "{APP_CENTER_SECRET}", "${{ secrets.App_Center_Secret }}"} | Set-Content $env:Project_Folder_Path\App.xaml.cs
+
     # Decode the base 64 encoded pfx and save the Signing_Certificate
     - name: Decode the pfx
       id: decodePfxStep
