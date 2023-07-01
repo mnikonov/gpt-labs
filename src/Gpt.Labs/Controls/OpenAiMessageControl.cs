@@ -8,6 +8,7 @@ using Windows.System;
 using Microsoft.UI.Xaml.Input;
 using Gpt.Labs.Helpers;
 using Gpt.Labs.ViewModels;
+using Gpt.Labs.Controls.Markdown;
 
 namespace Gpt.Labs.Controls
 {
@@ -71,6 +72,8 @@ namespace Gpt.Labs.Controls
                 //this.textBlock.ImageResolving += this.OnMarkdownTextBlockImageResolving;
                 this.textBlock.ImageClicked -= this.OnMarkdownTextBlockImageClicked;
                 this.textBlock.ImageClicked += this.OnMarkdownTextBlockImageClicked;
+
+                this.textBlock.SetRenderer<ExtendedMarkdownRenderer>();
             }
 
             if (this.copyButton != null)

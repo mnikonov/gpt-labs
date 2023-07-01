@@ -1,5 +1,4 @@
 ﻿using Gpt.Labs.Common.Interfaces;
-using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Models;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -153,20 +152,6 @@ namespace Gpt.Labs.Helpers.Navigation
             {
                 state = frameState.PageState[this.pageKey];
             }
-
-            var eventProperties = new ViewModelState()
-            {
-                ["SourcePage"] = e.SourcePageType.Name,
-                ["Query"] = e.Parameter != null ? e.Parameter.ToString() : string.Empty,
-                ["NavigationMode"] = e.NavigationMode.ToString()
-            };
-
-            foreach (var stateItem in state)
-            {
-                eventProperties.Add(stateItem.Key, stateItem.Value);
-            }
-
-            "PageNavigation".LogEvent(eventProperties);
             
             await (this.Page as IPageStateStore)?.LoadState(
                 e.SourcePageType,

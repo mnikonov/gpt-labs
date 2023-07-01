@@ -21,6 +21,8 @@
             <Color x:Key="AssistantMessageBackgroundColorDefault">#4D000000</Color>
             
             <SolidColorBrush x:Key="MarkdownLinkForeground" Color="{ThemeResource SystemAccentColorLight2}" />
+            <SolidColorBrush x:Key="MarkdownCodeBackground" Color="{ThemeResource SmokeFillColorDefault}" />
+            <SolidColorBrush x:Key="MarkdownCodeBorderBrush" Color="{ThemeResource ControlStrokeColorSecondary}" />
             
             <SolidColorBrush x:Key="PanelBordersBrush" Color="{StaticResource PanelBordersColor}" />
             <SolidColorBrush x:Key="PanelBackgroundBrush" Color="{StaticResource PanelBackgroundColor}" />
@@ -32,6 +34,8 @@
             <Color x:Key="AssistantMessageBackgroundColorDefault">#80F6F6F6</Color>
             
             <SolidColorBrush x:Key="MarkdownLinkForeground" Color="{ThemeResource SystemAccentColorDark1}" />
+            <SolidColorBrush x:Key="MarkdownCodeBackground" Color="{ThemeResource SurfaceStrokeColorFlyout}" />
+            <SolidColorBrush x:Key="MarkdownCodeBorderBrush" Color="{ThemeResource ControlStrokeColorSecondary}" />
             
             <SolidColorBrush x:Key="PanelBordersBrush" Color="{StaticResource PanelBordersColor}" />
             <SolidColorBrush x:Key="PanelBackgroundBrush" Color="{StaticResource PanelBackgroundColor}" />
@@ -39,6 +43,8 @@
         </ResourceDictionary>
         <ResourceDictionary x:Key="HighContrast">
             <SolidColorBrush x:Key="MarkdownLinkForeground" Color="{ThemeResource SystemAccentColorDark1}" />
+            <SolidColorBrush x:Key="MarkdownCodeBackground" Color="{ThemeResource SystemColorWindowTextColor}" />
+            <SolidColorBrush x:Key="MarkdownCodeBorderBrush" Color="{ThemeResource ControlStrokeColorSecondary}" />
             
             <SolidColorBrush x:Key="PanelBordersBrush" Color="{ThemeResource SystemColorWindowTextColor}" />
             <SolidColorBrush x:Key="PanelBackgroundBrush" Color="{ThemeResource SystemColorWindowColor}" />

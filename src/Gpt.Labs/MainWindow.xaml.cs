@@ -1,9 +1,15 @@
-using ColorCode.Common;
 using Gpt.Labs.Helpers;
+using Gpt.Labs.Helpers.Extensions;
+using Gpt.Labs.Models;
+using Gpt.Labs.Models.Enums;
 using Gpt.Labs.ViewModels;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
+using OpenAI.Chat;
 using System;
+using System.Collections.Generic;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Storage;
 using Windows.UI.ViewManagement;
 
 namespace Gpt.Labs
@@ -13,6 +19,10 @@ namespace Gpt.Labs
         #region Fields
 
         private UISettings uISettings;
+                
+        private DataTransferManager dataTransferManager;
+
+        private ShareContent share;
 
         #endregion
 
@@ -26,6 +36,9 @@ namespace Gpt.Labs
             this.uISettings.ColorValuesChanged += OnUISettingsColorValuesChanged;
 
             this.Closed += OnMainWindowClosed;
+            
+            this.dataTransferManager = this.GetDataTransferManager();
+            this.dataTransferManager.DataRequested += this.OnDataTransferManagerDataRequested;
         }
 
         #endregion
@@ -36,14 +49,60 @@ namespace Gpt.Labs
 
         #endregion
 
+        #region Public Methods
+
+        public void SetShareContent(ShareContent share)
+        {
+            this.share = share;
+        }
+
+        #endregion
+
         #region Private Methods
 
         private void OnMainWindowClosed(object sender, WindowEventArgs args)
         {
             this.Closed -= OnMainWindowClosed;
             this.uISettings.ColorValuesChanged -= OnUISettingsColorValuesChanged;
-
+            this.dataTransferManager.DataRequested -= this.OnDataTransferManagerDataRequested;
+            
             WindowManager.UnregisterWindow(this.WindowId);
+        }
+
+        private async void OnDataTransferManagerDataRequested(DataTransferManager sender, DataRequestedEventArgs args)
+        {
+            var requestData = args.Request.Data;
+            var differal = args.Request.GetDeferral();
+
+            try
+            {
+                if (!string.IsNullOrEmpty(share.Title))
+                {
+                    requestData.Properties.Title = share.Title;
+                }
+
+                if (!string.IsNullOrEmpty(share.Message))
+                {
+                    requestData.SetText(share.Message);
+                }
+
+                if (share.Files.Count > 0)
+                {
+                    var files = new List<IStorageItem>();
+
+                    foreach (var filePath in this.share.Files)
+                    {
+                        var file = await ApplicationData.Current.LocalCacheFolder.GetFileAsync(filePath);
+                        files.Add(file);
+                    }
+
+                    requestData.SetStorageItems(files);
+                }
+            }
+            finally
+            {
+                differal.Complete();
+            }
         }
 
         private void OnUISettingsColorValuesChanged(UISettings sender, object args)
