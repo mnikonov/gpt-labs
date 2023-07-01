@@ -1,7 +1,6 @@
 ﻿using Gpt.Labs.Helpers;
 using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Helpers.Navigation;
-using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
@@ -10,6 +9,15 @@ using Microsoft.Windows.ApplicationModel.Resources;
 using System;
 using System.Diagnostics;
 using Windows.ApplicationModel.Activation;
+
+#if !DEBUG
+
+using System.Globalization;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
+using Microsoft.AppCenter;
+
+#endif
 
 namespace Gpt.Labs
 {
@@ -21,10 +29,21 @@ namespace Gpt.Labs
         {
             this.InitializeComponent();
 
+#if !DEBUG
+            AppCenter.Configure("{APP_CENTER_SECRET}");
+            AppCenter.SetCountryCode(RegionInfo.CurrentRegion.TwoLetterISORegionName);
+            
+            if (AppCenter.Configured)
+            {
+                AppCenter.Start(typeof(Analytics));
+                AppCenter.Start(typeof(Crashes));
+            }
+#endif
+
             this.UnhandledException += this.AppUnhandledException;
         }
 
-        #endregion
+#endregion
 
         #region Properties
 
@@ -85,6 +104,8 @@ namespace Gpt.Labs
             {
                 Debugger.Break();
             }
+
+            e.Exception.LogError("App unhandled exception occured");
 
             e.Handled = true;
         }
