@@ -57,7 +57,12 @@ namespace Gpt.Labs
                 this.SettingsViewModel.OpenAIApiKey = dialog.ViewModel.ApiKey;
             }
         }
-                
+        
+        private async void OnQuestionButtonClick(object sender, RoutedEventArgs e)
+        {
+            await Launcher.LaunchUriAsync(new Uri("https://github.com/mnikonov/gpt-labs/issues/new?assignees=mnikonov&labels=question&projects=&template=question.md&title=%5BQUESTION%5D+-+")); 
+        }
+
         private async void OnFeatureButtonClick(object sender, RoutedEventArgs e)
         {
             await Launcher.LaunchUriAsync(new Uri("https://github.com/mnikonov/gpt-labs/issues/new?assignees=mnikonov&labels=enhancement&projects=&template=feature_request.md&title=%5BFEATURE%5D+-+")); 

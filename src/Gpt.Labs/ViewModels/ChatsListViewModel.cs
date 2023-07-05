@@ -4,13 +4,16 @@ using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Helpers.Navigation;
 using Gpt.Labs.Models;
 using Gpt.Labs.Models.Enums;
+using Gpt.Labs.Models.Exceptions;
 using Gpt.Labs.ViewModels.Base;
 using Gpt.Labs.ViewModels.Collections;
 using Gpt.Labs.ViewModels.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using OpenAI;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.Storage;
@@ -79,7 +82,14 @@ namespace Gpt.Labs.ViewModels
             switch (ChatType)
             {
                 case OpenAIChatType.Chat:
-                    dialog = new EditChatDialog(this.Window, dialogModel);
+                    var models = await this.GetSupportedChatModels(dialogModel);
+
+                    if (models == null)
+                    {
+                        return SaveResult.Cancelled;
+                    }
+
+                    dialog = new EditChatDialog(this.Window, dialogModel, models);
                     break;
                 case OpenAIChatType.Image:
                     dialog = new EditImageDialog(this.Window, dialogModel);
@@ -263,6 +273,46 @@ namespace Gpt.Labs.ViewModels
             base.SaveState(destinationPageType, parameters, state, mode);
 
             state.SetValue(nameof(this.ChatType), this.ChatType);
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        private async Task<IReadOnlyCollection<string>> GetSupportedChatModels(OpenAIChat chat)
+        {
+            try
+            {
+                var authentication = new OpenAIAuthentication(ApplicationSettings.Instance.OpenAIApiKey, ApplicationSettings.Instance.OpenAIOrganization);
+                var api = new OpenAIClient(authentication);
+                var allModels = await api.WrapAction((client) => client.ModelsEndpoint.GetModelsAsync());
+
+                switch (chat.Type)
+                {
+                    case OpenAIChatType.Chat:
+                        return allModels.Where(p => p.Id.Contains("gpt")).OrderByDescending(p => p.CreatedAt).Select(p => p.Id).ToList().AsReadOnly();
+                    default:
+                        return null;
+                }
+            }
+            catch (OpenAiException ex)
+            {
+                await this.DispatcherQueue.EnqueueAsync(async () =>
+                {
+                    await this.Window.CreateErrorDialog(ex).ShowAsync();
+                });
+            }
+            catch (Exception ex)
+            {
+                ex.LogError();
+
+                await this.DispatcherQueue.EnqueueAsync(async () =>
+                {
+                    await this.Window.CreateExceptionDialog(ex).ShowAsync();
+                });
+            }
+
+            return null;
         }
 
         #endregion

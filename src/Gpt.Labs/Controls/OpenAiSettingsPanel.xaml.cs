@@ -1,13 +1,17 @@
 using Gpt.Labs.Helpers;
+using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Models;
+using Gpt.Labs.Models.Exceptions;
 using Gpt.Labs.ViewModels;
 using Gpt.Labs.ViewModels.Enums;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
+using OpenAI;
+using System;
+using System.Threading.Tasks;
 
 namespace Gpt.Labs.Controls
 {
-    public sealed partial class OpenAiSettingsPanel : UserControl
+    public sealed partial class OpenAiSettingsPanel : BaseUserControl
     {
         #region Fields
 
@@ -56,16 +60,25 @@ namespace Gpt.Labs.Controls
         {
             this.ChatSettings.Validate();
 
-            if (!this.ChatSettings.HasErrors)
+            if (this.ChatSettings.HasErrors)
             {
-                await this.ViewModel.SaveSettings();
+                return;
+            }
 
-                var chatsViewModel = this.GetParent<ChatsPage>().ViewModel.Result;
+            await CheckOpenAiAuthentication();
 
-                if (chatsViewModel.SelectedElement.Id == ChatSettings.ChatId)
-                {
-                    chatsViewModel.SelectedElement.Settings = this.ChatSettings;
-                }
+            if (this.ChatSettings.HasErrors)
+            {
+                return;
+            }
+
+            await this.ViewModel.SaveSettings();
+
+            var chatsViewModel = this.GetParent<ChatsPage>().ViewModel.Result;
+
+            if (chatsViewModel.SelectedElement.Id == ChatSettings.ChatId)
+            {
+                chatsViewModel.SelectedElement.Settings = this.ChatSettings;
             }
         }
         
@@ -77,6 +90,45 @@ namespace Gpt.Labs.Controls
         private void OnCollapseClick(object sender, RoutedEventArgs e)
         {
             this.ViewModel.CollapsePanel(ChatPanelTypes.ChatSettings);
+        }
+
+        private async Task CheckOpenAiAuthentication()
+        {
+            if (string.IsNullOrEmpty(this.ChatSettings.OpenAIOrganization))
+            {
+                return;
+            }
+
+            try
+            {
+                var api = new OpenAIClient(new OpenAIAuthentication(ApplicationSettings.Instance.OpenAIApiKey, this.ChatSettings.OpenAIOrganization));
+                await api.WrapAction((client) => client.ModelsEndpoint.GetModelsAsync());
+            }
+            catch (OpenAiException ex)
+            {
+                await this.DispatcherQueue.EnqueueAsync(() =>
+                {
+                    switch (ex.Code)
+                    {
+                        case "invalid_organization":
+                            this.ChatSettings.AddError(nameof(this.ChatSettings.OpenAIOrganization), ex.Message);
+                            break;
+                        default:
+                            this.ChatSettings.AddError(string.Empty, ex.Message);
+                            break;
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                ex.LogError();
+
+                await this.DispatcherQueue.EnqueueAsync(async () =>
+                {
+                    await this.Window.CreateExceptionDialog(ex).ShowAsync();
+                    this.ChatSettings.AddError(string.Empty, App.ResourceLoader.GetString("OpenAiUnexpectedAuthenticationError"));
+                });
+            }
         }
 
         #endregion

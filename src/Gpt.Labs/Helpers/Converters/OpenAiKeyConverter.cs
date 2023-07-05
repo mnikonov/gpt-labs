@@ -16,6 +16,11 @@ namespace Gpt.Labs.Helpers.Converters
 
             var keyParts = val.Split('-');
 
+            if (keyParts.Length != 2 || keyParts[1].Length <= 3)
+            {
+                return val;
+            }
+
             return $"{keyParts[0]} - {new string('⚹', keyParts[1].Length - 3)}{keyParts[1].Substring(keyParts[1].Length - 3, 3)}";
         }
 
