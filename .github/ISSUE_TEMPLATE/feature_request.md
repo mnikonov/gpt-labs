@@ -8,7 +8,7 @@ assignees: mnikonov
 ---
 
 ### Description
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+A clear and concise description of what functionality is being sought. Ex: I would like to request a feature that [...]
 
 ### Solution
 A clear and concise description of what you want to happen.
