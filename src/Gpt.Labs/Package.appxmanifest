@@ -9,7 +9,7 @@
   <Identity
     Name="6958MaxN.GPTLabs"
     Publisher="CN=234A7787-DAA3-4406-8ECF-CFEC878022E8"
-    Version="1.0.2.0" />
+    Version="1.0.3.0" />
 
   <Properties>
     <DisplayName>GPT Labs</DisplayName>
