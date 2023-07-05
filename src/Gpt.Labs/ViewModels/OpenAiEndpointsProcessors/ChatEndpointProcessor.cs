@@ -1,6 +1,5 @@
 ﻿using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Models;
-using Gpt.Labs.Models.Enums;
 using Gpt.Labs.Models.Extensions;
 using Gpt.Labs.ViewModels.Collections;
 using Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base;
@@ -34,18 +33,24 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
 
             var chatRequest = settings.ToChatRequest(this.messagesCollection, userMessage);
 
-            var client = new OpenAIClient(this.authentication);
+            var client = new OpenAIClient(this.GetAuthentication());
 
             if (settings.Stream)
             {
-                await foreach (var result in client.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest, token))
+                await client.WrapAction(async (client, token) =>
                 {
-                    await this.HandleChatResponseAsync(userMessage, result, responseMessages, token);
-                }
+                    await foreach (var result in client.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest, token))
+                    {
+                        await this.HandleChatResponseAsync(userMessage, result, responseMessages, token);
+                    }
+
+                    return true;
+                }, 
+                token);
             }
             else
             {
-                var result = await client.ChatEndpoint.GetCompletionAsync(chatRequest, token);
+                var result = await client.WrapAction((client, token) => client.ChatEndpoint.GetCompletionAsync(chatRequest, token), token);
                 await this.HandleChatResponseAsync(userMessage, result, responseMessages, token);
             }
         }

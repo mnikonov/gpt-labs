@@ -30,6 +30,8 @@
             this.window = window;
 
             this.XamlRoot = window.Content.XamlRoot;
+
+            this.Style = (Style)App.Current.Resources["DefaultContentDialogStyle"];
         }
 
         #endregion

@@ -1,7 +1,7 @@
 ﻿namespace Gpt.Labs.Helpers.Extensions
 {
     using Gpt.Labs.Controls.Dialogs.Base;
-    using Gpt.Labs.Models;
+    using Gpt.Labs.Models.Exceptions;
     using Microsoft.UI.Text;
     using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Controls;
@@ -21,7 +21,7 @@
                 IsPrimaryButtonEnabled = true,
                 IsSecondaryButtonEnabled = true,
                 PrimaryButtonText = App.ResourceLoader.GetString("Yes"),
-                SecondaryButtonText = App.ResourceLoader.GetString("No"),
+                SecondaryButtonText = App.ResourceLoader.GetString("No")
             };
         }
 
@@ -30,10 +30,9 @@
             var title = App.ResourceLoader.GetString("DialogTitle/Error");
             var content = new TextBlock { TextWrapping = TextWrapping.Wrap, FontWeight = FontWeights.Normal };
 
-#if !DEBUG
-            content.Text = App.ResourceLoader.GetString("DialogDescription/UnhandledError");
-#else
             content.Inlines.Add(new Run { Text = ex.Message });
+
+#if DEBUG
             content.Inlines.Add(new LineBreak());
             content.Inlines.Add(new LineBreak());
             content.Inlines.Add(new Run { Text = ex.StackTrace });
@@ -49,7 +48,7 @@
             };
         }
 
-        public static ContentDialog CreateErrorDialog(this Window window, OpenAIError error)
+        public static ContentDialog CreateErrorDialog(this Window window, OpenAiException error)
         {
             var title = App.ResourceLoader.GetString("DialogTitle/Error");
             var content = new TextBlock { TextWrapping = TextWrapping.Wrap, FontWeight = FontWeights.Normal };

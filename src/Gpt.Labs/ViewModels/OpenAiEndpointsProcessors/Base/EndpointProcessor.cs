@@ -5,7 +5,6 @@ using Gpt.Labs.ViewModels.Collections;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Dispatching;
 using OpenAI;
-using OpenAI.Chat;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,8 +21,6 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base
 
         protected DispatcherQueue dispatcher;
 
-        protected OpenAIAuthentication authentication;
-
         private Action cleanUserMessage;
 
         #endregion
@@ -36,8 +33,6 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base
             this.messagesCollection = messagesCollection;
             this.cleanUserMessage = cleanUserMessage;
             this.dispatcher = dispatcher;
-
-            this.authentication = new OpenAIAuthentication(ApplicationSettings.Instance.OpenAIApiKey, !string.IsNullOrEmpty(this.chat.Settings.OpenAIOrganization) ? this.chat.Settings.OpenAIOrganization : ApplicationSettings.Instance.OpenAIOrganization );
         }
 
         #endregion
@@ -49,6 +44,11 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base
         #endregion
 
         #region Protected Methods
+
+        protected OpenAIAuthentication GetAuthentication()
+        {
+            return new OpenAIAuthentication(ApplicationSettings.Instance.OpenAIApiKey, !string.IsNullOrEmpty(this.chat.Settings.OpenAIOrganization) ? this.chat.Settings.OpenAIOrganization : ApplicationSettings.Instance.OpenAIOrganization );
+        }
 
         protected async Task<OpenAIMessage> AddMessageToCollectionAsync(OpenAIMessage message, CancellationToken token)
         {
@@ -90,7 +90,12 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base
                     }
                 }
 
-                await context.SaveChangesAsync(token);
+                await this.dispatcher.EnqueueAsync(async () =>
+                {
+                    await context.SaveChangesAsync(token);
+                }, 
+                DispatcherQueuePriority.Normal, 
+                token);
             }
         }
 

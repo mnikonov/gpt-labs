@@ -7,7 +7,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:controls="using:Gpt.Labs.Controls"
     xmlns:models="using:Gpt.Labs.Models"
-    Style="{StaticResource DefaultContentDialogStyle}"
     Title="Chat details"
     PrimaryButtonText="Apply" 
     SecondaryButtonText="Cancel"

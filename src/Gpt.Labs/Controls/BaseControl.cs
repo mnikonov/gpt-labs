@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 
 namespace Gpt.Labs.Controls
 {
-    public abstract class BaseControl : Control
+    public abstract class BaseUserControl : UserControl
     {
         #region Properties
 

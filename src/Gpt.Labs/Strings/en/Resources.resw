@@ -139,13 +139,13 @@
     <value>Secret key</value>
   </data>
   <data name="OpenAIApiKeyTextBox.PlaceholderText" xml:space="preserve">
-    <value>Enter OpenAI secret key...</value>
+    <value>Enter OpenAI Secret key in format sk-...</value>
   </data>
   <data name="OpenAIOrganizationLabel.Text" xml:space="preserve">
     <value>Organization ID (optional)</value>
   </data>
   <data name="OpenAIOrganizationTextBox.PlaceholderText" xml:space="preserve">
-    <value>Enter OpenAI organization ID...</value>
+    <value>Enter OpenAI organization ID in format org-...</value>
   </data>
   <data name="OpenAISettingsLabel.Text" xml:space="preserve">
     <value>OpenAI settings</value>
@@ -299,11 +299,6 @@ Including the conversation history helps when user instructions refer to prior m
   </data>
   <data name="LastNMessagesToIncludeLabel.Text" xml:space="preserve">
     <value>Last N messages to include</value>
-  </data>
-  <data name="DialogDescription.UnhandledError" xml:space="preserve">
-    <value>Unhandled exception occurred on attempt to perform action.  
-
-Please try again or contact your system administrator</value>
   </data>
   <data name="DialogTitle.Error" xml:space="preserve">
     <value>Error</value>
@@ -644,5 +639,14 @@ I'm available to listen.</value>
   </data>
   <data name="ShareToolTip.Content" xml:space="preserve">
     <value>Share</value>
+  </data>
+  <data name="OpenAiUnexpectedAuthenticationError" xml:space="preserve">
+    <value>Unexpected error occurred on attempt to check OpenAI authentication. Please, try to re enter your API keys or try again later.</value>
+  </data>
+  <data name="AskLabel.Text" xml:space="preserve">
+    <value>Ask</value>
+  </data>
+  <data name="QuestionLabel.Text" xml:space="preserve">
+    <value>Question</value>
   </data>
 </root>

@@ -1,8 +1,13 @@
 using Gpt.Labs.Controls.Dialogs.Base;
+using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Models;
+using Gpt.Labs.Models.Exceptions;
 using Gpt.Labs.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using OpenAI;
+using System;
+using System.Threading.Tasks;
 
 namespace Gpt.Labs.Controls.Dialogs
 {
@@ -28,13 +33,68 @@ namespace Gpt.Labs.Controls.Dialogs
 
         #region Private Methods
 
-        private void OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        private async void OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            this.ViewModel.Validate();
+            var deferral = args.GetDeferral();
 
-            if (this.ViewModel.HasErrors)
+            try
             {
-                args.Cancel = true;
+                this.ViewModel.Validate();
+
+                if (this.ViewModel.HasErrors)
+                {
+                    return;
+                }
+
+                await CheckOpenAiAuthentication();
+            }
+            finally
+            {
+                await this.DispatcherQueue.EnqueueAsync(() =>
+                { 
+                    if (this.ViewModel.HasErrors)
+                    {
+                        args.Cancel = true;
+                    }
+
+                    deferral.Complete();
+                });
+            }
+        }
+
+        private async Task CheckOpenAiAuthentication()
+        {
+            try
+            {
+                var api = new OpenAIClient(new OpenAIAuthentication(this.ViewModel.ApiKey, this.ViewModel.Organization));
+                await api.WrapAction((client) => client.ModelsEndpoint.GetModelsAsync());
+            }
+            catch (OpenAiException ex)
+            {
+                await this.DispatcherQueue.EnqueueAsync(() =>
+                {
+                    switch (ex.Code)
+                    {
+                        case "invalid_organization":
+                            this.ViewModel.AddError(nameof(this.ViewModel.Organization), ex.Message);
+                            break;
+                        case "invalid_api_key":
+                            this.ViewModel.AddError(nameof(this.ViewModel.ApiKey), ex.Message);
+                            break;
+                        default:
+                            this.ViewModel.AddError(string.Empty, ex.Message);
+                            break;
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                ex.LogError();
+
+                await this.DispatcherQueue.EnqueueAsync(() =>
+                {
+                    this.ViewModel.AddError(string.Empty, App.ResourceLoader.GetString("OpenAiUnexpectedAuthenticationError"));
+                });
             }
         }
 

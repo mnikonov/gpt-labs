@@ -12,7 +12,7 @@ using Gpt.Labs.Controls.Markdown;
 
 namespace Gpt.Labs.Controls
 {
-    public sealed class OpenAiMessageControl : Control
+    public sealed class OpenAiMessageControl : BaseControl
     {
         #region Fields
 

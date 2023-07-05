@@ -1,4 +1,4 @@
-<UserControl
+<controls:BaseUserControl
     x:Class="Gpt.Labs.Controls.OpenAiSettingsPanel"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -43,7 +43,11 @@
                 </Grid.ColumnDefinitions>
                 
                 <ScrollViewer Grid.Row="0" Grid.ColumnSpan="2" Padding="16 0">
-                    <controls:OpenAiSettingsControl ChatSettings="{x:Bind ChatSettings, Mode=OneWay}" Style="{x:Bind ChatSettings.Type, Converter={StaticResource OpenAiSettingsStyleConverter}, Mode=OneWay}"></controls:OpenAiSettingsControl>
+                    <controls:OpenAiSettingsControl 
+                        ChatSettings="{x:Bind ChatSettings, Mode=OneWay}" 
+                        SupportedAiModels="{x:Bind ViewModel.SupportedChatModels, Mode=OneWay}"
+                        Style="{x:Bind ChatSettings.Type, Converter={StaticResource OpenAiSettingsStyleConverter}, Mode=OneWay}">
+                    </controls:OpenAiSettingsControl>
                 </ScrollViewer>
 
                 <controls:ErrorsListPanel x:Name="ErrorsPanel" Margin="16 12 16 0" Grid.Row="1" Grid.ColumnSpan="2"
@@ -58,4 +62,4 @@
             </Grid>
         </controls:TitledContentPanel>
     </Border>
-</UserControl>
+</controls:BaseUserControl>

@@ -8,7 +8,7 @@ using Microsoft.UI.Xaml.Input;
 
 namespace Gpt.Labs.Controls
 {
-    public sealed class OpenAiChatControl : Control
+    public sealed class OpenAiChatControl : BaseControl
     {
         #region Fields
 
