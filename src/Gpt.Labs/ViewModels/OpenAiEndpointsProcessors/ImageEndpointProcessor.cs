@@ -37,9 +37,10 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
 
             var chatRequest = settings.ToImageGenerationRequest(userMessage);
 
-            var client = new OpenAIClient(this.authentication);
+            var client = new OpenAIClient(this.GetAuthentication());
 
-            var result = await client.ImagesEndPoint.GenerateImageAsync(chatRequest, token);
+            var result = await client.WrapAction((client, token) => client.ImagesEndPoint.GenerateImageAsync(chatRequest, token), token);
+
             await this.HandleChatResponseAsync(userMessage, result, responseMessages, token);
         }
 

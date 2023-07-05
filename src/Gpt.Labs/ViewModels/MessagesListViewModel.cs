@@ -16,7 +16,6 @@ using Gpt.Labs.Models.Extensions;
 using Gpt.Labs.Models.Enums;
 using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.ViewModels.Enums;
-using System.Net.Http;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.EntityFrameworkCore;
 using Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base;
@@ -30,7 +29,8 @@ using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Pickers;
 using WinRT.Interop;
 using OpenAI;
-using OpenAI.Chat;
+using Gpt.Labs.Models.Exceptions;
+using System.Drawing.Text;
 
 namespace Gpt.Labs.ViewModels
 {
@@ -116,6 +116,8 @@ namespace Gpt.Labs.ViewModels
             set => this.Set(ref this.processingMessage, value); 
         }
 
+        public IReadOnlyCollection<string> SupportedChatModels { get; private set; }
+
         #endregion
 
         #region Public Methods
@@ -153,6 +155,8 @@ namespace Gpt.Labs.ViewModels
                     this.messageProcessor = new ImageEndpointProcessor(this.Chat, this.ItemsCollection, this.DispatcherQueue, () => { this.Message = string.Empty; });
                     break;
             }
+
+            await InitSupportedChatModels();
 
             await base.LoadStateAsync(destinationPageType, parameters, state, mode);
         }
@@ -551,7 +555,7 @@ namespace Gpt.Labs.ViewModels
                     await this.WrapOpenAiRequest(async () => {
                         var client = new OpenAIClient(new OpenAIAuthentication(ApplicationSettings.Instance.OpenAIApiKey, !string.IsNullOrEmpty(this.chat.Settings.OpenAIOrganization) ? this.chat.Settings.OpenAIOrganization : ApplicationSettings.Instance.OpenAIOrganization ));
                         var request = new AudioTranscriptionRequest(this.mediaMemoryBuffer.AsStream(), "voice.mp3");
-                        var result = await client.AudioEndpoint.CreateTranscriptionAsync(request, cancellation.Token);
+                        var result = await client.WrapAction((client, token) => client.AudioEndpoint.CreateTranscriptionAsync(request, token), cancellation.Token);
                                 
                         this.Message = result;
                     });
@@ -619,6 +623,38 @@ namespace Gpt.Labs.ViewModels
             }
         }
 
+        private async Task InitSupportedChatModels()
+        {
+            if (this.Chat.Type != OpenAIChatType.Chat)
+            {
+                return;
+            }
+
+            try
+            {
+                var authentication = new OpenAIAuthentication(ApplicationSettings.Instance.OpenAIApiKey, ApplicationSettings.Instance.OpenAIOrganization);
+                var api = new OpenAIClient(authentication);
+                var allModels = await api.WrapAction((client) => client.ModelsEndpoint.GetModelsAsync());
+
+                switch (this.Chat.Type)
+                {
+                    case OpenAIChatType.Chat:
+                        this.SupportedChatModels = allModels.Where(p => p.Id.Contains("gpt")).OrderByDescending(p => p.CreatedAt).Select(p => p.Id).ToList().AsReadOnly();
+                        break;
+                }
+            }
+            catch (OpenAiException ex)
+            {
+                await this.Window.CreateErrorDialog(ex).ShowAsync();
+            }
+            catch (Exception ex)
+            {
+                ex.LogError();
+
+                await this.Window.CreateExceptionDialog(ex).ShowAsync();
+            }
+        }
+
         private async Task WrapOpenAiRequest(Func<Task> action)
         {
             try
@@ -628,28 +664,12 @@ namespace Gpt.Labs.ViewModels
 
                 await action();
             }
-            catch (HttpRequestException ex)
+            catch (OpenAiException ex)
             {
-                var error = ex.ToOpenAiError();
-
                 await this.DispatcherQueue.EnqueueAsync(async () =>
                 {
-                    ContentDialog dialog = null;
-
-                    if (error != null)
-                    {
-                        dialog = this.Window.CreateErrorDialog(error);
-                    }
-                    else
-                    {
-                        ex.LogError();
-                        dialog = this.Window.CreateExceptionDialog(ex);
-                    }
-
-                    await dialog.ShowAsync();
+                    await this.Window.CreateErrorDialog(ex).ShowAsync();
                 });
-
-                ex.LogWarning();
             }
             catch (TaskCanceledException)
             {
@@ -662,6 +682,7 @@ namespace Gpt.Labs.ViewModels
             catch (Exception ex)
             {
                 ex.LogError();
+
                 await this.DispatcherQueue.EnqueueAsync(async () =>
                 {
                     await this.Window.CreateExceptionDialog(ex).ShowAsync();

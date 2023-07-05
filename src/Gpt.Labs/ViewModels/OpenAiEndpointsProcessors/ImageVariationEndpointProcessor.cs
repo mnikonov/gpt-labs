@@ -37,9 +37,9 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
 
             var chatRequest = settings.ToImageVariationRequest(storageFile);
 
-            var client = new OpenAIClient(this.authentication);
+            var client = new OpenAIClient(this.GetAuthentication());
 
-            var result = await client.ImagesEndPoint.CreateImageVariationAsync(chatRequest, token);
+            var result = await client.WrapAction((client, token) => client.ImagesEndPoint.CreateImageVariationAsync(chatRequest, token), token);
 
             await this.HandleChatResponseAsync(storageFile, result, responseMessages, token);
 

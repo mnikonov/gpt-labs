@@ -81,8 +81,6 @@ namespace Gpt.Labs.ViewModels
             get => (ElementTheme)this.Get((int)ElementTheme.Default);
             set => this.Set((int)value);
         }
-                
-        public IReadOnlyList<Model> OpenAIModels { get; set; }
 
         public string OpenAIOrganization
         {

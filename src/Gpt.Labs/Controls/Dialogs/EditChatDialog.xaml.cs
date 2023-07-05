@@ -1,10 +1,14 @@
 using Gpt.Labs.Controls.Dialogs.Base;
+using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Models;
+using Gpt.Labs.Models.Exceptions;
 using Gpt.Labs.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using OpenAI;
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 
 namespace Gpt.Labs.Controls.Dialogs
 {
@@ -12,10 +16,10 @@ namespace Gpt.Labs.Controls.Dialogs
     {
         #region Constructors
 
-        public EditChatDialog(Window window, OpenAIChat viewModel)
+        public EditChatDialog(Window window, OpenAIChat viewModel, IReadOnlyCollection<string> supportedModels)
             : base(window)
         {           
-            this.SupportedAiModels = ApplicationSettings.Instance.OpenAIModels.Where(p => p.Id.Contains("gpt")).OrderByDescending(p => p.CreatedAt).Select(p => p.Id).ToList().AsReadOnly();
+            this.SupportedAiModels = supportedModels;
             this.ViewModel = viewModel;
 
             this.InitializeComponent();
@@ -33,14 +37,71 @@ namespace Gpt.Labs.Controls.Dialogs
 
         #region Private Methods
 
-        private void OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
+        private async void OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            this.ViewModel.Validate();
-            this.ViewModel.Settings.Validate();
+            var deferral = args.GetDeferral();
 
-            if (this.ViewModel.HasErrors || this.ViewModel.Settings.HasErrors)
+            try
             {
-                args.Cancel = true;
+                this.ViewModel.Validate();
+                this.ViewModel.Settings.Validate();
+
+                if (this.ViewModel.HasErrors || this.ViewModel.Settings.HasErrors)
+                {
+                    return;
+                }
+
+                await CheckOpenAiAuthentication();
+            }
+            finally
+            {
+                await this.DispatcherQueue.EnqueueAsync(() =>
+                { 
+                    if (this.ViewModel.HasErrors || this.ViewModel.Settings.HasErrors)
+                    {
+                        args.Cancel = true;
+                    }
+
+                    deferral.Complete();
+                });
+            }
+        }
+
+        private async Task CheckOpenAiAuthentication()
+        {
+            if (string.IsNullOrEmpty(this.ViewModel.Settings.OpenAIOrganization))
+            {
+                return;
+            }
+
+            try
+            {
+                var api = new OpenAIClient(new OpenAIAuthentication(ApplicationSettings.Instance.OpenAIApiKey, this.ViewModel.Settings.OpenAIOrganization));
+                await api.WrapAction((client) => client.ModelsEndpoint.GetModelsAsync());
+            }
+            catch (OpenAiException ex)
+            {
+                await this.DispatcherQueue.EnqueueAsync(() =>
+                {
+                    switch (ex.Code)
+                    {
+                        case "invalid_organization":
+                            this.ViewModel.Settings.AddError(nameof(this.ViewModel.Settings.OpenAIOrganization), ex.Message);
+                            break;
+                        default:
+                            this.ViewModel.AddError(string.Empty, ex.Message);
+                            break;
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                ex.LogError();
+
+                await this.DispatcherQueue.EnqueueAsync(() =>
+                {
+                    this.ViewModel.AddError(string.Empty, App.ResourceLoader.GetString("OpenAiUnexpectedAuthenticationError"));
+                });
             }
         }
 

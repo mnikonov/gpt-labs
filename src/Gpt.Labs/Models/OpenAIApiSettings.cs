@@ -32,7 +32,9 @@ namespace Gpt.Labs.Models
         #region Properties
 
         [Required(ErrorMessage = "The 'Secret Key' field is required")]
-        [JsonPropertyOrder(2)]
+        [StringLength(100, ErrorMessage = "The 'Secret Key' field must be a string with a maximum length of {1}.")]
+        [RegularExpression(@"^sk-.*$",  ErrorMessage = "The field 'Secret Key' must start with 'sk-' prefix.")]
+        [JsonPropertyOrder(1)]
         public string ApiKey
         {
             get => this.apiKey;

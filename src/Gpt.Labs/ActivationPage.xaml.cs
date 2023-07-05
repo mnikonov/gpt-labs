@@ -7,6 +7,8 @@ using Gpt.Labs.Helpers.Navigation;
 using Gpt.Labs.Models.Base;
 using Gpt.Labs.Controls.Wizards.Activation;
 using Gpt.Labs.Helpers;
+using Gpt.Labs.Helpers.Extensions;
+using OpenAI.Chat;
 
 namespace Gpt.Labs
 {
@@ -74,30 +76,36 @@ namespace Gpt.Labs
 
                 await this.ViewModel.Step.ExecuteStepAsync(executeArgs);
 
-                if (this.ViewModel.Step.Model != null)
+                await this.DispatcherQueue.EnqueueAsync(async () =>
                 {
-                    this.ErrorsPanel.Visibility = this.ViewModel.Step.Model.HasErrors ? Visibility.Visible : Visibility.Collapsed;
-                    this.ErrorsList.ViewModel = this.ViewModel.Step.Model.Errors;
-                }
-                else
-                {
-                    this.ErrorsPanel.Visibility = Visibility.Collapsed;
-                }
-
-                if ((this.ViewModel.Step.Model == null || !this.ViewModel.Step.Model.HasErrors) && this.ViewModel.Step.HasNextStep)
-                {
-                    this.ViewModel.Step = this.ViewModel.Step.GetNextStep();
-
-                    if (this.ViewModel.Step != null)
+                    if (this.ViewModel.Step.Model != null)
                     {
-                        await this.InitWizardStep();
+                        this.ErrorsPanel.Visibility = this.ViewModel.Step.Model.HasErrors ? Visibility.Visible : Visibility.Collapsed;
+                        this.ErrorsList.ViewModel = this.ViewModel.Step.Model.Errors;
                     }
-                }
+                    else
+                    {
+                        this.ErrorsPanel.Visibility = Visibility.Collapsed;
+                    }
+
+                    if ((this.ViewModel.Step.Model == null || !this.ViewModel.Step.Model.HasErrors) && this.ViewModel.Step.HasNextStep)
+                    {
+                        this.ViewModel.Step = this.ViewModel.Step.GetNextStep();
+
+                        if (this.ViewModel.Step != null)
+                        {
+                            await this.InitWizardStep();
+                        }
+                    }
+                });
             }
             finally
             {
-                this.WizardFormContent.IsEnabled = true;
-                this.Progress.Visibility = Visibility.Collapsed;
+                await this.DispatcherQueue.EnqueueAsync(() =>
+                {
+                    this.WizardFormContent.IsEnabled = true;
+                    this.Progress.Visibility = Visibility.Collapsed;
+                });
             }
         }
 

@@ -1,14 +1,10 @@
 ﻿using Gpt.Labs.Models;
-using Gpt.Labs.Models.Enums;
-using Gpt.Labs.ViewModels;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Gpt.Labs.Controls
 {
-    public class OpenAiSettingsControl : Control
+    public class OpenAiSettingsControl : BaseControl
     {
         #region Fields
 
@@ -40,23 +36,13 @@ namespace Gpt.Labs.Controls
         public OpenAISettings ChatSettings
         {
             get => (OpenAISettings)this.GetValue(ChatSettingsProperty);
-            set
-            {
-                switch (value.Type)
-                {
-                    case OpenAIChatType.Chat:
-                        this.SupportedAiModels = ApplicationSettings.Instance.OpenAIModels.Where(p => p.Id.Contains("gpt")).OrderByDescending(p => p.CreatedAt).Select(p => p.Id).ToList().AsReadOnly();
-                        break;
-                }
-
-                this.SetValue(ChatSettingsProperty, value);
-            }
+            set => this.SetValue(ChatSettingsProperty, value);
         }
 
         public IReadOnlyCollection<string> SupportedAiModels 
         {
             get => (IReadOnlyCollection<string>)this.GetValue(SupportedAiModelsProperty);
-            private set => this.SetValue(SupportedAiModelsProperty, value);
+            set => this.SetValue(SupportedAiModelsProperty, value);
         }
 
         #endregion
