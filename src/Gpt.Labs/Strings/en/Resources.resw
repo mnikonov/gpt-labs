@@ -643,4 +643,10 @@ I'm available to listen.</value>
   <data name="OpenAiUnexpectedAuthenticationError" xml:space="preserve">
     <value>Unexpected error occurred on attempt to check OpenAI authentication. Please, try to re enter your API keys or try again later.</value>
   </data>
+  <data name="AskLabel.Text" xml:space="preserve">
+    <value>Ask</value>
+  </data>
+  <data name="QuestionLabel.Text" xml:space="preserve">
+    <value>Question</value>
+  </data>
 </root>
