@@ -7,6 +7,7 @@ using Microsoft.UI.Dispatching;
 using OpenAI;
 using OpenAI.Chat;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,23 +36,33 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
 
             var client = new OpenAIClient(this.GetAuthentication());
 
-            if (settings.Stream)
+            try
             {
-                await client.WrapAction(async (client, token) =>
+                if (settings.Stream)
                 {
-                    await foreach (var result in client.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest, token))
+                    await client.WrapAction(async (client, token) =>
                     {
-                        await this.HandleChatResponseAsync(userMessage, result, responseMessages, token);
-                    }
+                        await foreach (var result in client.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest, token))
+                        {
+                            await this.HandleChatResponseAsync(userMessage, result, responseMessages, token);
+                        }
 
-                    return true;
-                }, 
-                token);
+                        return true;
+                    }, 
+                    token);
+                }
+                else
+                {
+                    var result = await client.WrapAction((client, token) => client.ChatEndpoint.GetCompletionAsync(chatRequest, token), token);
+                    await this.HandleChatResponseAsync(userMessage, result, responseMessages, token);
+                }
             }
-            else
+            finally
             {
-                var result = await client.WrapAction((client, token) => client.ChatEndpoint.GetCompletionAsync(chatRequest, token), token);
-                await this.HandleChatResponseAsync(userMessage, result, responseMessages, token);
+                if (responseMessages.Length > 0)
+                {                    
+                    await SaveChatMessagesAsync(default, responseMessages);
+                }
             }
         }
 
@@ -82,8 +93,6 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
                     },
                     DispatcherQueuePriority.Normal,
                     token);
-
-                    await SaveChatMessagesAsync(token, responseMessage);
                 }
             }
         }

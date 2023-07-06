@@ -103,7 +103,7 @@
                             <Button x:Name="QuestionButton" Grid.Column="1" Grid.Row="0"
                                     Click="OnQuestionButtonClick">
                                 <StackPanel Orientation="Horizontal" Spacing="12"> 
-                                    <FontIcon Glyph="&#xf142;" FontSize="14" Foreground="{StaticResource VioletBrush}" />
+                                    <FontIcon Glyph="&#xe897;" FontSize="14" Foreground="{StaticResource VioletBrush}" />
                                     <TextBlock x:Uid="QuestionLabel" Text="Question" /> 
                                 </StackPanel> 
                             </Button>
@@ -111,7 +111,7 @@
                             
                             <TextBlock x:Uid="SuggesNewLabel" Text="Sugges new" Grid.Column="0" Grid.Row="1" TextLineBounds="Tight" Margin="0 24 0 0"/>
                         
-                            <Button x:Name="FeatureButton" Grid.Column="1" Grid.Row="1"
+                            <Button x:Name="FeatureButton" Grid.Column="1" Grid.Row="1" Margin="0 12 0 0"
                                     Click="OnFeatureButtonClick">
                                 <StackPanel Orientation="Horizontal" Spacing="12"> 
                                     <FontIcon Glyph="&#xe771;" FontSize="14" Foreground="{StaticResource GreenBrush}" />
