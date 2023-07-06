@@ -4,14 +4,12 @@ using Gpt.Labs.Helpers.Navigation;
 using Gpt.Labs.Models;
 using Gpt.Labs.Models.Base;
 using Gpt.Labs.Models.Exceptions;
-using Gpt.Labs.Models.Extensions;
 using Gpt.Labs.ViewModels.Base;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using OpenAI;
 using System;
-using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Gpt.Labs.ViewModels
