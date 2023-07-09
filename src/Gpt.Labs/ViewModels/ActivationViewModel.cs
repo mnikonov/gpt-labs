@@ -10,6 +10,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using OpenAI;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Gpt.Labs.ViewModels
@@ -19,6 +20,8 @@ namespace Gpt.Labs.ViewModels
         #region Fields
 
         private readonly Func<object[], Task> executeAndContinue;
+
+        private static Mutex mut = new Mutex(false, @"GptLab-InitDatabase");
 
         #endregion
 
@@ -57,7 +60,7 @@ namespace Gpt.Labs.ViewModels
                 (model) => new InitializationControl(),
                 async (model, args) =>
                 {
-                    await this.MigrateDatabase();
+                    await Task.Run(async () => await MigrateDatabase().ConfigureAwait(false));
 
                     if (this.HasAuthenticationSettings)
                     {
@@ -146,9 +149,7 @@ namespace Gpt.Labs.ViewModels
                             {
                                 model.AddError(string.Empty, App.ResourceLoader.GetString("OpenAiUnexpectedAuthenticationError"));
 
-                                var dialog = this.Window.CreateExceptionDialog(ex);
-
-                                await dialog.ShowAsync();
+                                await this.Window.CreateExceptionDialog(ex).ShowAsync();
                             });
                         }
 
@@ -194,6 +195,8 @@ namespace Gpt.Labs.ViewModels
 
         private async Task MigrateDatabase()
         {
+            mut.WaitOne();
+
             try
             {
                 using (var db = new DataContext())
@@ -204,10 +207,9 @@ namespace Gpt.Labs.ViewModels
                     // var dbFolder = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
                 }
             }
-            catch (Exception ex)
+            finally
             {
-                ex.LogError("Unable to execute database migration");
-                throw;
+                mut.ReleaseMutex();
             }
         }
 
