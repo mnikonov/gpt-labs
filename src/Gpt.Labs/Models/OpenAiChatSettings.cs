@@ -47,7 +47,7 @@ namespace Gpt.Labs.Models
         }
 
         [Required(ErrorMessage = "The 'System message' field is required")]
-        [StringLength(2500, ErrorMessage = "The 'System message' field must be a string with a maximum length of {1}.")]
+        [StringLength(1000, ErrorMessage = "The 'System message' field must be a string with a maximum length of {1}.")]
         public string SystemMessage 
         { 
             get => this.systemMessage;

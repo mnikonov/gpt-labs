@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Input;
 using Gpt.Labs.Helpers;
 using Gpt.Labs.ViewModels;
 using Gpt.Labs.Controls.Markdown;
+using Gpt.Labs.Controls.Extensions;
 
 namespace Gpt.Labs.Controls
 {
@@ -121,7 +122,10 @@ namespace Gpt.Labs.Controls
 
         private async void OnDeleteButtonClick(object sender, RoutedEventArgs e)
         {
-            await this.ParentViewViewModel.DeleteMessages(true, this.ViewModel);
+            await sender.DisableUiAndExecuteAsync(async () =>
+            {
+                await this.ParentViewViewModel.DeleteMessages(true, this.ViewModel);
+            });
         }
 
         private async void OnMarkdownTextBlockLinkClicked(object sender, LinkClickedEventArgs e)

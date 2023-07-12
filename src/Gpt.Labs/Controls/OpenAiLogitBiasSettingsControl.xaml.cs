@@ -7,6 +7,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System;
+using Gpt.Labs.Controls.Extensions;
 
 namespace Gpt.Labs.Controls
 {
@@ -45,17 +46,26 @@ namespace Gpt.Labs.Controls
 
         private async void OnAddLogitBiasClick(object sender, RoutedEventArgs e)
         {
-            await this.AddEditLogitBias(null);
+            await sender.DisableUiAndExecuteAsync(async () =>
+            {
+                await this.AddEditLogitBias(null);
+            });
         }
 
         private async void OnEditLogitBiasClick(object sender, RoutedEventArgs e)
         {
-            await this.AddEditLogitBias((OpenAILogitBias)((FrameworkElement)sender).DataContext);
+            await sender.DisableUiAndExecuteAsync(async () =>
+            {
+                await this.AddEditLogitBias((OpenAILogitBias)((FrameworkElement)sender).DataContext);
+            });
         }
 
         private async void OnDeleteLogitBiasClick(object sender, RoutedEventArgs e)
         {
-            await this.DeleteLogitBias((OpenAILogitBias)((FrameworkElement)sender).DataContext);
+            await sender.DisableUiAndExecuteAsync(async () =>
+            {
+                await this.DeleteLogitBias((OpenAILogitBias)((FrameworkElement)sender).DataContext);
+            });
         }
 
         private async Task AddEditLogitBias(OpenAILogitBias token)

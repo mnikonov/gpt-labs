@@ -1,3 +1,4 @@
+using Gpt.Labs.Controls.Extensions;
 using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Models;
 using Gpt.Labs.ViewModels;
@@ -206,7 +207,10 @@ namespace Gpt.Labs.Controls
 
         private async void OnDeleteMultiClick(object sender, RoutedEventArgs e)
         {
-            await this.DeleteChats();
+            await sender.DisableUiAndExecuteAsync(async () =>
+            {
+                await this.DeleteChats();
+            });
         }
 
         private async void OnCopyMultiClick(object sender, RoutedEventArgs e)

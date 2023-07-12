@@ -1,4 +1,5 @@
-﻿using Gpt.Labs.Helpers;
+﻿using Gpt.Labs.Controls.Extensions;
+using Gpt.Labs.Helpers;
 using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Models;
 using Gpt.Labs.ViewModels;
@@ -100,19 +101,24 @@ namespace Gpt.Labs.Controls
 
         private async void OnEditButtonClick(object sender, RoutedEventArgs e)
         {
-            var result = await this.ParentViewViewModel.AddEditChat(this.ViewModel);
-
-            if (result == ViewModels.Enums.SaveResult.Edited && this.ParentViewViewModel.SelectedElement != null && this.ViewModel.Id == this.ParentViewViewModel.SelectedElement.Id)
+            await sender.DisableUiAndExecuteAsync(async () =>
             {
-                ((MessagesPage)this.ParentPage.GetInnerFrame().Content).ViewModel.Result.Chat = this.ParentViewViewModel.SelectedElement;
-            }
+                var result = await this.ParentViewViewModel.AddEditChat(this.ViewModel);
+
+                if (result == ViewModels.Enums.SaveResult.Edited && this.ParentViewViewModel.SelectedElement != null && this.ViewModel.Id == this.ParentViewViewModel.SelectedElement.Id)
+                {
+                    ((MessagesPage)this.ParentPage.GetInnerFrame().Content).ViewModel.Result.Chat = this.ParentViewViewModel.SelectedElement;
+                }
+            });
         }
 
         private async void OnDeleteButtonClick(object sender, RoutedEventArgs e)
         {
-            await this.ParentViewViewModel.DeleteChats(this.ViewModel);
-
-            await ParentPage.ClearBackState(this.ViewModel);
+            await sender.DisableUiAndExecuteAsync(async () =>
+            {
+                await this.ParentViewViewModel.DeleteChats(this.ViewModel);
+                await ParentPage.ClearBackState(this.ViewModel);
+            });
         }
 
         #endregion

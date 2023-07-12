@@ -1,3 +1,4 @@
+using Gpt.Labs.Controls.Extensions;
 using Gpt.Labs.Helpers;
 using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Models;
@@ -58,33 +59,39 @@ namespace Gpt.Labs.Controls
 
         private async void OnApplyClick(object sender, RoutedEventArgs e)
         {
-            this.ChatSettings.Validate();
-
-            if (this.ChatSettings.HasErrors)
+            await sender.DisableUiAndExecuteAsync(async () =>
             {
-                return;
-            }
+                this.ChatSettings.Validate();
 
-            await CheckOpenAiAuthentication();
+                if (this.ChatSettings.HasErrors)
+                {
+                    return;
+                }
 
-            if (this.ChatSettings.HasErrors)
-            {
-                return;
-            }
+                await CheckOpenAiAuthentication();
 
-            await this.ViewModel.SaveSettings();
+                if (this.ChatSettings.HasErrors)
+                {
+                    return;
+                }
 
-            var chatsViewModel = this.GetParent<ChatsPage>().ViewModel.Result;
+                await this.ViewModel.SaveSettings();
 
-            if (chatsViewModel.SelectedElement.Id == ChatSettings.ChatId)
-            {
-                chatsViewModel.SelectedElement.Settings = this.ChatSettings;
-            }
+                var chatsViewModel = this.GetParent<ChatsPage>().ViewModel.Result;
+
+                if (chatsViewModel.SelectedElement.Id == ChatSettings.ChatId)
+                {
+                    chatsViewModel.SelectedElement.Settings = this.ChatSettings;
+                }
+            });
         }
         
         private async void OnCancelClick(object sender, RoutedEventArgs e)
         {
-            await this.ViewModel.CancelSettings();
+            await sender.DisableUiAndExecuteAsync(async () =>
+            {
+                await this.ViewModel.CancelSettings();
+            });
         }
    
         private void OnCollapseClick(object sender, RoutedEventArgs e)

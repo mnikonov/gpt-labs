@@ -9,6 +9,7 @@ using Windows.ApplicationModel;
 using Windows.System;
 using Windows.Services.Store;
 using WinRT.Interop;
+using Gpt.Labs.Controls.Extensions;
 
 namespace Gpt.Labs
 {
@@ -48,14 +49,17 @@ namespace Gpt.Labs
 
         private async void OnEditOpenAISettingsClick(object sender, RoutedEventArgs e)
         {
-            var dialog = new EditOpenAISettingsDialog(this.Window);
-            var result = await dialog.ShowAsync();
-
-            if (result == ContentDialogResult.Primary)
+            await sender.DisableUiAndExecuteAsync(async () =>
             {
-                this.SettingsViewModel.OpenAIOrganization = dialog.ViewModel.Organization;
-                this.SettingsViewModel.OpenAIApiKey = dialog.ViewModel.ApiKey;
-            }
+                var dialog = new EditOpenAISettingsDialog(this.Window);
+                var result = await dialog.ShowAsync();
+
+                if (result == ContentDialogResult.Primary)
+                {
+                    this.SettingsViewModel.OpenAIOrganization = dialog.ViewModel.Organization;
+                    this.SettingsViewModel.OpenAIApiKey = dialog.ViewModel.ApiKey;
+                }
+            });
         }
         
         private async void OnQuestionButtonClick(object sender, RoutedEventArgs e)

@@ -1,4 +1,5 @@
 using Gpt.Labs.Controls.Dialogs;
+using Gpt.Labs.Controls.Extensions;
 using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Models;
 using Microsoft.UI.Xaml;
@@ -45,17 +46,26 @@ namespace Gpt.Labs.Controls
 
         private async void OnAddStopClick(object sender, RoutedEventArgs e)
         {
-            await this.AddEditStop(null);
+            await sender.DisableUiAndExecuteAsync(async () =>
+            {
+                await this.AddEditStop(null);
+            });
         }
 
         private async void OnEditStopClick(object sender, RoutedEventArgs e)
         {
-            await this.AddEditStop((OpenAIStop)((FrameworkElement)sender).DataContext);
+            await sender.DisableUiAndExecuteAsync(async () =>
+            {
+                await this.AddEditStop((OpenAIStop)((FrameworkElement)sender).DataContext);
+            });
         }
 
         private async void OnDeleteStopClick(object sender, RoutedEventArgs e)
         {
-            await this.DeleteStop((OpenAIStop)((FrameworkElement)sender).DataContext);
+            await sender.DisableUiAndExecuteAsync(async () =>
+            {
+                await this.DeleteStop((OpenAIStop)((FrameworkElement)sender).DataContext);
+            });
         }
 
         private async Task AddEditStop(OpenAIStop token)

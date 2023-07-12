@@ -16,6 +16,17 @@ namespace Gpt.Labs.Controls.Extensions
             }
         }
 
+        public static async Task DisableUiAndExecuteAsync(this object controlObj, Func<Task> action)
+        {
+            if (controlObj is Control control)
+            {
+                await control.DisableUiAndExecuteAsync(async (token) => {
+                    await action();
+                },
+                default(CancellationToken));
+            }
+        }
+
         public static async Task DisableUiAndExecuteAsync(this object controlObj, Func<CancellationToken, Task> action, CancellationToken token = default)
         {
             if (controlObj is Control control)

@@ -195,12 +195,15 @@ namespace Gpt.Labs
 
         private async void OnAddChatClick(object sender, RoutedEventArgs e)
         {
-            var result = await this.ViewModel.Result.AddEditChat(null);
-
-            if (result == SaveResult.Added)
+            await sender.DisableUiAndExecuteAsync(async () =>
             {
-                this.SelectChat(this.ViewModel.Result.ItemsCollection.FirstOrDefault());
-            }
+                var result = await this.ViewModel.Result.AddEditChat(null);
+
+                if (result == SaveResult.Added)
+                {
+                    this.SelectChat(this.ViewModel.Result.ItemsCollection.FirstOrDefault());
+                }
+            });
         }
                 
         private void OnChatListItemClick(object sender, ItemClickEventArgs e)
@@ -266,10 +269,13 @@ namespace Gpt.Labs
 
         private async void OnDeleteMultiClick(object sender, RoutedEventArgs e)
         {
-            var chats = this.ChatList.SelectedItems.OfType<OpenAIChat>().ToArray();
-            await this.ViewModel.Result.DeleteChats(chats);
+            await sender.DisableUiAndExecuteAsync(async () =>
+            {
+                var chats = this.ChatList.SelectedItems.OfType<OpenAIChat>().ToArray();
+                await this.ViewModel.Result.DeleteChats(chats);
 
-            await ClearBackState(chats);
+                await ClearBackState(chats);
+            });
         }
 
         private async Task RegisterFrame()
