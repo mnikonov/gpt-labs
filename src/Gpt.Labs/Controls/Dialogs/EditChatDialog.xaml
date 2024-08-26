@@ -27,7 +27,7 @@
                 
         <ComboBox x:Name="ModelComboBox" HorizontalAlignment="Stretch"
                 ItemsSource="{x:Bind SupportedAiModels}" 
-                SelectedItem="{x:Bind ((models:OpenAIChatSettings)ViewModel.Settings).ModelId, Mode=TwoWay}" >
+                SelectedItem="{x:Bind ViewModel.Settings.ModelId, Mode=TwoWay}" >
         </ComboBox>
 
         <TextBlock x:Uid="ModelDescription" Style="{StaticResource DescriptionStyle}">                    

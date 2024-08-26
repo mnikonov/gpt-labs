@@ -2,6 +2,7 @@ using Gpt.Labs.Controls.Dialogs.Base;
 using Gpt.Labs.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System.Collections.Generic;
 
 namespace Gpt.Labs.Controls.Dialogs
 {
@@ -9,12 +10,13 @@ namespace Gpt.Labs.Controls.Dialogs
     {
         #region Constructors
 
-        public EditImageDialog(Window window, OpenAIChat viewModel)
+        public EditImageDialog(Window window, OpenAIChat viewModel, IReadOnlyCollection<string> supportedModels)
             : base(window)
-        {           
-            this.ViewModel = viewModel;
+        {
+            SupportedAiModels = supportedModels;
+            ViewModel = viewModel;
 
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         #endregion
@@ -23,16 +25,18 @@ namespace Gpt.Labs.Controls.Dialogs
 
         public OpenAIChat ViewModel { get; private set; }
 
+        public IReadOnlyCollection<string> SupportedAiModels { get; private set; }
+
         #endregion
 
         #region Private Methods
 
         private void OnPrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            this.ViewModel.Validate();
-            this.ViewModel.Settings.Validate();
+            ViewModel.Validate();
+            ViewModel.Settings.Validate();
 
-            if (this.ViewModel.HasErrors || this.ViewModel.Settings.HasErrors)
+            if (ViewModel.HasErrors || ViewModel.Settings.HasErrors)
             {
                 args.Cancel = true;
             }

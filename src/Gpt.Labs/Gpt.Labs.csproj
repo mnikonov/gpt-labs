@@ -64,7 +64,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240802000" />
-    <PackageReference Include="OpenAI-DotNet" Version="7.0.3" />
+    <PackageReference Include="OpenAI-DotNet" Version="8.2.2" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 

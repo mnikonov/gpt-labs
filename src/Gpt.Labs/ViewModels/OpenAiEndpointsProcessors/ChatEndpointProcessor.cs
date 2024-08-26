@@ -7,7 +7,6 @@ using Microsoft.UI.Dispatching;
 using OpenAI;
 using OpenAI.Chat;
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,7 +16,7 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
     {
         #region Constructors
 
-        public ChatEndpointProcessor(OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, DispatcherQueue dispatcher, Action cleanUserMessage) 
+        public ChatEndpointProcessor(OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, DispatcherQueue dispatcher, Action cleanUserMessage)
             : base(chat, messagesCollection, dispatcher, cleanUserMessage)
         {
         }
@@ -28,13 +27,13 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
 
         public override async Task ProcessAsync(OpenAIMessage userMessage, CancellationToken token)
         {
-            var settings = this.chat.GetSettings<OpenAIChatSettings>();
+            var settings = chat.GetSettings<OpenAIChatSettings>();
 
             var responseMessages = new OpenAIMessage[settings.N];
 
-            var chatRequest = settings.ToChatRequest(this.messagesCollection, userMessage);
+            var chatRequest = settings.ToChatRequest(messagesCollection, userMessage);
 
-            var client = new OpenAIClient(this.GetAuthentication());
+            var client = new OpenAIClient(GetAuthentication());
 
             try
             {
@@ -42,25 +41,25 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
                 {
                     await client.WrapAction(async (client, token) =>
                     {
-                        await foreach (var result in client.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest, token))
+                        await foreach (var result in client.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest, false, token))
                         {
-                            await this.HandleChatResponseAsync(userMessage, result, responseMessages, token);
+                            await HandleChatResponseAsync(userMessage, result, responseMessages, token);
                         }
 
                         return true;
-                    }, 
+                    },
                     token);
                 }
                 else
                 {
                     var result = await client.WrapAction((client, token) => client.ChatEndpoint.GetCompletionAsync(chatRequest, token), token);
-                    await this.HandleChatResponseAsync(userMessage, result, responseMessages, token);
+                    await HandleChatResponseAsync(userMessage, result, responseMessages, token);
                 }
             }
             finally
             {
                 if (responseMessages.Length > 0)
-                {                    
+                {
                     await SaveChatMessagesAsync(default, responseMessages);
                 }
             }
@@ -80,16 +79,16 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
 
             foreach (var choise in chatResponse.Choices)
             {
-                var settings = this.chat.GetSettings<OpenAIChatSettings>();
+                var settings = chat.GetSettings<OpenAIChatSettings>();
                 var content = settings.Stream ? choise.Delta?.Content : choise.Message?.Content;
 
                 if (!string.IsNullOrEmpty(content))
                 {
-                    var responseMessage = await GetMessageAsync(responseMessages, choise.Index, token);
+                    var responseMessage = await GetMessageAsync(responseMessages, choise.Index ?? 0, token);
 
-                    await this.dispatcher.EnqueueAsync(() =>
+                    await dispatcher.EnqueueAsync(() =>
                     {
-                        responseMessage.Content = responseMessage.Content + content;
+                        responseMessage.Content += content;
                     },
                     DispatcherQueuePriority.Normal,
                     token);

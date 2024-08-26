@@ -10,8 +10,10 @@ namespace Gpt.Labs.Models
     {
         #region Fields
 
+        private string modelId;
+
         private int n = 1;
-                
+
         public string user;
 
         private OpenAIChat chat;
@@ -26,23 +28,36 @@ namespace Gpt.Labs.Models
 
         #region Properties
 
+        /// <summary>
+        /// string Required
+        /// ID of the model to use. See the model endpoint compatibility table for details on which models work with the API.
+        /// https://platform.openai.com/docs/models/model-endpoint-compatibility
+        /// </summary>
+        [Required(ErrorMessage = "The 'Model' field is required")]
+        [StringLength(250, ErrorMessage = "The 'Model' field must be a string with a maximum length of {1}.")]
+        public string ModelId
+        {
+            get => modelId;
+            set => Set(ref modelId, value);
+        }
+
         public OpenAIChat Chat
         {
-            get => this.chat;
-            set => this.Set(ref this.chat, value);
+            get => chat;
+            set => Set(ref chat, value);
         }
 
         [ForeignKey("Chat")]
         public Guid ChatId
         {
-            get => this.chatId;
-            set => this.Set(ref this.chatId, value);
+            get => chatId;
+            set => Set(ref chatId, value);
         }
 
         public OpenAIChatType Type
         {
-            get => this.type;
-            set => this.Set(ref this.type, value);
+            get => type;
+            set => Set(ref type, value);
         }
 
         /// <summary>
@@ -51,9 +66,9 @@ namespace Gpt.Labs.Models
         /// </summary>
         [Range(1, 10, ErrorMessage = "Value for 'Number of completions' must be between {1} and {2}.")]
         public int N
-        { 
-            get => this.n;
-            set => this.Set(ref this.n, value);
+        {
+            get => n;
+            set => Set(ref n, value);
         }
 
         /// <summary>
@@ -63,17 +78,17 @@ namespace Gpt.Labs.Models
         /// </summary>
         [StringLength(250, ErrorMessage = "The field 'User' must be a string with a maximum length of {1}.")]
         public string User
-        { 
-            get => this.user;
-            set => this.Set(ref this.user, value);
+        {
+            get => user;
+            set => Set(ref user, value);
         }
 
         [StringLength(50, ErrorMessage = "The field 'Organization ID' must be a string with a maximum length of {1}.")]
-        [RegularExpression(@"^org-.*$",  ErrorMessage = "The field 'Organization ID' must start with 'org-' prefix.")]
+        [RegularExpression(@"^org-.*$", ErrorMessage = "The field 'Organization ID' must start with 'org-' prefix.")]
         public string OpenAIOrganization
-        { 
-            get => this.openAIOrganization;
-            set => this.Set(ref this.openAIOrganization, value);
+        {
+            get => openAIOrganization;
+            set => Set(ref openAIOrganization, value);
         }
 
         #endregion

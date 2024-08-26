@@ -1,36 +1,35 @@
-﻿using Gpt.Labs.Helpers.Navigation;
+﻿using Gpt.Labs.Helpers.Extensions;
+using Gpt.Labs.Helpers.Navigation;
 using Gpt.Labs.Models;
+using Gpt.Labs.Models.Enums;
+using Gpt.Labs.Models.Exceptions;
+using Gpt.Labs.Models.Extensions;
 using Gpt.Labs.ViewModels.Base;
+using Gpt.Labs.ViewModels.Collections;
+using Gpt.Labs.ViewModels.Collections.Interfaces;
+using Gpt.Labs.ViewModels.Enums;
+using Gpt.Labs.ViewModels.OpenAiEndpointsProcessors;
+using Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using OpenAI;
+using OpenAI.Audio;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.DataTransfer;
 using Windows.Media.Capture;
 using Windows.Media.MediaProperties;
-using Windows.Storage.Streams;
-using OpenAI.Audio;
-using System.IO;
-using System.Threading;
-using System.Linq;
-using Gpt.Labs.Models.Extensions;
-using Gpt.Labs.Models.Enums;
-using Gpt.Labs.Helpers.Extensions;
-using Gpt.Labs.ViewModels.Enums;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.EntityFrameworkCore;
-using Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base;
-using Gpt.Labs.ViewModels.OpenAiEndpointsProcessors;
-using Gpt.Labs.ViewModels.Collections.Interfaces;
-using System.Collections.Generic;
-using Gpt.Labs.ViewModels.Collections;
-using System.Collections.ObjectModel;
 using Windows.Storage;
-using Windows.ApplicationModel.DataTransfer;
 using Windows.Storage.Pickers;
+using Windows.Storage.Streams;
 using WinRT.Interop;
-using OpenAI;
-using Gpt.Labs.Models.Exceptions;
-using System.Drawing.Text;
 
 namespace Gpt.Labs.ViewModels
 {
@@ -41,10 +40,10 @@ namespace Gpt.Labs.ViewModels
         private string message;
 
         private bool isRecording;
-        
+
         private bool disposed;
 
-        private Stopwatch watch = new Stopwatch();
+        private readonly Stopwatch watch = new();
 
         private OpenAIChat chat;
 
@@ -54,7 +53,7 @@ namespace Gpt.Labs.ViewModels
 
         private InMemoryRandomAccessStream mediaMemoryBuffer;
 
-        private SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
+        private SemaphoreSlim semaphoreSlim = new(1, 1);
 
         private ChatPanelTypes expandedPanels;
 
@@ -71,7 +70,7 @@ namespace Gpt.Labs.ViewModels
         public MessagesListViewModel(Func<BasePage> getBasePage)
             : base(getBasePage)
         {
-            this.mediaCapture = new MediaCapture();       
+            mediaCapture = new MediaCapture();
         }
 
         #endregion
@@ -80,40 +79,40 @@ namespace Gpt.Labs.ViewModels
 
         public Guid ChatId { get; private set; }
 
-        public OpenAIChat Chat 
-        { 
-            get => this.chat;
-            set => this.Set(ref this.chat, value);
+        public OpenAIChat Chat
+        {
+            get => chat;
+            set => Set(ref chat, value);
         }
 
-        public string Message 
-        { 
-            get => this.message;
-            set => this.Set(ref this.message, value);
+        public string Message
+        {
+            get => message;
+            set => Set(ref message, value);
         }
 
-        public bool IsRecording 
-        { 
-            get => this.isRecording;
-            set => this.Set(ref this.isRecording, value);
+        public bool IsRecording
+        {
+            get => isRecording;
+            set => Set(ref isRecording, value);
         }
 
         public int ExpandedPanels
         {
-            get => (int)this.expandedPanels;
-            set => this.Set(ref this.expandedPanels, (ChatPanelTypes)value);
+            get => (int)expandedPanels;
+            set => Set(ref expandedPanels, (ChatPanelTypes)value);
         }
 
-        public bool MultiSelectModeEnabled 
-        { 
-            get => this.multiSelectModeEnabled; 
-            set => this.Set(ref this.multiSelectModeEnabled, value); 
+        public bool MultiSelectModeEnabled
+        {
+            get => multiSelectModeEnabled;
+            set => Set(ref multiSelectModeEnabled, value);
         }
 
-        public bool ProcessingMessage 
-        { 
-            get => this.processingMessage; 
-            set => this.Set(ref this.processingMessage, value); 
+        public bool ProcessingMessage
+        {
+            get => processingMessage;
+            set => Set(ref processingMessage, value);
         }
 
         public IReadOnlyCollection<string> SupportedChatModels { get; private set; }
@@ -124,35 +123,28 @@ namespace Gpt.Labs.ViewModels
 
         public override async Task LoadStateAsync(Type destinationPageType, Query parameters, ViewModelState state, NavigationMode mode)
         {
-            await this.mediaCapture.InitializeAsync(new MediaCaptureInitializationSettings
+            await mediaCapture.InitializeAsync(new MediaCaptureInitializationSettings
             {
                 StreamingCaptureMode = StreamingCaptureMode.Audio
             });
 
-            if (mode == NavigationMode.New)
-            {
-                this.ChatId = parameters.GetValue<Guid>("chat-id");
-            }
-            else
-            {
-                this.ChatId = state.GetValue<Guid>(nameof(this.ChatId));
-            }
+            ChatId = mode == NavigationMode.New ? parameters.GetValue<Guid>("chat-id") : state.GetValue<Guid>(nameof(ChatId));
 
-            await this.LoadChatInfo();
+            await LoadChatInfo();
 
             var collectiom = new ObservableList<OpenAIMessage, Guid>(this, p => p.Id);
             var messagesCount = ((IQueryableDataProvider<OpenAIMessage, Guid>)this).GetCount();
             collectiom.Initialize(messagesCount > 0 ? messagesCount - 1 : 0);
 
-            this.ItemsCollection = collectiom;
+            ItemsCollection = collectiom;
 
-            switch (this.Chat.Type)
+            switch (Chat.Type)
             {
                 case OpenAIChatType.Chat:
-                    this.messageProcessor = new ChatEndpointProcessor(this.Chat, this.ItemsCollection, this.DispatcherQueue, () => { this.Message = string.Empty; });
+                    messageProcessor = new ChatEndpointProcessor(Chat, ItemsCollection, DispatcherQueue, () => { Message = string.Empty; });
                     break;
                 case OpenAIChatType.Image:
-                    this.messageProcessor = new ImageEndpointProcessor(this.Chat, this.ItemsCollection, this.DispatcherQueue, () => { this.Message = string.Empty; });
+                    messageProcessor = new ImageEndpointProcessor(Chat, ItemsCollection, DispatcherQueue, () => { Message = string.Empty; });
                     break;
             }
 
@@ -165,102 +157,102 @@ namespace Gpt.Labs.ViewModels
         {
             base.SaveState(destinationPageType, parameters, state, mode);
 
-            state.SetValue(nameof(this.ChatId), this.ChatId);
+            state.SetValue(nameof(ChatId), ChatId);
         }
 
         public async Task CancelSettings()
         {
-            var dialog = this.Window.CreateYesNoDialog("Confirm", "CancellSettingsChanges");
+            var dialog = Window.CreateYesNoDialog("Confirm", "CancellSettingsChanges");
             var result = await dialog.ShowAsync();
 
             if (result == ContentDialogResult.Primary)
             {
-                await this.LoadChatInfo();
+                await LoadChatInfo();
             }
         }
 
         public async Task SaveSettings()
         {
-            using (var context = new DataContext())
+            using var context = new DataContext();
+            context.Entry(Chat.Settings).State = EntityState.Modified;
+
+            switch (Chat.Type)
             {
-                context.Entry(this.Chat.Settings).State = EntityState.Modified;
+                case OpenAIChatType.Chat:
+                    var chatSettings = (OpenAIChatSettings)Chat.Settings;
 
-                switch (this.Chat.Type)
-                {
-                    case OpenAIChatType.Chat:
-                        var chatSettings = (OpenAIChatSettings)this.Chat.Settings;
+                    var oldStops = await context.Stops.AsNoTracking().Where(p => p.SettingsId == chatSettings.Id).ToListAsync();
 
-                        var oldStops = await context.Stops.AsNoTracking().Where(p => p.SettingsId == chatSettings.Id).ToListAsync();
-                        
-                        var existStops = new HashSet<Guid>();
+                    var existStops = new HashSet<Guid>();
 
-                        foreach (var item in chatSettings.Stop)
+                    foreach (var item in chatSettings.Stop)
+                    {
+                        if (item.IsNew)
                         {
-                            if (item.IsNew)
-                            {
-                                context.Add(item);
-                            }
-                            else
-                            {
-                                context.Entry(item).State = EntityState.Modified;
-                            }
-                                                        
-                            existStops.Add(item.Id);
+                            context.Add(item);
+                        }
+                        else
+                        {
+                            context.Entry(item).State = EntityState.Modified;
                         }
 
-                        foreach (var item in oldStops)
+                        existStops.Add(item.Id);
+                    }
+
+                    foreach (var item in oldStops)
+                    {
+                        if (!existStops.Contains(item.Id))
                         {
-                            if (!existStops.Contains(item.Id))
-                            {
-                                 context.Entry(item).State = EntityState.Deleted;
-                            }
+                            context.Entry(item).State = EntityState.Deleted;
+                        }
+                    }
+
+                    var oldBias = await context.LogitBias.AsNoTracking().Where(p => p.SettingsId == chatSettings.Id).ToListAsync();
+
+                    var existBias = new HashSet<Guid>();
+
+                    foreach (var item in chatSettings.LogitBias)
+                    {
+                        if (item.IsNew)
+                        {
+                            context.Add(item);
+                        }
+                        else
+                        {
+                            context.Entry(item).State = EntityState.Modified;
                         }
 
-                        var oldBias = await context.LogitBias.AsNoTracking().Where(p => p.SettingsId == chatSettings.Id).ToListAsync();
+                        existBias.Add(item.Id);
+                    }
 
-                        var existBias = new HashSet<Guid>();
-
-                        foreach (var item in chatSettings.LogitBias)
+                    foreach (var item in oldBias)
+                    {
+                        if (!existBias.Contains(item.Id))
                         {
-                            if (item.IsNew)
-                            {
-                                context.Add(item);
-                            }
-                            else
-                            {
-                                context.Entry(item).State = EntityState.Modified;
-                            }
-
-                            existBias.Add(item.Id);
+                            context.Entry(item).State = EntityState.Deleted;
                         }
+                    }
 
-                        foreach (var item in oldBias)
-                        {
-                            if (!existBias.Contains(item.Id))
-                            {
-                                 context.Entry(item).State = EntityState.Deleted;
-                            }
-                        }
-
-                        break;
-                }
-
-                await context.SaveChangesAsync();
+                    break;
             }
+
+            await context.SaveChangesAsync();
         }
 
         public async Task CreateImageVariation()
         {
-            var imagePicker = new FileOpenPicker();
-            imagePicker.ViewMode = PickerViewMode.Thumbnail;
-            imagePicker.SuggestedStartLocation = PickerLocationId.PicturesLibrary;
+            var imagePicker = new FileOpenPicker
+            {
+                ViewMode = PickerViewMode.Thumbnail,
+                SuggestedStartLocation = PickerLocationId.PicturesLibrary
+            };
             imagePicker.FileTypeFilter.Add(".png");
 
-            var hwnd = WindowNative.GetWindowHandle(this.Window);
+            var hwnd = WindowNative.GetWindowHandle(Window);
             InitializeWithWindow.Initialize(imagePicker, hwnd);
 
             var file = await imagePicker.PickSingleFileAsync();
-            
+
             if (file == null)
             {
                 return;
@@ -270,42 +262,44 @@ namespace Gpt.Labs.ViewModels
 
             if (properties.Size > 4 * 1024 * 1024)
             {
-                var dialog = this.Window.CreateOkDialog("Error", "ImageVariationValidationError");
+                var dialog = Window.CreateOkDialog("Error", "ImageVariationValidationError");
                 await dialog.ShowAsync();
                 return;
             }
 
-            await this.WrapOpenAiRequest(async () => {
-                var imageVariationProcessor = new ImageVariationEndpointProcessor(this.Chat, this.ItemsCollection, this.DispatcherQueue, () => { this.Message = string.Empty; });
+            await WrapOpenAiRequest(async () =>
+            {
+                var imageVariationProcessor = new ImageVariationEndpointProcessor(Chat, ItemsCollection, DispatcherQueue, () => { Message = string.Empty; });
                 await imageVariationProcessor.ProcessAsync(file, cancellation.Token);
             });
         }
 
         public async Task SendMessage()
         {
-            if (string.IsNullOrEmpty(this.Message))
+            if (string.IsNullOrEmpty(Message))
             {
                 return;
             }
 
-            await this.WrapOpenAiRequest(() => {
-                return this.messageProcessor.ProcessAsync(new OpenAIMessage { Role = OpenAIRole.User, Content = this.Message, ChatId = this.ChatId }, cancellation.Token);
+            await WrapOpenAiRequest(() =>
+            {
+                return messageProcessor.ProcessAsync(new OpenAIMessage { Role = OpenAIRole.User, Content = Message, ChatId = ChatId }, cancellation.Token);
             });
         }
-               
+
         public void CancelChatRequest()
         {
-            if (!this.ProcessingMessage || this.cancellation == null || this.cancellation.IsCancellationRequested)
+            if (!ProcessingMessage || cancellation == null || cancellation.IsCancellationRequested)
             {
                 return;
             }
 
-            this.cancellation.Cancel();
+            cancellation.Cancel();
         }
 
         public async Task RegenerateResponse()
         {
-            if (this.ProcessingMessage || this.ItemsCollection.Count == 0)
+            if (ProcessingMessage || ItemsCollection.Count == 0)
             {
                 return;
             }
@@ -314,15 +308,15 @@ namespace Gpt.Labs.ViewModels
 
             OpenAIMessage userMessage = null;
 
-            for (int i = this.ItemsCollection.Count - 1; i >= 0; i--)
+            for (int i = ItemsCollection.Count - 1; i >= 0; i--)
             {
-                if (this.ItemsCollection[i].Role == OpenAIRole.User)
+                if (ItemsCollection[i].Role == OpenAIRole.User)
                 {
-                    userMessage = this.ItemsCollection[i];
+                    userMessage = ItemsCollection[i];
                     break;
                 }
 
-                messagesToDelete.Add(this.ItemsCollection[i]);
+                messagesToDelete.Add(ItemsCollection[i]);
             }
 
             if (userMessage == null)
@@ -330,33 +324,34 @@ namespace Gpt.Labs.ViewModels
                 return;
             }
 
-            await this.DeleteMessages(false, messagesToDelete.ToArray());
+            await DeleteMessages(false, messagesToDelete.ToArray());
 
-            await this.WrapOpenAiRequest(() => {
-                return this.messageProcessor.ProcessAsync(userMessage, cancellation.Token);
+            await WrapOpenAiRequest(() =>
+            {
+                return messageProcessor.ProcessAsync(userMessage, cancellation.Token);
             });
         }
 
         public async Task DeleteLastMessages()
         {
-            if (this.ProcessingMessage || this.ItemsCollection.Count == 0)
+            if (ProcessingMessage || ItemsCollection.Count == 0)
             {
                 return;
             }
 
             var messagesToDelete = new List<OpenAIMessage>();
 
-            for (int i = this.ItemsCollection.Count - 1; i >= 0; i--)
+            for (int i = ItemsCollection.Count - 1; i >= 0; i--)
             {
-                messagesToDelete.Add(this.ItemsCollection[i]);
+                messagesToDelete.Add(ItemsCollection[i]);
 
-                if (this.ItemsCollection[i].Role == OpenAIRole.User)
+                if (ItemsCollection[i].Role == OpenAIRole.User)
                 {
                     break;
                 }
             }
 
-            await this.DeleteMessages(true, messagesToDelete.ToArray());
+            await DeleteMessages(true, messagesToDelete.ToArray());
         }
 
         public async Task DeleteMessages(bool showConfirmationDialog, params OpenAIMessage[] messages)
@@ -368,17 +363,9 @@ namespace Gpt.Labs.ViewModels
 
             if (showConfirmationDialog)
             {
-                ContentDialog dialog;
-
-                if (messages.Length == 1)
-                {
-                    dialog = this.Window.CreateYesNoDialog("Confirm", "DeleteMessage");
-                }
-                else
-                {
-                    dialog = this.Window.CreateYesNoDialog("Confirm", "DeleteMessages", messages.Length);
-                }
-
+                ContentDialog dialog = messages.Length == 1
+                    ? Window.CreateYesNoDialog("Confirm", "DeleteMessage")
+                    : Window.CreateYesNoDialog("Confirm", "DeleteMessages", messages.Length);
                 var result = await dialog.ShowAsync();
 
                 if (result != ContentDialogResult.Primary)
@@ -395,13 +382,13 @@ namespace Gpt.Labs.ViewModels
 
                     await context.SaveChangesAsync();
 
-                    this.ItemsCollection.Remove(message);
-                } 
+                    ItemsCollection.Remove(message);
+                }
             }
 
-            if (this.Chat.Type == OpenAIChatType.Image)
+            if (Chat.Type == OpenAIChatType.Image)
             {
-                foreach(var message in messages)
+                foreach (var message in messages)
                 {
                     var imageFile = await ApplicationData.Current.LocalCacheFolder.TryGetItemAsync($"{message.ChatId}\\{message.Id}.png");
 
@@ -415,51 +402,51 @@ namespace Gpt.Labs.ViewModels
 
         public async Task OpenChatInNewWindow()
         {
-            await this.Chat.OpenChatInNewWindows();
+            await Chat.OpenChatInNewWindows();
         }
 
         public async Task StartStopRecord()
         {
-            await this.semaphoreSlim.WaitAsync();
+            await semaphoreSlim.WaitAsync();
 
             try
             {
-                if (!this.IsRecording)
+                if (!IsRecording)
                 {
-                    await this.StartRecord();
+                    await StartRecord();
                 }
                 else
                 {
-                    await this.StopRecord();
+                    await StopRecord();
                 }
             }
             finally
             {
-                this.semaphoreSlim.Release();
+                semaphoreSlim.Release();
             }
         }
 
 
         public void ExpandCollapsePanel(ChatPanelTypes panelType)
         {
-            if (this.IsPanelExpanded(this.ExpandedPanels, (int)panelType))
+            if (IsPanelExpanded(ExpandedPanels, (int)panelType))
             {
-                this.CollapsePanel(panelType);
+                CollapsePanel(panelType);
             }
             else
             {
-                this.ExpandPanel(panelType);
+                ExpandPanel(panelType);
             }
         }
 
         public void ExpandPanel(ChatPanelTypes panelType)
         {
-            this.ExpandedPanels |= (int)panelType;
+            ExpandedPanels |= (int)panelType;
         }
 
         public void CollapsePanel(ChatPanelTypes panelType)
         {
-            this.ExpandedPanels &= ~(int)panelType;
+            ExpandedPanels &= ~(int)panelType;
         }
 
         public bool IsPanelExpanded(int panels, int panelType)
@@ -481,7 +468,7 @@ namespace Gpt.Labs.ViewModels
 
             dataPackage.SetText(messages.Format());
 
-            if (this.Chat.Type == OpenAIChatType.Image)
+            if (Chat.Type == OpenAIChatType.Image)
             {
                 var images = new List<IStorageItem>();
 
@@ -510,8 +497,8 @@ namespace Gpt.Labs.ViewModels
                 return;
             }
 
-            this.Window.SetShareContent(this.Chat.ShareChatContent(messages));
-            this.Window.ShowShareUI();
+            Window.SetShareContent(Chat.ShareChatContent(messages));
+            Window.ShowShareUI();
         }
 
         #endregion
@@ -520,21 +507,21 @@ namespace Gpt.Labs.ViewModels
 
         protected override void Dispose(bool disposing)
         {
-            if (!this.disposed)
+            if (!disposed)
             {
                 if (disposing)
                 {
-                    this.mediaCapture?.Dispose();
-                    this.mediaCapture = null;
+                    mediaCapture?.Dispose();
+                    mediaCapture = null;
 
-                    this.mediaMemoryBuffer?.Dispose();
-                    this.mediaMemoryBuffer = null;
+                    mediaMemoryBuffer?.Dispose();
+                    mediaMemoryBuffer = null;
 
-                    this.semaphoreSlim.Dispose();
-                    this.semaphoreSlim = null;
+                    semaphoreSlim.Dispose();
+                    semaphoreSlim = null;
                 }
 
-                this.disposed = true;
+                disposed = true;
             }
 
             base.Dispose(disposing);
@@ -544,88 +531,87 @@ namespace Gpt.Labs.ViewModels
         {
             try
             {
-                await this.mediaCapture.StopRecordAsync();
-                
-                this.watch.Stop();
+                await mediaCapture.StopRecordAsync();
+
+                watch.Stop();
 
                 if (watch.ElapsedMilliseconds > 2000)
                 {
-                    this.mediaMemoryBuffer.Seek(0);
+                    mediaMemoryBuffer.Seek(0);
 
-                    await this.WrapOpenAiRequest(async () => {
-                        var client = new OpenAIClient(new OpenAIAuthentication(ApplicationSettings.Instance.OpenAIApiKey, !string.IsNullOrEmpty(this.chat.Settings.OpenAIOrganization) ? this.chat.Settings.OpenAIOrganization : ApplicationSettings.Instance.OpenAIOrganization ));
-                        var request = new AudioTranscriptionRequest(this.mediaMemoryBuffer.AsStream(), "voice.mp3");
-                        var result = await client.WrapAction((client, token) => client.AudioEndpoint.CreateTranscriptionAsync(request, token), cancellation.Token);
-                                
-                        this.Message = result;
+                    await WrapOpenAiRequest(async () =>
+                    {
+                        var client = new OpenAIClient(new OpenAIAuthentication(ApplicationSettings.Instance.OpenAIApiKey, !string.IsNullOrEmpty(chat.Settings.OpenAIOrganization) ? chat.Settings.OpenAIOrganization : ApplicationSettings.Instance.OpenAIOrganization));
+                        var request = new AudioTranscriptionRequest(mediaMemoryBuffer.AsStream(), "voice.mp3");
+                        var result = await client.WrapAction((client, token) => client.AudioEndpoint.CreateTranscriptionTextAsync(request, token), cancellation.Token);
+
+                        Message = result;
                     });
                 }
                 else
                 {
-                    this.Message = string.Empty;
+                    Message = string.Empty;
                 }
             }
             catch (Exception ex)
             {
-                this.Message = string.Empty;
+                Message = string.Empty;
                 ex.LogError("Exception on attempt to stop recording");
             }
-            finally 
-            {                 
-                this.mediaMemoryBuffer?.Dispose();
-                this.mediaMemoryBuffer = null;
-                                
-                await this.DispatcherQueue.EnqueueAsync(async () =>
+            finally
+            {
+                mediaMemoryBuffer?.Dispose();
+                mediaMemoryBuffer = null;
+
+                await DispatcherQueue.EnqueueAsync(() =>
                 {
-                    this.IsRecording = false;
+                    IsRecording = false;
                 });
 
-                this.watch.Reset();
+                watch.Reset();
             }
         }
-                
+
         private async Task StartRecord()
-        {        
-            this.IsRecording = true;
+        {
+            IsRecording = true;
 
-            this.mediaMemoryBuffer = new InMemoryRandomAccessStream();
+            mediaMemoryBuffer = new InMemoryRandomAccessStream();
 
-            this.watch.Start();
+            watch.Start();
 
-            await this.mediaCapture.StartRecordToStreamAsync(MediaEncodingProfile.CreateMp3(AudioEncodingQuality.Low), this.mediaMemoryBuffer);
+            await mediaCapture.StartRecordToStreamAsync(MediaEncodingProfile.CreateMp3(AudioEncodingQuality.Low), mediaMemoryBuffer);
         }
 
         private async Task LoadChatInfo()
         {
-            using (var context = new DataContext())
+            using var context = new DataContext();
+            Chat = await context.Chats.AsNoTracking().Include(p => p.Settings).SingleAsync(p => p.Id == ChatId);
+
+            switch (Chat.Type)
             {
-                this.Chat = await context.Chats.AsNoTracking().Include(p => p.Settings).SingleAsync(p => p.Id == this.ChatId);
+                case OpenAIChatType.Chat:
+                    var chatSettings = (OpenAIChatSettings)Chat.Settings;
 
-                switch (this.Chat.Type)
-                {
-                    case OpenAIChatType.Chat:
-                        var chatSettings = (OpenAIChatSettings)this.Chat.Settings;
+                    chatSettings.Stop = new ObservableCollection<OpenAIStop>();
+                    await foreach (var item in context.Stops.AsNoTracking().Where(p => p.SettingsId == chatSettings.Id).AsAsyncEnumerable())
+                    {
+                        chatSettings.Stop.Add(item);
+                    }
 
-                        chatSettings.Stop = new ObservableCollection<OpenAIStop>();
-                        await foreach (var item in context.Stops.AsNoTracking().Where(p => p.SettingsId == chatSettings.Id).AsAsyncEnumerable())
-                        {
-                            chatSettings.Stop.Add(item);
-                        }
+                    chatSettings.LogitBias = new ObservableCollection<OpenAILogitBias>();
+                    await foreach (var item in context.LogitBias.AsNoTracking().Where(p => p.SettingsId == chatSettings.Id).AsAsyncEnumerable())
+                    {
+                        chatSettings.LogitBias.Add(item);
+                    }
 
-                        chatSettings.LogitBias = new ObservableCollection<OpenAILogitBias>();
-                        await foreach (var item in context.LogitBias.AsNoTracking().Where(p => p.SettingsId == chatSettings.Id).AsAsyncEnumerable())
-                        {
-                            chatSettings.LogitBias.Add(item);
-                        }
-
-                        break;
-                }
+                    break;
             }
         }
 
         private async Task InitSupportedChatModels()
         {
-            if (this.Chat.Type != OpenAIChatType.Chat)
+            if (Chat.Type != OpenAIChatType.Chat)
             {
                 return;
             }
@@ -636,22 +622,22 @@ namespace Gpt.Labs.ViewModels
                 var api = new OpenAIClient(authentication);
                 var allModels = await api.WrapAction((client) => client.ModelsEndpoint.GetModelsAsync());
 
-                switch (this.Chat.Type)
+                switch (Chat.Type)
                 {
                     case OpenAIChatType.Chat:
-                        this.SupportedChatModels = allModels.Where(p => p.Id.Contains("gpt")).OrderByDescending(p => p.CreatedAt).Select(p => p.Id).ToList().AsReadOnly();
+                        SupportedChatModels = allModels.Where(p => p.Id.Contains("gpt")).OrderByDescending(p => p.CreatedAt).Select(p => p.Id).ToList().AsReadOnly();
                         break;
                 }
             }
             catch (OpenAiException ex)
             {
-                await this.Window.CreateErrorDialog(ex).ShowAsync();
+                await Window.CreateErrorDialog(ex).ShowAsync();
             }
             catch (Exception ex)
             {
                 ex.LogError();
 
-                await this.Window.CreateExceptionDialog(ex).ShowAsync();
+                await Window.CreateExceptionDialog(ex).ShowAsync();
             }
         }
 
@@ -659,16 +645,16 @@ namespace Gpt.Labs.ViewModels
         {
             try
             {
-                this.ProcessingMessage = true;
-                this.cancellation = new CancellationTokenSource();
+                ProcessingMessage = true;
+                cancellation = new CancellationTokenSource();
 
                 await action();
             }
             catch (OpenAiException ex)
             {
-                await this.DispatcherQueue.EnqueueAsync(async () =>
+                await DispatcherQueue.EnqueueAsync(async () =>
                 {
-                    await this.Window.CreateErrorDialog(ex).ShowAsync();
+                    await Window.CreateErrorDialog(ex).ShowAsync();
                 });
             }
             catch (TaskCanceledException)
@@ -683,61 +669,51 @@ namespace Gpt.Labs.ViewModels
             {
                 ex.LogError();
 
-                await this.DispatcherQueue.EnqueueAsync(async () =>
+                await DispatcherQueue.EnqueueAsync(async () =>
                 {
-                    await this.Window.CreateExceptionDialog(ex).ShowAsync();
+                    await Window.CreateExceptionDialog(ex).ShowAsync();
                 });
             }
-            finally 
-            { 
-                this.cancellation?.Dispose();
-                this.cancellation = null;
+            finally
+            {
+                cancellation?.Dispose();
+                cancellation = null;
 
-                await this.DispatcherQueue.EnqueueAsync(async () =>
+                await DispatcherQueue.EnqueueAsync(() =>
                 {
-                    this.ProcessingMessage = false; 
+                    ProcessingMessage = false;
                 });
             }
         }
 
         bool IQueryableDataProvider<OpenAIMessage, Guid>.Contains(Guid id)
         {
-            using (var context = new DataContext())
-            {
-                return context.Messages.Contains(this.ChatId, id);
-            }
+            using var context = new DataContext();
+            return context.Messages.Contains(ChatId, id);
         }
 
         OpenAIMessage IQueryableDataProvider<OpenAIMessage, Guid>.GetById(Guid id)
         {
-            using (var context = new DataContext())
-            {
-                return context.Messages.GetById(this.ChatId, id);
-            }
+            using var context = new DataContext();
+            return context.Messages.GetById(ChatId, id);
         }
 
         int IQueryableDataProvider<OpenAIMessage, Guid>.GetCount()
         {
-            using (var context = new DataContext())
-            {
-                return context.Messages.Count(this.ChatId);
-            }
+            using var context = new DataContext();
+            return context.Messages.Count(ChatId);
         }
 
         IEnumerable<OpenAIMessage> IQueryableDataProvider<OpenAIMessage, Guid>.GetInRange(int skip, int take)
         {
-            using (var context = new DataContext())
-            {
-                return context.Messages.GetInRange(this.ChatId, skip, take).ToList();
-            }
+            using var context = new DataContext();
+            return context.Messages.GetInRange(ChatId, skip, take).ToList();
         }
 
         int IQueryableDataProvider<OpenAIMessage, Guid>.IndexOf(OpenAIMessage item)
         {
-            using (var context = new DataContext())
-            {
-                return context.Messages.IndexOf(item) - 1;
-            }
+            using var context = new DataContext();
+            return context.Messages.IndexOf(item) - 1;
         }
 
         #endregion

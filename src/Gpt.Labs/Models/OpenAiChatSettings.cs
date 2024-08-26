@@ -7,8 +7,6 @@ namespace Gpt.Labs.Models
     {
         #region Fields
 
-        private string modelId;
-
         private string systemMessage;
 
         private int lastNMessagesToInclude = 5;
@@ -33,25 +31,12 @@ namespace Gpt.Labs.Models
 
         #region Properties
 
-        /// <summary>
-        /// string Required
-        /// ID of the model to use. See the model endpoint compatibility table for details on which models work with the Chat API.
-        /// https://platform.openai.com/docs/models/model-endpoint-compatibility
-        /// </summary>
-        [Required(ErrorMessage = "The 'Model' field is required")]
-        [StringLength(250, ErrorMessage = "The 'Model' field must be a string with a maximum length of {1}.")]
-        public string ModelId 
-        { 
-            get => this.modelId;
-            set => this.Set(ref this.modelId, value);
-        }
-
         [Required(ErrorMessage = "The 'System message' field is required")]
         [StringLength(1000, ErrorMessage = "The 'System message' field must be a string with a maximum length of {1}.")]
-        public string SystemMessage 
-        { 
-            get => this.systemMessage;
-            set => this.Set(ref this.systemMessage, value);
+        public string SystemMessage
+        {
+            get => systemMessage;
+            set => Set(ref systemMessage, value);
         }
 
         /// <summary>
@@ -59,9 +44,9 @@ namespace Gpt.Labs.Models
         /// </summary>
         [Range(1, 1000, ErrorMessage = "Value for 'Last N messages to include' must be between {1} and {2}.")]
         public int LastNMessagesToInclude
-        { 
-            get => this.lastNMessagesToInclude;
-            set => this.Set(ref this.lastNMessagesToInclude, value);
+        {
+            get => lastNMessagesToInclude;
+            set => Set(ref lastNMessagesToInclude, value);
         }
 
         /// <summary>
@@ -71,9 +56,9 @@ namespace Gpt.Labs.Models
         /// </summary>
         [Range(0f, 2f, ErrorMessage = "Value for 'Temperature' must be between {1} and {2}.")]
         public float Temperature
-        { 
-            get => this.temperature;
-            set => this.Set(ref this.temperature, value);
+        {
+            get => temperature;
+            set => Set(ref temperature, value);
         }
 
         /// <summary>
@@ -83,9 +68,9 @@ namespace Gpt.Labs.Models
         /// </summary>
         [Range(0f, 1f, ErrorMessage = "Value for 'Top_P' must be between {1} and {2}.")]
         public float TopP
-        { 
-            get => this.top_p;
-            set => this.Set(ref this.top_p, value);
+        {
+            get => top_p;
+            set => Set(ref top_p, value);
         }
 
         /// <summary>
@@ -95,9 +80,9 @@ namespace Gpt.Labs.Models
         /// https://github.com/openai/openai-cookbook/blob/main/examples/How_to_stream_completions.ipynb
         /// </summary>
         public bool Stream
-        { 
-            get => this.stream;
-            set => this.Set(ref this.stream, value);
+        {
+            get => stream;
+            set => Set(ref stream, value);
         }
 
         /// <summary>
@@ -107,9 +92,9 @@ namespace Gpt.Labs.Models
         /// https://platform.openai.com/tokenizer
         /// </summary>
         public int? MaxTokens
-        { 
-            get => this.max_tokens;
-            set => this.Set(ref this.max_tokens, value);
+        {
+            get => max_tokens;
+            set => Set(ref max_tokens, value);
         }
 
         /// <summary>
@@ -119,9 +104,9 @@ namespace Gpt.Labs.Models
         /// </summary>
         [Range(-2f, 2f, ErrorMessage = "Value for 'Presence penalty' must be between {1} and {2}.")]
         public float PresencePenalty
-        { 
-            get => this.presence_penalty;
-            set => this.Set(ref this.presence_penalty, value);
+        {
+            get => presence_penalty;
+            set => Set(ref presence_penalty, value);
         }
 
         /// <summary>
@@ -131,9 +116,9 @@ namespace Gpt.Labs.Models
         /// </summary>
         [Range(-2f, 2f, ErrorMessage = "Value for 'Frequency penalty' must be between {1} and {2}.")]
         public float FrequencyPenalty
-        { 
-            get => this.frequency_penalty;
-            set => this.Set(ref this.frequency_penalty, value);
+        {
+            get => frequency_penalty;
+            set => Set(ref frequency_penalty, value);
         }
 
         /// <summary>
@@ -143,8 +128,8 @@ namespace Gpt.Labs.Models
         [MaxLength(4)]
         public ICollection<OpenAIStop> Stop
         {
-            get => this.stop;
-            set => this.Set(ref this.stop, value);
+            get => stop;
+            set => Set(ref stop, value);
         }
 
         /// <summary>
@@ -156,8 +141,8 @@ namespace Gpt.Labs.Models
         /// </summary>
         public ICollection<OpenAILogitBias> LogitBias
         {
-            get => this.logit_bias;
-            set => this.Set(ref this.logit_bias, value);
+            get => logit_bias;
+            set => Set(ref logit_bias, value);
         }
 
         #endregion

@@ -41,10 +41,10 @@ namespace Gpt.Labs.ViewModels
 
         public OpenAIChatType ChatType { get; private set; }
 
-        public bool MultiSelectModeEnabled 
-        { 
-            get => this.multiSelectModeEnabled; 
-            set => this.Set(ref this.multiSelectModeEnabled, value); 
+        public bool MultiSelectModeEnabled
+        {
+            get => multiSelectModeEnabled;
+            set => Set(ref multiSelectModeEnabled, value);
         }
 
         #endregion
@@ -53,21 +53,28 @@ namespace Gpt.Labs.ViewModels
 
         public async Task<SaveResult> AddEditChat(OpenAIChat chat)
         {
-            var dialogModel = new OpenAIChat() { Title = chat?.Title, Type = this.ChatType, Position = 0 };
+            var dialogModel = new OpenAIChat() { Title = chat?.Title, Type = ChatType, Position = 0 };
 
             OpenAISettings settings = null;
 
             switch (ChatType)
             {
                 case OpenAIChatType.Chat:
-                    var chatSettings = new OpenAIChatSettings() { Type = this.ChatType };
-                    chatSettings.SystemMessage = ((OpenAIChatSettings)chat?.Settings)?.SystemMessage;
-                    chatSettings.ModelId = ((OpenAIChatSettings)chat?.Settings)?.ModelId;
+                    var chatSettings = new OpenAIChatSettings
+                    {
+                        Type = ChatType,
+                        SystemMessage = ((OpenAIChatSettings)chat?.Settings)?.SystemMessage,
+                        ModelId = chat?.Settings?.ModelId
+                    };
                     settings = chatSettings;
                     break;
                 case OpenAIChatType.Image:
-                    var imageSettings = new OpenAIImageSettings() { Type = this.ChatType };
-                    imageSettings.Size = ((OpenAIImageSettings)chat?.Settings)?.Size ?? OpenAIImageSize.Large;
+                    var imageSettings = new OpenAIImageSettings
+                    {
+                        Type = ChatType,
+                        Size = ((OpenAIImageSettings)chat?.Settings)?.Size ?? OpenAIImageSize.Large,
+                        ModelId = chat?.Settings?.ModelId
+                    };
                     settings = imageSettings;
                     break;
             }
@@ -79,20 +86,20 @@ namespace Gpt.Labs.ViewModels
 
             ContentDialogBase dialog = null;
 
+            var models = await GetSupportedChatModels(dialogModel);
+
+            if (models == null)
+            {
+                return SaveResult.Cancelled;
+            }
+
             switch (ChatType)
             {
                 case OpenAIChatType.Chat:
-                    var models = await this.GetSupportedChatModels(dialogModel);
-
-                    if (models == null)
-                    {
-                        return SaveResult.Cancelled;
-                    }
-
-                    dialog = new EditChatDialog(this.Window, dialogModel, models);
+                    dialog = new EditChatDialog(Window, dialogModel, models);
                     break;
                 case OpenAIChatType.Image:
-                    dialog = new EditImageDialog(this.Window, dialogModel);
+                    dialog = new EditImageDialog(Window, dialogModel, models);
                     break;
             }
 
@@ -134,9 +141,9 @@ namespace Gpt.Labs.ViewModels
                 }
                 else
                 {
-                    for (int i = 0; i < this.ItemsCollection.Count; i++)
+                    for (int i = 0; i < ItemsCollection.Count; i++)
                     {
-                        var item = this.ItemsCollection[i];
+                        var item = ItemsCollection[i];
                         item.Position = i + 1;
                         context.Entry(item).State = EntityState.Modified;
                     }
@@ -151,7 +158,7 @@ namespace Gpt.Labs.ViewModels
 
             if (chat == null)
             {
-                this.ItemsCollection.Insert(0, dialogModel);
+                ItemsCollection.Insert(0, dialogModel);
             }
 
             return saveResult;
@@ -159,17 +166,9 @@ namespace Gpt.Labs.ViewModels
 
         public async Task DeleteChats(params OpenAIChat[] chats)
         {
-            ContentDialog dialog;
-
-            if (chats.Length == 1)
-            {
-                dialog = this.Window.CreateYesNoDialog("Confirm", "DeleteChat", chats[0].Title);
-            }
-            else
-            {
-                dialog = this.Window.CreateYesNoDialog("Confirm", "DeleteChats");
-            }
-
+            ContentDialog dialog = chats.Length == 1
+                ? Window.CreateYesNoDialog("Confirm", "DeleteChat", chats[0].Title)
+                : Window.CreateYesNoDialog("Confirm", "DeleteChats");
             var result = await dialog.ShowAsync();
 
             if (result == ContentDialogResult.Primary)
@@ -178,22 +177,22 @@ namespace Gpt.Labs.ViewModels
                 {
                     foreach (var chat in chats)
                     {
-                        for (int i = chat.Position + 1; i < this.ItemsCollection.Count; i++)
+                        for (int i = chat.Position + 1; i < ItemsCollection.Count; i++)
                         {
-                            var item = this.ItemsCollection[i];
+                            var item = ItemsCollection[i];
                             item.Position = i - 1;
                             context.Entry(item).State = EntityState.Modified;
                         }
-                    
+
                         context.Entry(chat).State = EntityState.Deleted;
 
-                        this.ItemsCollection.Remove(chat);
+                        ItemsCollection.Remove(chat);
 
-                        if (this.SelectedElement != null && chat.Id == this.SelectedElement.Id)
+                        if (SelectedElement != null && chat.Id == SelectedElement.Id)
                         {
-                            this.SelectedElement = null;
+                            SelectedElement = null;
                         }
-                    }  
+                    }
 
                     await context.SaveChangesAsync();
                 }
@@ -202,7 +201,7 @@ namespace Gpt.Labs.ViewModels
                 {
                     if (chat.Type == OpenAIChatType.Image)
                     {
-                        var chatFolder = (await ApplicationData.Current.LocalCacheFolder.TryGetItemAsync(chat.Id.ToString()));
+                        var chatFolder = await ApplicationData.Current.LocalCacheFolder.TryGetItemAsync(chat.Id.ToString());
 
                         if (chatFolder != null)
                         {
@@ -215,56 +214,49 @@ namespace Gpt.Labs.ViewModels
 
         public async Task UpdateChatPosition(OpenAIChat chat)
         {
-            using (var context = new DataContext())
+            using var context = new DataContext();
+            var newIndex = ItemsCollection.IndexOf(chat);
+
+            int from, to;
+
+            if (newIndex > chat.Position)
             {
-                var newIndex = this.ItemsCollection.IndexOf(chat);
-
-                int from, to;
-
-                if (newIndex > chat.Position)
-                {
-                    from = chat.Position;
-                    to = newIndex;
-                }
-                else
-                {
-                    from = newIndex;
-                    to = chat.Position;
-                }
-
-                for (int i = from; i <= to; i++)
-                {
-                    var item = this.ItemsCollection[i];
-                    item.Position = i;
-                    context.Entry(item).State = EntityState.Modified;
-                }
-
-                await context.SaveChangesAsync();
+                from = chat.Position;
+                to = newIndex;
             }
+            else
+            {
+                from = newIndex;
+                to = chat.Position;
+            }
+
+            for (int i = from; i <= to; i++)
+            {
+                var item = ItemsCollection[i];
+                item.Position = i;
+                context.Entry(item).State = EntityState.Modified;
+            }
+
+            await context.SaveChangesAsync();
         }
 
         public void SelectChat(OpenAIChat chat)
         {
-            this.SelectedElement = chat;
+            SelectedElement = chat;
         }
 
         public override async Task LoadStateAsync(Type destinationPageType, Query parameters, ViewModelState state, NavigationMode mode)
         {
-            if (mode == NavigationMode.New)
-            {
-                this.ChatType = parameters.GetValue<OpenAIChatType>("chat-type");
-            }
-            else
-            {
-                this.ChatType = state.GetValue<OpenAIChatType>(nameof(this.ChatType));
-            }
+            ChatType = mode == NavigationMode.New
+                ? parameters.GetValue<OpenAIChatType>("chat-type")
+                : state.GetValue<OpenAIChatType>(nameof(ChatType));
 
             using (var context = new DataContext())
             {
-                var chats = await context.Chats.Include(p => p.Settings).AsNoTracking().Where(p => p.Type == this.ChatType).OrderBy(p => p.Position).ToListAsync();
-                this.ItemsCollection = new ObservableList<OpenAIChat, Guid>(chats, p => p.Id);
+                var chats = await context.Chats.Include(p => p.Settings).AsNoTracking().Where(p => p.Type == ChatType).OrderBy(p => p.Position).ToListAsync();
+                ItemsCollection = new ObservableList<OpenAIChat, Guid>(chats, p => p.Id);
             }
-            
+
             await base.LoadStateAsync(destinationPageType, parameters, state, mode);
         }
 
@@ -272,7 +264,7 @@ namespace Gpt.Labs.ViewModels
         {
             base.SaveState(destinationPageType, parameters, state, mode);
 
-            state.SetValue(nameof(this.ChatType), this.ChatType);
+            state.SetValue(nameof(ChatType), ChatType);
         }
 
         #endregion
@@ -287,28 +279,27 @@ namespace Gpt.Labs.ViewModels
                 var api = new OpenAIClient(authentication);
                 var allModels = await api.WrapAction((client) => client.ModelsEndpoint.GetModelsAsync());
 
-                switch (chat.Type)
+                return chat.Type switch
                 {
-                    case OpenAIChatType.Chat:
-                        return allModels.Where(p => p.Id.Contains("gpt")).OrderByDescending(p => p.CreatedAt).Select(p => p.Id).ToList().AsReadOnly();
-                    default:
-                        return null;
-                }
+                    OpenAIChatType.Chat => allModels.Where(p => p.Id.Contains("gpt")).OrderByDescending(p => p.CreatedAt).Select(p => p.Id).ToList().AsReadOnly(),
+                    OpenAIChatType.Image => allModels.Where(p => p.Id.Contains("dall")).OrderByDescending(p => p.CreatedAt).Select(p => p.Id).ToList().AsReadOnly(),
+                    _ => null,
+                };
             }
             catch (OpenAiException ex)
             {
-                await this.DispatcherQueue.EnqueueAsync(async () =>
+                await DispatcherQueue.EnqueueAsync(async () =>
                 {
-                    await this.Window.CreateErrorDialog(ex).ShowAsync();
+                    await Window.CreateErrorDialog(ex).ShowAsync();
                 });
             }
             catch (Exception ex)
             {
                 ex.LogError();
 
-                await this.DispatcherQueue.EnqueueAsync(async () =>
+                await DispatcherQueue.EnqueueAsync(async () =>
                 {
-                    await this.Window.CreateExceptionDialog(ex).ShowAsync();
+                    await Window.CreateExceptionDialog(ex).ShowAsync();
                 });
             }
 
