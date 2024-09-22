@@ -72,7 +72,7 @@ namespace Gpt.Labs.ViewModels
                     var imageSettings = new OpenAIImageSettings
                     {
                         Type = ChatType,
-                        Size = ((OpenAIImageSettings)chat?.Settings)?.Size ?? OpenAIImageSize.Large,
+                        Size = ((OpenAIImageSettings)chat?.Settings)?.Size ?? OpenAIImageSize.Small,
                         ModelId = chat?.Settings?.ModelId
                     };
                     settings = imageSettings;
@@ -115,15 +115,16 @@ namespace Gpt.Labs.ViewModels
                 chat.Title = dialogModel.Title;
                 chat.Settings.User = settings.User;
                 chat.Settings.OpenAIOrganization = settings.OpenAIOrganization;
+                chat.Settings.ModelId = settings.ModelId;
 
                 switch (ChatType)
                 {
                     case OpenAIChatType.Chat:
                         ((OpenAIChatSettings)chat.Settings).SystemMessage = ((OpenAIChatSettings)settings).SystemMessage;
-                        ((OpenAIChatSettings)chat.Settings).ModelId = ((OpenAIChatSettings)settings).ModelId;
                         break;
                     case OpenAIChatType.Image:
                         ((OpenAIImageSettings)chat.Settings).Size = ((OpenAIImageSettings)settings).Size;
+                        ((OpenAIImageSettings)chat.Settings).RaisePropertyChanged(nameof(OpenAIImageSettings.SizeCaption));
                         break;
                 }
             }

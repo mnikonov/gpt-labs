@@ -1,4 +1,5 @@
-﻿using Gpt.Labs.Models.Enums;
+﻿using Gpt.Labs.Helpers;
+using Gpt.Labs.Models.Enums;
 
 namespace Gpt.Labs.Models
 {
@@ -19,8 +20,14 @@ namespace Gpt.Labs.Models
         public OpenAIImageSize Size
         {
             get => size;
-            set => Set(ref size, value);
+            set
+            {
+                Set(ref size, value);
+                RaisePropertyChanged(nameof(SizeCaption));
+            }
         }
+
+        public string SizeCaption => ModelId.ToImageSize(size);
 
         #endregion
     }

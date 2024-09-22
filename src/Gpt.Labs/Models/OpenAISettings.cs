@@ -35,7 +35,7 @@ namespace Gpt.Labs.Models
         /// </summary>
         [Required(ErrorMessage = "The 'Model' field is required")]
         [StringLength(250, ErrorMessage = "The 'Model' field must be a string with a maximum length of {1}.")]
-        public string ModelId
+        public virtual string ModelId
         {
             get => modelId;
             set => Set(ref modelId, value);

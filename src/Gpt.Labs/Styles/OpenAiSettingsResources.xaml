@@ -222,14 +222,28 @@
                                 <ResourceDictionary Source="ms-appx:///Styles/CommandBarSmallResources.xaml"/>
                             </StackPanel.Resources>
 
+                            <TextBlock x:Uid="ModelLabel" Style="{StaticResource LabelStyle}" Margin="0" Text="Model"/>
+
+                            <ComboBox x:Name="ModelComboBox" HorizontalAlignment="Stretch"
+                                      ItemsSource="{Binding SupportedAiModels, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}"
+                                      SelectedItem="{Binding ChatSettings.ModelId, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" >
+                            </ComboBox>
+
+                            <TextBlock x:Uid="ModelDescription" Style="{StaticResource DescriptionStyle}">                    
+                                <Run x:Uid="ModelDescription1"/><Hyperlink NavigateUri="https://platform.openai.com/docs/models"><Run x:Uid="ModelDescription2"/></Hyperlink><Run x:Uid="ModelDescription3"/>
+                                <LineBreak/><LineBreak/>
+                                <Run x:Uid="ModelDescription4"/><Hyperlink NavigateUri="https://platform.openai.com/docs/models/model-endpoint-compatibility"><Run x:Uid="ModelDescription5"/></Hyperlink><Run x:Uid="ModelDescription7"/>
+                            </TextBlock>
+                            
+                            
                             
                             <TextBlock x:Uid="SizeLabel" Style="{StaticResource LabelStyle}" Text="Size" Margin="0"/>
-                
+                            
                             <ComboBox x:Name="SizeComboBox" HorizontalAlignment="Stretch"
-                                      SelectedItem="{Binding ChatSettings.Size, Converter={StaticResource OpenAIImageSizeConverter}, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" >
-                                <x:String>256x256</x:String>
-                                <x:String>512x512</x:String>
-                                <x:String>1024x1024</x:String>
+                                      de:ImageSizeComboBoxHelper.Settings="{Binding ChatSettings, RelativeSource={RelativeSource TemplatedParent}, Mode=OneWay}"
+                                      SelectedValue="{Binding ChatSettings.Size, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                      DisplayMemberPath="Caption"
+                                      SelectedValuePath="Value">
                             </ComboBox>
 
                             <TextBlock x:Uid="SizeMessageDescription" Style="{StaticResource DescriptionStyle}" />

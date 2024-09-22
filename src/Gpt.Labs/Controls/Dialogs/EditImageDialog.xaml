@@ -7,11 +7,13 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:controls="using:Gpt.Labs.Controls"
     xmlns:models="using:Gpt.Labs.Models"
+    xmlns:dependency="using:Gpt.Labs.Controls.DependencyExtensions"
     Title="Chat details"
     PrimaryButtonText="Apply" 
     SecondaryButtonText="Cancel"
     PrimaryButtonClick="OnPrimaryButtonClick"
     x:Uid="EditChatDialog"
+    x:Name="EditChatDialog"
     mc:Ignorable="d">
 
      <StackPanel Width="480" Margin="0 6 0 0" Spacing="4">
@@ -38,12 +40,12 @@
          
          
         <TextBlock x:Uid="SizeLabel" Style="{StaticResource LabelStyle}" Text="Size"/>
-                
+
         <ComboBox x:Name="SizeComboBox" HorizontalAlignment="Stretch"
-                  SelectedItem="{x:Bind ((models:OpenAIImageSettings)ViewModel.Settings).Size, Converter={StaticResource OpenAIImageSizeConverter}, Mode=TwoWay}" >
-            <x:String>256x256</x:String>
-            <x:String>512x512</x:String>
-            <x:String>1024x1024</x:String>
+                  dependency:ImageSizeComboBoxHelper.Settings="{x:Bind ViewModel.Settings, Mode=OneWay}"
+                  SelectedValue="{Binding ViewModel.Settings.Size, ElementName=EditChatDialog, Mode=TwoWay}"
+                  DisplayMemberPath="Caption"
+                  SelectedValuePath="Value">
         </ComboBox>
 
         <TextBlock x:Uid="SizeMessageDescription" Style="{StaticResource DescriptionStyle}" />

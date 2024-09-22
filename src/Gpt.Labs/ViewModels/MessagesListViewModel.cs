@@ -611,11 +611,6 @@ namespace Gpt.Labs.ViewModels
 
         private async Task InitSupportedChatModels()
         {
-            if (Chat.Type != OpenAIChatType.Chat)
-            {
-                return;
-            }
-
             try
             {
                 var authentication = new OpenAIAuthentication(ApplicationSettings.Instance.OpenAIApiKey, ApplicationSettings.Instance.OpenAIOrganization);
@@ -626,6 +621,9 @@ namespace Gpt.Labs.ViewModels
                 {
                     case OpenAIChatType.Chat:
                         SupportedChatModels = allModels.Where(p => p.Id.Contains("gpt")).OrderByDescending(p => p.CreatedAt).Select(p => p.Id).ToList().AsReadOnly();
+                        break;
+                    case OpenAIChatType.Image:
+                        SupportedChatModels = allModels.Where(p => p.Id.Contains("dall")).OrderByDescending(p => p.CreatedAt).Select(p => p.Id).ToList().AsReadOnly();
                         break;
                 }
             }

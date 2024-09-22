@@ -20,7 +20,6 @@
             <converters:InvertBooleanConverter x:Key="InvertBooleanConverter" />
             <converters:ListViewSelectionModeConverter x:Key="ListViewSelectionModeConverter" />
             <converters:OpenAiKeyConverter x:Key="OpenAiKeyConverter" />
-            <converters:OpenAIImageSizeConverter x:Key="OpenAIImageSizeConverter" />
             <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
 
             <ResourceDictionary.MergedDictionaries>
