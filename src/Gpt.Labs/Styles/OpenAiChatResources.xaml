@@ -2,7 +2,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:controls="using:Gpt.Labs.Controls"
-    xmlns:toolkit="using:CommunityToolkit.WinUI.UI.Controls">
+    xmlns:toolkit="using:CommunityToolkit.WinUI.UI.Controls"   
+    xmlns:helpers="using:Gpt.Labs.Helpers">
 
     <Style x:Key="ChatStyle" TargetType="controls:OpenAiChatControl">
         <Style.Setters>
@@ -266,14 +267,22 @@
                                            ToolTipService.ToolTip="{Binding Settings.User, Mode=OneWay}"
                                            Visibility="{Binding Settings.User, Converter={StaticResource StringToVisibilityConverter}, Mode=OneWay}"/>
 
-                            
                                 <TextBlock Margin="0 6 0 0"
                                            FontWeight="Light" 
                                            TextTrimming="CharacterEllipsis"
                                            TextLineBounds="TrimToCapHeight"
                                            FontSize="11" HorizontalAlignment="Left"
                                            Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
-                                           Text="{Binding Settings.Size, Converter={StaticResource OpenAIImageSizeConverter}, Mode=OneWay}" />                                
+                                           Text="{Binding Settings.SizeCaption, Mode=OneWay}" />       
+                                
+                                <TextBlock Margin="0 6 0 0"
+                                          FontWeight="Light" 
+                                          TextTrimming="CharacterEllipsis"
+                                          TextLineBounds="TrimToCapHeight"
+                                          FontSize="11" HorizontalAlignment="Left"
+                                          Foreground="{ThemeResource SystemControlForegroundBaseMediumLowBrush}"
+                                          Text="{Binding Settings.ModelId, Mode=OneWay}"
+                                          ToolTipService.ToolTip="{Binding Settings.ModelId, Mode=OneWay}"/>
                             </StackPanel>
 
                             

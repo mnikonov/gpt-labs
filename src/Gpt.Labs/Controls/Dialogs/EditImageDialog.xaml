@@ -7,11 +7,13 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:controls="using:Gpt.Labs.Controls"
     xmlns:models="using:Gpt.Labs.Models"
+    xmlns:dependency="using:Gpt.Labs.Controls.DependencyExtensions"
     Title="Chat details"
     PrimaryButtonText="Apply" 
     SecondaryButtonText="Cancel"
     PrimaryButtonClick="OnPrimaryButtonClick"
     x:Uid="EditChatDialog"
+    x:Name="EditChatDialog"
     mc:Ignorable="d">
 
      <StackPanel Width="480" Margin="0 6 0 0" Spacing="4">
@@ -21,16 +23,29 @@
             Text="{x:Bind ViewModel.Title, Mode=TwoWay}"
             PlaceholderText="Enter title">
         </TextBox>
+         
             
+        <TextBlock x:Uid="ModelLabel" Style="{StaticResource LabelStyle}" Text="Model"/>
+        
+        <ComboBox x:Name="ModelComboBox" HorizontalAlignment="Stretch"
+                ItemsSource="{x:Bind SupportedAiModels}" 
+                SelectedItem="{x:Bind ViewModel.Settings.ModelId, Mode=TwoWay}" >
+        </ComboBox>
+
+        <TextBlock x:Uid="ModelDescription" Style="{StaticResource DescriptionStyle}">                    
+            <Run x:Uid="ModelDescription1"/><Hyperlink NavigateUri="https://platform.openai.com/docs/models"><Run x:Uid="ModelDescription2"/></Hyperlink><Run x:Uid="ModelDescription3"/>
+            <LineBreak/><LineBreak/>
+            <Run x:Uid="ModelDescription4"/><Hyperlink NavigateUri="https://platform.openai.com/docs/models/model-endpoint-compatibility"><Run x:Uid="ModelDescription5"/></Hyperlink><Run x:Uid="ModelDescription7"/>
+        </TextBlock>
          
          
         <TextBlock x:Uid="SizeLabel" Style="{StaticResource LabelStyle}" Text="Size"/>
-                
+
         <ComboBox x:Name="SizeComboBox" HorizontalAlignment="Stretch"
-                  SelectedItem="{x:Bind ((models:OpenAIImageSettings)ViewModel.Settings).Size, Converter={StaticResource OpenAIImageSizeConverter}, Mode=TwoWay}" >
-            <x:String>256x256</x:String>
-            <x:String>512x512</x:String>
-            <x:String>1024x1024</x:String>
+                  dependency:ImageSizeComboBoxHelper.Settings="{x:Bind ViewModel.Settings, Mode=OneWay}"
+                  SelectedValue="{Binding ViewModel.Settings.Size, ElementName=EditChatDialog, Mode=TwoWay}"
+                  DisplayMemberPath="Caption"
+                  SelectedValuePath="Value">
         </ComboBox>
 
         <TextBlock x:Uid="SizeMessageDescription" Style="{StaticResource DescriptionStyle}" />

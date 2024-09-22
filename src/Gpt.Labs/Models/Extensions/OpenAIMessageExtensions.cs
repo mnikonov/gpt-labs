@@ -1,5 +1,5 @@
-﻿using Gpt.Labs.Models.Enums;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using OpenAI;
 using OpenAI.Chat;
 using System;
 using System.Collections.Generic;

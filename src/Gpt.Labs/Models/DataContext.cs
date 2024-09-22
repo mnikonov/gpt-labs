@@ -1,12 +1,12 @@
 ﻿using Gpt.Labs.Common;
+using Gpt.Labs.Models.Enums;
+using Gpt.Labs.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
-using System.Threading;
 using System;
-using Gpt.Labs.Models.Interfaces;
-using Gpt.Labs.Models.Enums;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Gpt.Labs.Models
 {
@@ -38,7 +38,7 @@ namespace Gpt.Labs.Models
 
         #region Public Methods
 
-        public async Task CleanUpDatabase()
+        public void CleanUpDatabase()
         {
             //using (var transaction = this.Database.BeginTransaction())
             //{
@@ -73,16 +73,16 @@ namespace Gpt.Labs.Models
 
         public override int SaveChanges()
         {
-            this.InitId();
-            this.AddAuditInfo();
+            InitId();
+            AddAuditInfo();
 
             return base.SaveChanges();
         }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            this.InitId();
-            this.AddAuditInfo();
+            InitId();
+            AddAuditInfo();
 
             return await base.SaveChangesAsync(cancellationToken);
         }
@@ -99,7 +99,7 @@ namespace Gpt.Labs.Models
             modelBuilder.Entity<OpenAIChat>().Property(p => p.Position).HasDefaultValue(0);
             modelBuilder.Entity<OpenAIChat>().Property(p => p.CreatedDate).HasConversion(p => p, p => DateTime.SpecifyKind(p, DateTimeKind.Utc));
             modelBuilder.Entity<OpenAIChat>().Property(p => p.UpdatedDate).HasConversion(p => p, p => p != null ? DateTime.SpecifyKind(p.Value, DateTimeKind.Utc) : null);
-            
+
             modelBuilder.Entity<OpenAIChat>().HasOne(p => p.Settings).WithOne(p => p.Chat).IsRequired();
 
             modelBuilder.Entity<OpenAISettings>().ToTable("Settings")
@@ -111,6 +111,7 @@ namespace Gpt.Labs.Models
             modelBuilder.Entity<OpenAISettings>().Property(p => p.CreatedDate).HasConversion(p => p, p => DateTime.SpecifyKind(p, DateTimeKind.Utc));
             modelBuilder.Entity<OpenAISettings>().Property(p => p.UpdatedDate).HasConversion(p => p, p => p != null ? DateTime.SpecifyKind(p.Value, DateTimeKind.Utc) : null);
 
+            modelBuilder.Entity<OpenAIChatSettings>().Property(p => p.ModelId);
             modelBuilder.Entity<OpenAIChatSettings>().Property(p => p.N).HasDefaultValue(1);
             modelBuilder.Entity<OpenAIChatSettings>().Property(p => p.LastNMessagesToInclude).HasDefaultValue(5);
             modelBuilder.Entity<OpenAIChatSettings>().Property(p => p.Temperature).HasDefaultValue(1);
@@ -120,6 +121,7 @@ namespace Gpt.Labs.Models
             modelBuilder.Entity<OpenAIChatSettings>().Property(p => p.CreatedDate).HasConversion(p => p, p => DateTime.SpecifyKind(p, DateTimeKind.Utc));
             modelBuilder.Entity<OpenAIChatSettings>().Property(p => p.UpdatedDate).HasConversion(p => p, p => p != null ? DateTime.SpecifyKind(p.Value, DateTimeKind.Utc) : null);
 
+            modelBuilder.Entity<OpenAIImageSettings>().Property(p => p.ModelId);
             modelBuilder.Entity<OpenAIImageSettings>().Property(p => p.Size).HasDefaultValue(OpenAIImageSize.Large);
 
             modelBuilder.Entity<OpenAIStop>().ToTable("Stops");
@@ -159,9 +161,9 @@ namespace Gpt.Labs.Models
         {
             var now = DateTime.UtcNow;
 
-            foreach (var entry in this.ChangeTracker.Entries())
+            foreach (var entry in ChangeTracker.Entries())
             {
-                if (entry.State != EntityState.Added && entry.State != EntityState.Modified)
+                if (entry.State is not EntityState.Added and not EntityState.Modified)
                 {
                     continue;
                 }
@@ -182,16 +184,15 @@ namespace Gpt.Labs.Models
 
         private void InitId()
         {
-            foreach (var entry in this.ChangeTracker.Entries())
+            foreach (var entry in ChangeTracker.Entries())
             {
                 if (entry.State != EntityState.Added)
                 {
                     continue;
                 }
 
-                var entity = entry.Entity as IEntity<Guid>;
 
-                if (entity == null || entity.Id != default)
+                if (entry.Entity is not IEntity<Guid> entity || entity.Id != default)
                 {
                     continue;
                 }

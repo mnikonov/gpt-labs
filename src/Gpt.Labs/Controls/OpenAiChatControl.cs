@@ -27,7 +27,7 @@ namespace Gpt.Labs.Controls
 
         public OpenAiChatControl()
         {
-            this.DefaultStyleKey = typeof(OpenAiChatControl);
+            DefaultStyleKey = typeof(OpenAiChatControl);
         }
 
         #endregion
@@ -36,9 +36,9 @@ namespace Gpt.Labs.Controls
 
         private ChatsPage ParentPage => this.GetParent<ChatsPage>();
 
-        private ChatsListViewModel ParentViewViewModel => this.ParentPage?.ViewModel?.Result;
+        private ChatsListViewModel ParentViewViewModel => ParentPage?.ViewModel?.Result;
 
-        private OpenAIChat ViewModel => this.DataContext as OpenAIChat;
+        private OpenAIChat ViewModel => DataContext as OpenAIChat;
 
         #endregion
 
@@ -46,37 +46,37 @@ namespace Gpt.Labs.Controls
 
         protected override void OnApplyTemplate()
         {
-            this.rootGrid = (Grid)GetTemplateChild("RootGrid");
+            rootGrid = (Grid)GetTemplateChild("RootGrid");
 
-            this.openInWindowButton = (AppBarButton)GetTemplateChild("OpenChatInNewWindow");
-            this.editButton = (MenuFlyoutItem)GetTemplateChild("Edit");
-            this.deleteButton = (MenuFlyoutItem)GetTemplateChild("Delete");
+            openInWindowButton = (AppBarButton)GetTemplateChild("OpenChatInNewWindow");
+            editButton = (MenuFlyoutItem)GetTemplateChild("Edit");
+            deleteButton = (MenuFlyoutItem)GetTemplateChild("Delete");
 
-            if (this.rootGrid != null)
+            if (rootGrid != null)
             {
-                this.rootGrid.PointerEntered -= OnRootGridPointerEntered;
-                this.rootGrid.PointerEntered += OnRootGridPointerEntered;
+                rootGrid.PointerEntered -= OnRootGridPointerEntered;
+                rootGrid.PointerEntered += OnRootGridPointerEntered;
 
-                this.rootGrid.PointerExited -= OnRootGridPointerExited;
-                this.rootGrid.PointerExited += OnRootGridPointerExited;
+                rootGrid.PointerExited -= OnRootGridPointerExited;
+                rootGrid.PointerExited += OnRootGridPointerExited;
             }
 
-            if (this.openInWindowButton != null)
+            if (openInWindowButton != null)
             {
-                this.openInWindowButton.Click -= this.OnOpenChatInNewWindowButtonClick;
-                this.openInWindowButton.Click += this.OnOpenChatInNewWindowButtonClick;
+                openInWindowButton.Click -= OnOpenChatInNewWindowButtonClick;
+                openInWindowButton.Click += OnOpenChatInNewWindowButtonClick;
             }
 
-            if (this.editButton != null)
+            if (editButton != null)
             {
-                this.editButton.Click -= this.OnEditButtonClick;
-                this.editButton.Click += this.OnEditButtonClick;
+                editButton.Click -= OnEditButtonClick;
+                editButton.Click += OnEditButtonClick;
             }
 
-            if (this.deleteButton != null)
+            if (deleteButton != null)
             {
-                this.deleteButton.Click -= this.OnDeleteButtonClick;
-                this.deleteButton.Click += this.OnDeleteButtonClick;
+                deleteButton.Click -= OnDeleteButtonClick;
+                deleteButton.Click += OnDeleteButtonClick;
             }
 
             base.OnApplyTemplate();
@@ -84,30 +84,38 @@ namespace Gpt.Labs.Controls
 
         private void OnRootGridPointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            this.ParentViewViewModel.HoveredElement = this.ViewModel;
+            if (ParentViewViewModel != null)
+            {
+                ParentViewViewModel.HoveredElement = ViewModel;
+            }
+
             VisualStateManager.GoToState(this, "PointerEntered", true);
         }
 
         private void OnRootGridPointerExited(object sender, PointerRoutedEventArgs e)
         {
-            this.ParentViewViewModel.HoveredElement = null;
+            if (ParentViewViewModel != null)
+            {
+                ParentViewViewModel.HoveredElement = null;
+            }
+
             VisualStateManager.GoToState(this, "PointerExited", true);
         }
 
         private async void OnOpenChatInNewWindowButtonClick(object sender, RoutedEventArgs e)
         {
-            await this.ViewModel.OpenChatInNewWindows();
+            await ViewModel.OpenChatInNewWindows();
         }
 
         private async void OnEditButtonClick(object sender, RoutedEventArgs e)
         {
             await sender.DisableUiAndExecuteAsync(async () =>
             {
-                var result = await this.ParentViewViewModel.AddEditChat(this.ViewModel);
+                var result = await ParentViewViewModel.AddEditChat(ViewModel);
 
-                if (result == ViewModels.Enums.SaveResult.Edited && this.ParentViewViewModel.SelectedElement != null && this.ViewModel.Id == this.ParentViewViewModel.SelectedElement.Id)
+                if (result == ViewModels.Enums.SaveResult.Edited && ParentViewViewModel.SelectedElement != null && ViewModel.Id == ParentViewViewModel.SelectedElement.Id)
                 {
-                    ((MessagesPage)this.ParentPage.GetInnerFrame().Content).ViewModel.Result.Chat = this.ParentViewViewModel.SelectedElement;
+                    ((MessagesPage)ParentPage.GetInnerFrame().Content).ViewModel.Result.Chat = ParentViewViewModel.SelectedElement;
                 }
             });
         }
@@ -116,8 +124,8 @@ namespace Gpt.Labs.Controls
         {
             await sender.DisableUiAndExecuteAsync(async () =>
             {
-                await this.ParentViewViewModel.DeleteChats(this.ViewModel);
-                await ParentPage.ClearBackState(this.ViewModel);
+                await ParentViewViewModel.DeleteChats(ViewModel);
+                await ParentPage.ClearBackState(ViewModel);
             });
         }
 

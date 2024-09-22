@@ -21,14 +21,14 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base
 
         protected DispatcherQueue dispatcher;
 
-        private Action cleanUserMessage;
+        private readonly Action cleanUserMessage;
 
         #endregion
 
         #region Constructors
 
-        public EndpointProcessor(OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, DispatcherQueue dispatcher, Action cleanUserMessage) 
-        { 
+        public EndpointProcessor(OpenAIChat chat, ObservableList<OpenAIMessage, Guid> messagesCollection, DispatcherQueue dispatcher, Action cleanUserMessage)
+        {
             this.chat = chat;
             this.messagesCollection = messagesCollection;
             this.cleanUserMessage = cleanUserMessage;
@@ -47,18 +47,18 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base
 
         protected OpenAIAuthentication GetAuthentication()
         {
-            return new OpenAIAuthentication(ApplicationSettings.Instance.OpenAIApiKey, !string.IsNullOrEmpty(this.chat.Settings.OpenAIOrganization) ? this.chat.Settings.OpenAIOrganization : ApplicationSettings.Instance.OpenAIOrganization );
+            return new OpenAIAuthentication(ApplicationSettings.Instance.OpenAIApiKey, !string.IsNullOrEmpty(chat.Settings.OpenAIOrganization) ? chat.Settings.OpenAIOrganization : ApplicationSettings.Instance.OpenAIOrganization);
         }
 
         protected async Task<OpenAIMessage> AddMessageToCollectionAsync(OpenAIMessage message, CancellationToken token)
         {
             await SaveChatMessagesAsync(token, message);
 
-            await this.dispatcher.EnqueueAsync(() =>
+            await dispatcher.EnqueueAsync(() =>
             {
                 messagesCollection.Add(message);
-            }, 
-            DispatcherQueuePriority.Normal, 
+            },
+            DispatcherQueuePriority.Normal,
             token);
 
             return messagesCollection[messagesCollection.IndexOf(message)];
@@ -66,37 +66,35 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base
 
         protected Task CleanUserMessageAsync(CancellationToken token)
         {
-            return this.dispatcher.EnqueueAsync(() =>
+            return dispatcher.EnqueueAsync(() =>
             {
                 cleanUserMessage();
-            }, 
-            DispatcherQueuePriority.Normal, 
+            },
+            DispatcherQueuePriority.Normal,
             token);
         }
 
         protected async Task SaveChatMessagesAsync(CancellationToken token, params OpenAIMessage[] messages)
         {
-            using (var context = new DataContext())
+            using var context = new DataContext();
+            foreach (var message in messages)
             {
-                foreach (var message in messages)
+                if (message.IsNew)
                 {
-                    if (message.IsNew)
-                    {
-                        context.Add(message);
-                    }
-                    else
-                    {
-                        context.Entry(message).State = EntityState.Modified;
-                    }
+                    context.Add(message);
                 }
-
-                await this.dispatcher.EnqueueAsync(async () =>
+                else
                 {
-                    await context.SaveChangesAsync(token);
-                }, 
-                DispatcherQueuePriority.Normal, 
-                token);
+                    context.Entry(message).State = EntityState.Modified;
+                }
             }
+
+            await dispatcher.EnqueueAsync(async () =>
+            {
+                await context.SaveChangesAsync(token);
+            },
+            DispatcherQueuePriority.Normal,
+            token);
         }
 
         protected async Task<OpenAIMessage> GetMessageAsync(OpenAIMessage[] messages, int index, CancellationToken token)
