@@ -2,24 +2,21 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Foundation.Metadata;
 
 namespace Gpt.Labs.Helpers.Extensions
 {
     public static class DispatcherQueueExtensions
     {
-        private static readonly bool IsHasThreadAccessPropertyAvailable = ApiInformation.IsMethodPresent("Windows.System.DispatcherQueue", "HasThreadAccess");
-
         public static async Task EnqueueAsync(this DispatcherQueue dispatcher, Action function, DispatcherQueuePriority priority = DispatcherQueuePriority.Normal, CancellationToken token = default)
         {
-            if (IsHasThreadAccessPropertyAvailable && dispatcher.HasThreadAccess)
+            if (dispatcher.HasThreadAccess)
             {
                 function();
                 return;
             }
 
             var taskCompletionSource = new TaskCompletionSource<object>();
-            
+
             using (token.Register(() => taskCompletionSource.TrySetCanceled(token)))
             {
                 if (!dispatcher.TryEnqueue(
@@ -44,13 +41,13 @@ namespace Gpt.Labs.Helpers.Extensions
                     taskCompletionSource.SetException(new InvalidOperationException("Failed to enqueue the operation"));
                 }
 
-                await taskCompletionSource.Task;   
+                await taskCompletionSource.Task;
             }
         }
 
         public static async Task<T> EnqueueAsync<T>(this DispatcherQueue dispatcher, Func<T> function, DispatcherQueuePriority priority = DispatcherQueuePriority.Normal, CancellationToken token = default)
         {
-            if (IsHasThreadAccessPropertyAvailable && dispatcher.HasThreadAccess)
+            if (dispatcher.HasThreadAccess)
             {
                 return function();
             }
@@ -66,7 +63,7 @@ namespace Gpt.Labs.Helpers.Extensions
                                 try
                                 {
                                     var result = function();
-                                    
+
                                     if (!token.IsCancellationRequested)
                                     {
                                         taskCompletionSource.SetResult(result);
@@ -81,13 +78,13 @@ namespace Gpt.Labs.Helpers.Extensions
                     taskCompletionSource.SetException(new InvalidOperationException("Failed to enqueue the operation"));
                 }
 
-                return await taskCompletionSource.Task;   
+                return await taskCompletionSource.Task;
             }
         }
 
         public static async Task EnqueueAsync(this DispatcherQueue dispatcher, Func<Task> function, DispatcherQueuePriority priority = DispatcherQueuePriority.Normal, CancellationToken token = default)
         {
-            if (IsHasThreadAccessPropertyAvailable && dispatcher.HasThreadAccess)
+            if (dispatcher.HasThreadAccess)
             {
                 await function();
                 return;
@@ -104,7 +101,7 @@ namespace Gpt.Labs.Helpers.Extensions
                                 try
                                 {
                                     await function();
-                                    
+
                                     if (!token.IsCancellationRequested)
                                     {
                                         taskCompletionSource.SetResult(null);
@@ -119,13 +116,13 @@ namespace Gpt.Labs.Helpers.Extensions
                     taskCompletionSource.SetException(new InvalidOperationException("Failed to enqueue the operation"));
                 }
 
-                await taskCompletionSource.Task;   
+                await taskCompletionSource.Task;
             }
         }
 
         public static async Task<T> EnqueueAsync<T>(this DispatcherQueue dispatcher, Func<Task<T>> function, DispatcherQueuePriority priority = DispatcherQueuePriority.Normal, CancellationToken token = default)
         {
-            if (IsHasThreadAccessPropertyAvailable && dispatcher.HasThreadAccess)
+            if (dispatcher.HasThreadAccess)
             {
                 return await function();
             }
@@ -141,7 +138,7 @@ namespace Gpt.Labs.Helpers.Extensions
                                 try
                                 {
                                     var result = await function();
-                                    
+
                                     if (!token.IsCancellationRequested)
                                     {
                                         taskCompletionSource.SetResult(result);
@@ -156,7 +153,7 @@ namespace Gpt.Labs.Helpers.Extensions
                     taskCompletionSource.SetException(new InvalidOperationException("Failed to enqueue the operation"));
                 }
 
-                return await taskCompletionSource.Task;   
+                return await taskCompletionSource.Task;
             }
         }
     }

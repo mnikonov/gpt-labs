@@ -14,8 +14,20 @@
     </local:StatePage.AppTitleBarContent>   
     
     <Grid>
-        <ScrollViewer Padding="0 0 12 12">
-            <StackPanel Spacing="10">            
+        <ScrollViewer Padding="0 0 12 12" IsEnabled="{x:Bind SettingsViewModel.IsCompleted, Mode=OneWay}">
+            <StackPanel Spacing="10">        
+                
+                <controls:TitledContentPanel x:Uid="ApplicationSettings" Title="Settings" HorizontalContentAlignment="Stretch">
+                    <StackPanel Spacing="4">
+        
+                        <TextBlock x:Uid="ApplicationStrtDescription" Text="Run application on windows start" Margin="0" 
+                                   Style="{StaticResource LabelStyle}"></TextBlock>
+        
+                        <ToggleSwitch IsOn="{x:Bind SettingsViewModel.Result.LaunchOnStartup, Mode=OneWay}" Toggled="LaunchOnStartup_Toggled" />
+ 
+                    </StackPanel>
+                 </controls:TitledContentPanel>
+                
                 <controls:TitledContentPanel x:Uid="ThemeCaption" Title="Theme" HorizontalContentAlignment="Stretch">
                     <StackPanel Spacing="4">
                         
@@ -24,15 +36,15 @@
                         
                         <RadioButton x:Uid="ThemeDefault" Margin="-10 0" GroupName="AppTheme" Content="Default" HorizontalContentAlignment="Left" Tag="Default" Click="OnApplyThemeClick"
                                      Style="{StaticResource WhideRadioButtonStyle}"
-                                     IsChecked="{x:Bind SettingsViewModel.AppTheme, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Default, Mode=OneWay}" />
+                                     IsChecked="{x:Bind SettingsViewModel.Result.AppTheme, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Default, Mode=OneWay}" />
 
                         <RadioButton x:Uid="ThemeLight" Margin="-10 0" GroupName="AppTheme" Content="Light" Tag="Light" Click="OnApplyThemeClick"
                                      Style="{StaticResource WhideRadioButtonStyle}"
-                                     IsChecked="{x:Bind SettingsViewModel.AppTheme, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Light, Mode=OneWay}" />
+                                     IsChecked="{x:Bind SettingsViewModel.Result.AppTheme, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Light, Mode=OneWay}" />
 
                         <RadioButton x:Uid="ThemeDark" Margin="-10 0" GroupName="AppTheme" Content="Dark" Tag="Dark" Click="OnApplyThemeClick"
                                      Style="{StaticResource WhideRadioButtonStyle}"
-                                     IsChecked="{x:Bind SettingsViewModel.AppTheme, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Dark, Mode=OneWay}" />
+                                     IsChecked="{x:Bind SettingsViewModel.Result.AppTheme, Converter={StaticResource EnumToBoolConverter}, ConverterParameter=Dark, Mode=OneWay}" />
                  
                     </StackPanel>
                  </controls:TitledContentPanel>
@@ -57,14 +69,14 @@
                                    Style="{StaticResource LabelStyle}"/>
 
                         <TextBlock FontSize="13"
-                                   Text="{x:Bind SettingsViewModel.OpenAIApiKey, Converter={StaticResource OpenAiKeyConverter}, Mode=OneWay}"
+                                   Text="{x:Bind SettingsViewModel.Result.OpenAIApiKey, Converter={StaticResource OpenAiKeyConverter}, Mode=OneWay}"
                                    Style="{StaticResource DescriptionStyle}"/>
 
                         <TextBlock x:Uid="OpenAIOrganizationLabel" Text="Organization ID"
                                    Style="{StaticResource LabelStyle}"/>
 
                         <TextBlock FontSize="13"
-                                   Text="{x:Bind SettingsViewModel.OpenAIOrganization, Converter={StaticResource OpenAiKeyConverter}, Mode=OneWay}"
+                                   Text="{x:Bind SettingsViewModel.Result.OpenAIOrganization, Converter={StaticResource OpenAiKeyConverter}, Mode=OneWay}"
                                    Style="{StaticResource DescriptionStyle}"/>
                         
                     </StackPanel>

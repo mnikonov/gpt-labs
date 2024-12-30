@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <TargetFramework>net9.0-windows10.0.19041.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>Gpt.Labs</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -11,7 +11,14 @@
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
   </PropertyGroup>
+  
+  <PropertyGroup>
+    <WindowsSdkPackageVersion>10.0.19041.38</WindowsSdkPackageVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  
   <ItemGroup>
     <None Remove="ActivationPage.xaml" />
     <None Remove="ChatsPage.xaml" />
@@ -55,16 +62,17 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls.Markdown" Version="7.1.2" />
-    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="5.0.5" />
-    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="5.0.5" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8">
+    <PackageReference Include="H.NotifyIcon.WinUI" Version="2.2.0" />
+    <PackageReference Include="Microsoft.AppCenter.Analytics" Version="5.0.6" />
+    <PackageReference Include="Microsoft.AppCenter.Crashes" Version="5.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240802000" />
-    <PackageReference Include="OpenAI-DotNet" Version="8.3.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.0" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.241114003" />
+    <PackageReference Include="OpenAI-DotNet" Version="8.4.1" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
@@ -134,6 +142,10 @@
   <ItemGroup>
     <Page Update="Styles\OpenAiSettingsResources.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+    </Page>
+    <Page Update="Styles\TrayIconResources.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

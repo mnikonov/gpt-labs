@@ -1,130 +1,155 @@
-﻿using Microsoft.UI.Xaml;
-using System.Runtime.CompilerServices;
-using System.Text.Json.Serialization.Metadata;
-using System.Text.Json.Serialization;
-using System.Text.Json;
-using Windows.Storage;
-using System.Linq;
-using Gpt.Labs.Models.Attributes;
+﻿using Gpt.Labs.Models.Attributes;
 using Gpt.Labs.Models.Base;
-using OpenAI.Models;
-using System.Collections.Generic;
+using Microsoft.UI.Xaml;
+using System;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
+using System.Threading.Tasks;
+using Windows.ApplicationModel;
+using Windows.Foundation;
+using Windows.Storage;
 
-namespace Gpt.Labs.ViewModels
+namespace Gpt.Labs.ViewModels;
+
+public class ApplicationSettings : ObservableObject
 {
-    public class ApplicationSettings : ObservableObject
+    #region Fields
+
+    private static readonly object SyncRoot = new();
+
+    private static volatile ApplicationSettings _instance;
+
+    private bool _launchOnStartup;
+
+    #endregion
+
+    #region Constructors
+
+    private ApplicationSettings()
     {
-        #region Fields
+    }
 
-        private static readonly object SyncRoot = new object();
+    #endregion
 
-        private static volatile ApplicationSettings instance;
+    #region Properties
 
-        #endregion
-
-        #region Constructors
-
-        private ApplicationSettings()
+    public static ApplicationSettings Instance
+    {
+        get
         {
-        }
-
-        #endregion
-
-        #region Properties
-
-        public static ApplicationSettings Instance
-        {
-            get
+            if (_instance != null)
             {
-                if (instance != null)
-                {
-                    return instance;
-                }
-
-                lock (SyncRoot)
-                {
-                    if (instance == null)
-                    {
-                        instance = new ApplicationSettings();
-                    }
-                }
-
-                return instance;
+                return _instance;
             }
-        }
 
-        public JsonSerializerOptions SerializerOptions { get; } = new JsonSerializerOptions
-        {
-            ReferenceHandler = ReferenceHandler.IgnoreCycles,
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
-            TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+            lock (SyncRoot)
             {
-                Modifiers =
-                    {
-                        (JsonTypeInfo jsonTypeInfo) =>
-                        {
-                            var toRemove = jsonTypeInfo.Properties.Where(p => p.AttributeProvider.IsDefined(typeof(ExternalJsonIgnoreAttribute), false)).ToList();
+                _instance ??= new ApplicationSettings();
+            }
 
-                            foreach (var item in toRemove)
-                            {
-                                jsonTypeInfo.Properties.Remove(item);
-                            }
+            return _instance;
+        }
+    }
+
+    public JsonSerializerOptions SerializerOptions { get; } = new JsonSerializerOptions
+    {
+        ReferenceHandler = ReferenceHandler.IgnoreCycles,
+        DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals,
+        TypeInfoResolver = new DefaultJsonTypeInfoResolver()
+        {
+            Modifiers =
+                {
+                    (JsonTypeInfo jsonTypeInfo) =>
+                    {
+                        var toRemove = jsonTypeInfo.Properties.Where(p => p.AttributeProvider.IsDefined(typeof(ExternalJsonIgnoreAttribute), false)).ToList();
+
+                        foreach (var item in toRemove)
+                        {
+                            jsonTypeInfo.Properties.Remove(item);
                         }
                     }
-            }
-        };
-
-        public ElementTheme AppTheme
-        {
-            get => (ElementTheme)this.Get((int)ElementTheme.Default);
-            set => this.Set((int)value);
+                }
         }
+    };
 
-        public string OpenAIOrganization
-        {
-            get => this.Get(string.Empty);
-            set => this.Set(value);
-        }
-
-        public string OpenAIApiKey
-        {
-            get => this.Get(string.Empty);
-            set => this.Set(value);
-        }
-
-        #endregion
-
-        #region Public Methods
-
-
-        public T Get<T>(T defaultValue, [CallerMemberName] string propertyName = null)
-        {
-            if (!ApplicationData.Current.LocalSettings.Values.ContainsKey(propertyName)
-                || !(ApplicationData.Current.LocalSettings.Values[propertyName] is T))
-            {
-                ApplicationData.Current.LocalSettings.Values[propertyName] = defaultValue;
-            }
-
-            return (T)ApplicationData.Current.LocalSettings.Values[propertyName];
-        }
-
-        public bool Set<T>(T newValue, [CallerMemberName] string propertyName = null)
-        {
-            var oldValue = ApplicationData.Current.LocalSettings.Values[propertyName];
-
-            if (Equals(oldValue, newValue))
-            {
-                return false;
-            }
-
-            ApplicationData.Current.LocalSettings.Values[propertyName] = newValue;
-            this.RaisePropertyChanged(propertyName);
-
-            return true;
-        }
-
-        #endregion
+    public ElementTheme AppTheme
+    {
+        get => (ElementTheme)Get((int)ElementTheme.Default);
+        set => Set((int)value);
     }
+
+    public string OpenAIOrganization
+    {
+        get => Get(string.Empty);
+        set => Set(value);
+    }
+
+    public string OpenAIApiKey
+    {
+        get => Get(string.Empty);
+        set => Set(value);
+    }
+
+    public bool LaunchOnStartup
+    {
+        get => _launchOnStartup;
+
+        set
+        {
+            if (_launchOnStartup != value)
+            {
+                _launchOnStartup = value;
+                RaisePropertyChanged();
+            }
+        }
+    }
+
+    #endregion
+
+    #region Public Methods
+
+    public IAsyncOperation<StartupTask> GetStartupTask()
+    {
+        return StartupTask.GetAsync("GPTLabsStartupTask");
+    }
+
+    public async Task InitExtraSettings()
+    {
+        var startup = await GetStartupTask();
+
+        _launchOnStartup = startup.State == StartupTaskState.Enabled;
+    }
+
+    public T Get<T>(T defaultValue, [CallerMemberName] string propertyName = null)
+    {
+        if (!ApplicationData.Current.LocalSettings.Values.ContainsKey(propertyName)
+            || ApplicationData.Current.LocalSettings.Values[propertyName] is not T)
+        {
+            ApplicationData.Current.LocalSettings.Values[propertyName] = defaultValue;
+        }
+
+        return (T)ApplicationData.Current.LocalSettings.Values[propertyName];
+    }
+
+    public bool Set<T>(T newValue, [CallerMemberName] string propertyName = null)
+    {
+        var oldValue = ApplicationData.Current.LocalSettings.Values[propertyName];
+
+        if (Equals(oldValue, newValue))
+        {
+            return false;
+        }
+
+        ApplicationData.Current.LocalSettings.Values[propertyName] = newValue;
+        RaisePropertyChanged(propertyName);
+
+        return true;
+    }
+
+    #endregion
 }

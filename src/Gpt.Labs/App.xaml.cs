@@ -1,11 +1,15 @@
 ﻿using Gpt.Labs.Helpers;
 using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Helpers.Navigation;
+using H.NotifyIcon;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Windows.ApplicationModel.Resources;
+using Microsoft.Windows.AppLifecycle;
 using System;
 using System.Diagnostics;
 using Windows.ApplicationModel.Activation;
@@ -19,60 +23,120 @@ using Microsoft.AppCenter;
 
 #endif
 
-namespace Gpt.Labs
-{
-    public partial class App : Application
-    {
-        #region Constructors
+namespace Gpt.Labs;
 
-        public App()
-        {
-            this.InitializeComponent();
+public partial class App : Application
+{
+    #region Constructors
+
+    public App()
+    {
+        InitializeComponent();
 
 #if !DEBUG
-            AppCenter.Configure("{APP_CENTER_SECRET}");
-            AppCenter.SetCountryCode(RegionInfo.CurrentRegion.TwoLetterISORegionName);
-            
-            if (AppCenter.Configured)
-            {
-                AppCenter.Start(typeof(Analytics));
-                AppCenter.Start(typeof(Crashes));
-            }
+        AppCenter.Configure("{APP_CENTER_SECRET}");
+        AppCenter.SetCountryCode(RegionInfo.CurrentRegion.TwoLetterISORegionName);
+        
+        if (AppCenter.Configured)
+        {
+            AppCenter.Start(typeof(Analytics));
+            AppCenter.Start(typeof(Crashes));
+        }
 #endif
 
-            this.UnhandledException += this.AppUnhandledException;
+        UnhandledException += AppUnhandledException;
+
+        AppInstance keyInstance = AppInstance.FindOrRegisterForKey(Program.AppInstanceKey);
+
+        if (keyInstance.IsCurrent)
+        {
+            keyInstance.Activated += KeyInstance_Activated;
+        }
+    }
+
+    #endregion
+
+    #region Properties
+
+    public static ResourceLoader ResourceLoader { get; } = new();
+
+    public TaskbarIcon TrayIcon { get; private set; }
+
+    #endregion
+
+    protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+    {
+        InitializeTrayIcon();
+
+        var kind = AppInstance.FindOrRegisterForKey(Program.AppInstanceKey).GetActivatedEventArgs().Kind;
+
+        if (kind != ExtendedActivationKind.StartupTask)
+        {
+            GetMainWindow(args.UWPLaunchActivatedEventArgs, out var window);
+            window.Show();
+        }
+    }
+
+    #region Private Methods
+
+    private void KeyInstance_Activated(object sender, AppActivationArguments e)
+    {
+        TrayIcon.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+        {
+            if (GetMainWindow(null, out var window) || !window.Visible)
+            {
+                window.Show();
+            }
+            else
+            {
+                window.BringToFront();
+            }
+        });
+    }
+
+    private void InitializeTrayIcon()
+    {
+        if (TrayIcon != null)
+        {
+            return;
         }
 
-#endregion
+        var showHideWindowCommand = (XamlUICommand)Resources["ShowHideWindowCommand"];
+        showHideWindowCommand.ExecuteRequested += ShowHideWindowCommand_ExecuteRequested;
 
-        #region Properties
+        var exitApplicationCommand = (XamlUICommand)Resources["ExitApplicationCommand"];
+        exitApplicationCommand.ExecuteRequested += ExitApplicationCommand_ExecuteRequested;
 
-        public static ResourceLoader ResourceLoader { get; } = new ();
+        TrayIcon = (TaskbarIcon)Resources["TrayIcon"];
+        TrayIcon.ForceCreate();
+    }
 
-        #endregion
+    private void ExitApplicationCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+    {
+        TrayIcon?.Dispose();
 
-        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+        WindowManager.CloseWindows();
+
+        // https://github.com/HavenDV/H.NotifyIcon/issues/66
+        //if (MainWindow == null)
+        //{
+        //    Environment.Exit(0);
+        //}
+    }
+
+    private bool GetMainWindow(IActivatedEventArgs args, out MainWindow window)
+    {
+        var isNew = WindowManager.TryGet(() => typeof(SingleChatPage).CreatePageId(), window =>
         {
-            this.ActivateAsync(args.UWPLaunchActivatedEventArgs);
-        }
+            window.SetTitle(ResourceLoader.GetString("AppDisplayName"));
 
-        #region Private Methods
-
-        private void ActivateAsync(IActivatedEventArgs args)
-        {
-            var window = WindowManager.CreateWindow();
-
-            if (!(window.Content is Frame rootFrame))
+            if (window.Content is not Frame rootFrame)
             {
                 rootFrame = new Frame();
-                rootFrame.NavigationFailed += this.OnNavigationFailed;
+                rootFrame.NavigationFailed += OnNavigationFailed;
 
                 window.Content = rootFrame;
             }
-
-            window.SetTitle(ResourceLoader.GetString("AppDisplayName"));
-            window.SetExtendsContentIntoTitleBar();
-            window.ApplyTheme();
 
             if (rootFrame.Content == null)
             {
@@ -89,27 +153,42 @@ namespace Gpt.Labs
 
                 rootFrame.Navigate(typeof(ActivationPage), query.ToString(), new CommonNavigationTransitionInfo());
             }
+        }, out window);
 
-            window.Activate();
-        }
-
-        private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
-        {
-            throw new Exception($"Failed to load {e.SourcePageType.FullName}: {e.Exception}");
-        }
-
-        private void AppUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
-        {
-            if (Debugger.IsAttached)
-            {
-                Debugger.Break();
-            }
-
-            e.Exception.LogError("App unhandled exception occured");
-
-            e.Handled = true;
-        }
-
-        #endregion
+        return isNew;
     }
+
+    private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
+    {
+        throw new Exception($"Failed to load {e.SourcePageType.FullName}: {e.Exception}");
+    }
+
+    private void AppUnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
+    {
+        if (Debugger.IsAttached)
+        {
+            Debugger.Break();
+        }
+
+        e.Exception.LogError("App unhandled exception occured");
+
+        e.Handled = true;
+    }
+
+    private void ShowHideWindowCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+    {
+        if (!GetMainWindow(null, out var window))
+        {
+            if (window.Visible)
+            {
+                window.Hide();
+            }
+            else
+            {
+                window.Show();
+            }
+        }
+    }
+
+    #endregion
 }

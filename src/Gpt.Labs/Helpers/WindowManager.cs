@@ -1,41 +1,73 @@
-﻿using System;
+﻿using Gpt.Labs.Helpers.Extensions;
+using H.NotifyIcon;
+using Microsoft.UI.Xaml;
+using System;
 using System.Collections.Generic;
 
 namespace Gpt.Labs.Helpers
 {
     public static class WindowManager
     {
-        private static Dictionary<Guid, MainWindow> windows = new Dictionary<Guid, MainWindow>();
+        private static readonly Dictionary<string, MainWindow> windows = [];
+
+        public static bool HandleClosedEvents { get; set; } = true;
 
         public static IEnumerable<MainWindow> Enumerate()
         {
             return windows.Values;
         }
 
-        public static MainWindow CreateWindow()
+        public static bool TryGet(Func<string> createWindowId, Action<MainWindow> initializeContent, out MainWindow window)
         {
-            var window = new MainWindow();
+            var windowId = createWindowId();
+
+            if (windows.ContainsKey(windowId))
+            {
+                window = windows[windowId];
+                return false;
+            }
+
+            window = new MainWindow(windowId);
+
+            window.SetExtendsContentIntoTitleBar();
+            window.ApplyTheme();
+
+            window.Closed += Window_Closed;
 
             windows[window.WindowId] = window;
 
-            return window;
+            initializeContent(window);
+
+            return true;
         }
 
-        public static MainWindow GetWindow(Guid windowId)
+        public static MainWindow Get(string windowId)
         {
-            if (!windows.ContainsKey(windowId))
+            return !windows.ContainsKey(windowId) ? null : windows[windowId];
+        }
+
+        public static void CloseWindows()
+        {
+            HandleClosedEvents = false;
+
+            foreach (var window in Enumerate())
             {
-                return null;
+                window.Close();
             }
 
-            return windows[windowId];
+            windows.Clear();
+
+            HandleClosedEvents = true;
         }
 
-        public static void UnregisterWindow(Guid windowId)
+        private static void Window_Closed(object sender, WindowEventArgs args)
         {
-            if (windows.ContainsKey(windowId))
+            var window = (MainWindow)sender;
+
+            if (HandleClosedEvents)
             {
-                windows.Remove(windowId);
+                args.Handled = true;
+                window.Hide();
             }
         }
     }

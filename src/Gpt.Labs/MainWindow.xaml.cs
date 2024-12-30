@@ -1,11 +1,9 @@
 using Gpt.Labs.Helpers;
 using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Models;
-using Gpt.Labs.Models.Enums;
 using Gpt.Labs.ViewModels;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
-using OpenAI.Chat;
 using System;
 using System.Collections.Generic;
 using Windows.ApplicationModel.DataTransfer;
@@ -18,9 +16,9 @@ namespace Gpt.Labs
     {
         #region Fields
 
-        private UISettings uISettings;
-                
-        private DataTransferManager dataTransferManager;
+        private readonly UISettings uISettings;
+
+        private readonly DataTransferManager dataTransferManager;
 
         private ShareContent share;
 
@@ -28,24 +26,24 @@ namespace Gpt.Labs
 
         #region Constructors
 
-        public MainWindow()
+        public MainWindow(string windowId)
         {
-            this.InitializeComponent();
+            WindowId = windowId;
 
-            this.uISettings = new UISettings();
-            this.uISettings.ColorValuesChanged += OnUISettingsColorValuesChanged;
+            InitializeComponent();
 
-            this.Closed += OnMainWindowClosed;
-            
-            this.dataTransferManager = this.GetDataTransferManager();
-            this.dataTransferManager.DataRequested += this.OnDataTransferManagerDataRequested;
+            uISettings = new UISettings();
+            uISettings.ColorValuesChanged += OnUISettingsColorValuesChanged;
+
+            dataTransferManager = this.GetDataTransferManager();
+            dataTransferManager.DataRequested += OnDataTransferManagerDataRequested;
         }
 
         #endregion
 
         #region Properties
 
-        public Guid WindowId { get; } = Guid.NewGuid();
+        public string WindowId { get; private set; }
 
         #endregion
 
@@ -60,14 +58,6 @@ namespace Gpt.Labs
 
         #region Private Methods
 
-        private void OnMainWindowClosed(object sender, WindowEventArgs args)
-        {
-            this.Closed -= OnMainWindowClosed;
-            this.uISettings.ColorValuesChanged -= OnUISettingsColorValuesChanged;
-            this.dataTransferManager.DataRequested -= this.OnDataTransferManagerDataRequested;
-            
-            WindowManager.UnregisterWindow(this.WindowId);
-        }
 
         private async void OnDataTransferManagerDataRequested(DataTransferManager sender, DataRequestedEventArgs args)
         {
@@ -90,7 +80,7 @@ namespace Gpt.Labs
                 {
                     var files = new List<IStorageItem>();
 
-                    foreach (var filePath in this.share.Files)
+                    foreach (var filePath in share.Files)
                     {
                         var file = await ApplicationData.Current.LocalCacheFolder.GetFileAsync(filePath);
                         files.Add(file);
@@ -108,13 +98,13 @@ namespace Gpt.Labs
         private void OnUISettingsColorValuesChanged(UISettings sender, object args)
         {
             DispatcherQueue.TryEnqueue(DispatcherQueuePriority.High,
-		        () =>
-		            {
-                        if (ApplicationSettings.Instance.AppTheme == ElementTheme.Default && this.Content != null)
+                () =>
+                    {
+                        if (ApplicationSettings.Instance.AppTheme == ElementTheme.Default && Content != null)
                         {
                             this.ApplyTheme();
                         }
-		            });
+                    });
         }
 
         #endregion

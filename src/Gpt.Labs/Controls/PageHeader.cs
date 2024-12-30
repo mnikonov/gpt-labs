@@ -1,167 +1,155 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Windows.Foundation;
-using Windows.Graphics;
+﻿using Gpt.Labs.Helpers;
+using Gpt.Labs.Helpers.Extensions;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-
-using Microsoft.UI.Windowing;
-using Gpt.Labs.Helpers.Extensions;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
-using Gpt.Labs.Helpers;
+using Windows.Foundation;
+using Windows.Graphics;
 
-namespace Gpt.Labs.Controls
+namespace Gpt.Labs.Controls;
+
+public partial class PageHeader : ContentControl
 {
-    public partial class PageHeader : ContentControl
+    #region Fields
+
+    private ContentPresenter container;
+
+    private Window window;
+
+    private AppWindowTitleBar titleBar;
+
+    #endregion
+
+    #region Constructors
+
+    public PageHeader()
     {
-        #region Fields
+        DefaultStyleKey = typeof(PageHeader);
+    }
 
-        private ContentPresenter container;
+    #endregion
 
-        private Window window;
+    #region Methods
 
-        private AppWindowTitleBar titleBar;
+    protected override void OnApplyTemplate()
+    {
+        window = this.GetParent<BasePage>().Window;
 
-        #endregion
-
-        #region Constructors
-
-        public PageHeader()
+        if (AppWindowTitleBar.IsCustomizationSupported())
         {
-            DefaultStyleKey = typeof(PageHeader);
+            titleBar = window.GetAppWindow().TitleBar;
         }
 
-        #endregion
+        container = (ContentPresenter)GetTemplateChild("HeaderContentPresenter");
 
-        #region Methods
-
-        protected override void OnApplyTemplate()
+        if (titleBar != null)
         {
-            window = this.GetParent<BasePage>().Window;
+            container.SizeChanged -= OnContainerSizeChanged;
+            container.SizeChanged += OnContainerSizeChanged;
+            container.LayoutUpdated -= OnContainerLayoutUpdated;
+            container.LayoutUpdated += OnContainerLayoutUpdated;
 
-            if (AppWindowTitleBar.IsCustomizationSupported())
-            {
-                titleBar = window.GetAppWindow().TitleBar;
-            }
-
-            container = (ContentPresenter)GetTemplateChild("HeaderContentPresenter");
-
-            if (titleBar != null)
-            {
-                container.SizeChanged -= OnContainerSizeChanged;
-                container.SizeChanged += OnContainerSizeChanged;
-                container.LayoutUpdated -= OnContainerLayoutUpdated;
-                container.LayoutUpdated += OnContainerLayoutUpdated;
-
-                this.Unloaded -= OnUnloaded;
-                this.Unloaded += OnUnloaded;
-            }
-
-            base.OnApplyTemplate();
-
-            if (titleBar != null)
-            {
-                SetDragRectangles();
-            }
+            Unloaded -= OnUnloaded;
+            Unloaded += OnUnloaded;
         }
 
-        #endregion
+        base.OnApplyTemplate();
 
-        private void OnContainerSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if (e.PreviousSize.Width == e.NewSize.Width)
-            {
-                return;
-            }
-
-            SetDragRectangles();
-        }
-
-        private void OnContainerLayoutUpdated(object sender, object e)
+        if (titleBar != null)
         {
             SetDragRectangles();
         }
+    }
 
-        private void SetDragRectangles()
+    #endregion
+
+    private void OnContainerSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (e.PreviousSize.Width == e.NewSize.Width)
         {
-            if (container == null || container.Height == 0)
+            return;
+        }
+
+        SetDragRectangles();
+    }
+
+    private void OnContainerLayoutUpdated(object sender, object e)
+    {
+        SetDragRectangles();
+    }
+
+    private void SetDragRectangles()
+    {
+        if (container == null || container.Height == 0)
+        {
+            return;
+        }
+
+        var scale = window.GetDpiScale();
+
+        var y = 0;
+        var height = (int)(container.ActualHeight * scale);
+
+        container.Margin = new Thickness(0, 0, titleBar.RightInset / scale, 0);
+
+        try
+        {
+            var containerPosition = container.TransformToVisual(window.Content).TransformPoint(new Point(0, 0));
+
+            var x = containerPosition.X;
+            var width = 0d;
+
+            var rects = new List<RectInt32>();
+
+            var controls = (container.Content as Grid)?.Children?.OfType<Control>();
+
+            if (controls != null)
             {
-                return;
-            }
-
-            var scale = window.GetDpiScale();
-
-    #if DEBUG
-            var y = (int)(22 * scale);
-            var height = (int)(container.ActualHeight * scale) - y;
-    #else
-            var y = 0;
-            var height = (int)(this.container.ActualHeight * scale);
-    #endif
-
-            if (height < 0)
-            {
-
-            }
-
-            container.Margin = new Thickness(0, 0, titleBar.RightInset / scale, 0);
-
-            try
-            {
-                var containerPosition = container.TransformToVisual(window.Content).TransformPoint(new Point(0, 0));
-
-                var x = containerPosition.X;
-                var width = 0d;
-
-                var rects = new List<RectInt32>();
-
-                var controls = (container.Content as Grid)?.Children?.OfType<Control>();
-
-                if (controls != null)
+                foreach (var control in controls)
                 {
-                    foreach (var control in controls)
+                    var controlPosition = control.TransformToVisual(window.Content).TransformPoint(new Point(0, 0));
+
+                    if (controlPosition.X > x)
                     {
-                        var controlPosition = control.TransformToVisual(window.Content).TransformPoint(new Point(0, 0));
+                        width = controlPosition.X - x;
 
-                        if (controlPosition.X > x)
+                        if (width > 0)
                         {
-                            width = controlPosition.X - x;
-
-                            if (width > 0)
-                            {
-                                rects.Add(new RectInt32((int)(x * scale), y, (int)(width * scale), height));
-                            }
-
-                            x = (int)(controlPosition.X + control.ActualWidth);
+                            rects.Add(new RectInt32((int)(x * scale), y, (int)(width * scale), height));
                         }
+
+                        x = (int)(controlPosition.X + control.ActualWidth);
                     }
                 }
-
-                width = (int)(container.ActualWidth + containerPosition.X - x + titleBar.RightInset);
-
-                if (width > 0)
-                {
-                    rects.Add(new RectInt32((int)(x * scale), y, (int)(width * scale), height));
-                }
-
-                titleBar.SetDragRectangles(rects.ToArray());
             }
-            catch (COMException)
+
+            width = (int)(container.ActualWidth + containerPosition.X - x + titleBar.RightInset);
+
+            if (width > 0)
             {
-                // Exception handling not necessary in this case
+                rects.Add(new RectInt32((int)(x * scale), y, (int)(width * scale), height));
             }
-            
-        }
 
-        private void OnUnloaded(object sender, RoutedEventArgs e)
+            titleBar.SetDragRectangles(rects.ToArray());
+        }
+        catch (COMException)
         {
-            if (container != null)
-            {
-                container.SizeChanged -= OnContainerSizeChanged;
-                container.LayoutUpdated -= OnContainerLayoutUpdated;
-            }
-
-            this.Unloaded -= OnUnloaded;
+            // Exception handling not necessary in this case
         }
+
+    }
+
+    private void OnUnloaded(object sender, RoutedEventArgs e)
+    {
+        if (container != null)
+        {
+            container.SizeChanged -= OnContainerSizeChanged;
+            container.LayoutUpdated -= OnContainerLayoutUpdated;
+        }
+
+        Unloaded -= OnUnloaded;
     }
 }

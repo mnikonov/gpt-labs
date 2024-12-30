@@ -27,6 +27,7 @@
                 
                 <ResourceDictionary Source="ms-appx:///Styles/Colors.xaml"/>
                 <ResourceDictionary Source="ms-appx:///Styles/AppResources.xaml"/>
+                <ResourceDictionary Source="ms-appx:///Styles/TrayIconResources.xaml"/>
                 <ResourceDictionary Source="ms-appx:///Styles/PageHeaderResources.xaml"/>
                 <ResourceDictionary Source="ms-appx:///Styles/TitledContentPanelResources.xaml"/>
                 <ResourceDictionary Source="ms-appx:///Styles/RadioButtonResources.xaml"/>

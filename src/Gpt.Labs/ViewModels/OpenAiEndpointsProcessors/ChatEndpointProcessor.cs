@@ -41,10 +41,12 @@ namespace Gpt.Labs.ViewModels.OpenAiEndpointsProcessors
                 {
                     await client.WrapAction(async (client, token) =>
                     {
-                        await foreach (var result in client.ChatEndpoint.StreamCompletionEnumerableAsync(chatRequest, false, token))
-                        {
-                            await HandleChatResponseAsync(userMessage, result, responseMessages, token);
-                        }
+                        await client.ChatEndpoint.StreamCompletionAsync(chatRequest, async (chatResponse) =>
+                            {
+                                await HandleChatResponseAsync(userMessage, chatResponse, responseMessages, token);
+                            },
+                            false,
+                            token);
 
                         return true;
                     },

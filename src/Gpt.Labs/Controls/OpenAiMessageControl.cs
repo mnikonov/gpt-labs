@@ -1,15 +1,14 @@
+using CommunityToolkit.WinUI.UI.Controls;
+using Gpt.Labs.Controls.Extensions;
+using Gpt.Labs.Helpers;
+using Gpt.Labs.Models;
+using Gpt.Labs.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Gpt.Labs.Models;
-using CommunityToolkit.WinUI.UI.Controls;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Imaging;
 using System;
 using Windows.System;
-using Microsoft.UI.Xaml.Input;
-using Gpt.Labs.Helpers;
-using Gpt.Labs.ViewModels;
-using Gpt.Labs.Controls.Markdown;
-using Gpt.Labs.Controls.Extensions;
 
 namespace Gpt.Labs.Controls
 {
@@ -33,7 +32,7 @@ namespace Gpt.Labs.Controls
 
         public OpenAiMessageControl()
         {
-            this.DefaultStyleKey = typeof(OpenAiMessageControl);
+            DefaultStyleKey = typeof(OpenAiMessageControl);
         }
 
         #endregion
@@ -42,7 +41,7 @@ namespace Gpt.Labs.Controls
 
         private MessagesListViewModel ParentViewViewModel => this.GetParent<MessagesControl>()?.ViewModel;
 
-        private OpenAIMessage ViewModel => this.DataContext as OpenAIMessage;
+        private OpenAIMessage ViewModel => DataContext as OpenAIMessage;
 
         #endregion
 
@@ -50,49 +49,49 @@ namespace Gpt.Labs.Controls
 
         protected override void OnApplyTemplate()
         {
-            this.rootGrid = (Grid)GetTemplateChild("RootGrid");
-            this.textBlock = (MarkdownTextBlock)GetTemplateChild("MessageTextBlock");
-            this.copyButton = (AppBarButton)GetTemplateChild("Copy");
-            this.shareButton = (MenuFlyoutItem)GetTemplateChild("Share");
-            this.deleteButton = (MenuFlyoutItem)GetTemplateChild("Delete");
+            rootGrid = (Grid)GetTemplateChild("RootGrid");
+            textBlock = (MarkdownTextBlock)GetTemplateChild("MessageTextBlock");
+            copyButton = (AppBarButton)GetTemplateChild("Copy");
+            shareButton = (MenuFlyoutItem)GetTemplateChild("Share");
+            deleteButton = (MenuFlyoutItem)GetTemplateChild("Delete");
 
-            if (this.rootGrid != null)
+            if (rootGrid != null)
             {
-                this.rootGrid.PointerEntered -= OnRootGridPointerEntered;
-                this.rootGrid.PointerEntered += OnRootGridPointerEntered;
+                rootGrid.PointerEntered -= OnRootGridPointerEntered;
+                rootGrid.PointerEntered += OnRootGridPointerEntered;
 
-                this.rootGrid.PointerExited -= OnRootGridPointerExited;
-                this.rootGrid.PointerExited += OnRootGridPointerExited;
+                rootGrid.PointerExited -= OnRootGridPointerExited;
+                rootGrid.PointerExited += OnRootGridPointerExited;
             }
 
-            if (this.textBlock != null)
+            if (textBlock != null)
             {
-                this.textBlock.LinkClicked -= this.OnMarkdownTextBlockLinkClicked;
-                this.textBlock.LinkClicked += this.OnMarkdownTextBlockLinkClicked;
+                textBlock.LinkClicked -= OnMarkdownTextBlockLinkClicked;
+                textBlock.LinkClicked += OnMarkdownTextBlockLinkClicked;
                 //this.textBlock.ImageResolving -= this.OnMarkdownTextBlockImageResolving;
                 //this.textBlock.ImageResolving += this.OnMarkdownTextBlockImageResolving;
-                this.textBlock.ImageClicked -= this.OnMarkdownTextBlockImageClicked;
-                this.textBlock.ImageClicked += this.OnMarkdownTextBlockImageClicked;
+                textBlock.ImageClicked -= OnMarkdownTextBlockImageClicked;
+                textBlock.ImageClicked += OnMarkdownTextBlockImageClicked;
 
-                this.textBlock.SetRenderer<ExtendedMarkdownRenderer>();
+                //textBlock.SetRenderer<ExtendedMarkdownRenderer>();
             }
 
-            if (this.copyButton != null)
+            if (copyButton != null)
             {
-                this.copyButton.Click -= this.OnCopyButtonClick;
-                this.copyButton.Click += this.OnCopyButtonClick;
+                copyButton.Click -= OnCopyButtonClick;
+                copyButton.Click += OnCopyButtonClick;
             }
 
-            if (this.shareButton != null)
+            if (shareButton != null)
             {
-                this.shareButton.Click -= this.OnShareButtonClick;
-                this.shareButton.Click += this.OnShareButtonClick;
+                shareButton.Click -= OnShareButtonClick;
+                shareButton.Click += OnShareButtonClick;
             }
 
-            if (this.deleteButton != null)
+            if (deleteButton != null)
             {
-                this.deleteButton.Click -= this.OnDeleteButtonClick;
-                this.deleteButton.Click += this.OnDeleteButtonClick;
+                deleteButton.Click -= OnDeleteButtonClick;
+                deleteButton.Click += OnDeleteButtonClick;
             }
 
             base.OnApplyTemplate();
@@ -100,31 +99,31 @@ namespace Gpt.Labs.Controls
 
         private void OnRootGridPointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            this.ParentViewViewModel.HoveredElement = this.ViewModel;
+            ParentViewViewModel.HoveredElement = ViewModel;
             VisualStateManager.GoToState(this, "PointerEntered", true);
         }
 
         private void OnRootGridPointerExited(object sender, PointerRoutedEventArgs e)
         {
-            this.ParentViewViewModel.HoveredElement = null;
+            ParentViewViewModel.HoveredElement = null;
             VisualStateManager.GoToState(this, "PointerExited", true);
         }
 
         private async void OnCopyButtonClick(object sender, RoutedEventArgs e)
         {
-            await this.ParentViewViewModel.CopyMessages(this.ViewModel);
+            await ParentViewViewModel.CopyMessages(ViewModel);
         }
 
         private void OnShareButtonClick(object sender, RoutedEventArgs e)
         {
-            this.ParentViewViewModel.ShareMessages(this.ViewModel);
+            ParentViewViewModel.ShareMessages(ViewModel);
         }
 
         private async void OnDeleteButtonClick(object sender, RoutedEventArgs e)
         {
             await sender.DisableUiAndExecuteAsync(async () =>
             {
-                await this.ParentViewViewModel.DeleteMessages(true, this.ViewModel);
+                await ParentViewViewModel.DeleteMessages(true, ViewModel);
             });
         }
 

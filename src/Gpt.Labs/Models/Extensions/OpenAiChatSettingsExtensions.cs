@@ -33,7 +33,7 @@ namespace Gpt.Labs.Models.Extensions
                 topLogProbs: null, // TODO add this paramether to settings 
                 parallelToolCalls: null,
                 jsonSchema: null,
-                settings.User);
+                user: settings.User);
         }
     }
 }

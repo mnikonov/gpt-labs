@@ -1,6 +1,4 @@
 using Gpt.Labs.Controls.Extensions;
-using Gpt.Labs.Helpers;
-using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Helpers.Navigation;
 using Gpt.Labs.Models;
 using Gpt.Labs.ViewModels;
@@ -8,7 +6,6 @@ using Gpt.Labs.ViewModels.Base;
 using Gpt.Labs.ViewModels.Enums;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using System;
@@ -26,7 +23,7 @@ namespace Gpt.Labs
             nameof(ViewModel),
             typeof(NotifyTaskCompletion<ChatsListViewModel>),
             typeof(ChatsPage),
-            new PropertyMetadata(null, null));  
+            new PropertyMetadata(null, null));
 
         private Guid frameUid;
 
@@ -38,8 +35,8 @@ namespace Gpt.Labs
 
         public ChatsPage()
         {
-            this.ViewModel = new NotifyTaskCompletion<ChatsListViewModel>();
-            this.InitializeComponent();
+            ViewModel = new NotifyTaskCompletion<ChatsListViewModel>();
+            InitializeComponent();
         }
 
         #endregion
@@ -63,15 +60,15 @@ namespace Gpt.Labs
             ViewModelState state,
             NavigationMode mode)
         {
-            this.frameUid = parameters.GetValue<Guid>("frame-uid");
+            frameUid = parameters.GetValue<Guid>("frame-uid");
 
-            await this.RegisterFrame();
-            
+            await RegisterFrame();
+
             await base.LoadState(destinationPageType, parameters, state, mode);
 
             ViewModel.Function = async token =>
             {
-                var viewModel = new ChatsListViewModel(() => this.RootPage);
+                var viewModel = new ChatsListViewModel(() => RootPage);
 
                 await viewModel.LoadStateAsync(destinationPageType, parameters, state, mode);
 
@@ -90,25 +87,25 @@ namespace Gpt.Labs
             ViewModel.Result?.SaveState(destinationPageType, parameters, state, mode);
             base.SaveState(destinationPageType, parameters, state, mode);
 
-            this.RootPage?.SuspensionManager?.SaveFrameNavigationState(this.chatFrame);
-            this.RootPage?.SuspensionManager?.UnregisterFrame(this.chatFrame, false);
+            RootPage?.SuspensionManager?.SaveFrameNavigationState(chatFrame);
+            RootPage?.SuspensionManager?.UnregisterFrame(chatFrame, false);
         }
 
         public override Frame GetInnerFrame()
         {
-            return this.chatFrame;
+            return chatFrame;
         }
 
         public async Task ClearBackState(params OpenAIChat[] chats)
         {
-            if (this.ViewModel.Result.MultiSelectModeEnabled && this.ViewModel.Result.ItemsCollection.Count == 0)
+            if (ViewModel.Result.MultiSelectModeEnabled && ViewModel.Result.ItemsCollection.Count == 0)
             {
-                this.ViewModel.Result.MultiSelectModeEnabled = false;
+                ViewModel.Result.MultiSelectModeEnabled = false;
             }
 
-            var sessionState = this.RootPage?.SuspensionManager?.SessionStateForFrame(this.chatFrame);
+            var sessionState = RootPage?.SuspensionManager?.SessionStateForFrame(chatFrame);
 
-            foreach (var chat in chats) 
+            foreach (var chat in chats)
             {
                 bool hasRemovedStates = false;
                 foreach (var state in sessionState.PageState.ToList())
@@ -137,56 +134,56 @@ namespace Gpt.Labs
                             states.Insert(index, new KeyValuePair<string, ViewModelState>(newKey, state.Value));
                         }
 
-                        i ++;
+                        i++;
                     }
 
                     sessionState.PageState = states.ToDictionary(p => p.Key, p => p.Value);
                 }
 
-                foreach (var stack in this.chatFrame.BackStack.ToList())
+                foreach (var stack in chatFrame.BackStack.ToList())
                 {
                     var query = Query.Parse(stack.Parameter);
                     var chatId = query.GetValue<Guid>("chat-id");
 
                     if (chatId == chat.Id)
                     {
-                        this.chatFrame.BackStack.Remove(stack);
+                        chatFrame.BackStack.Remove(stack);
                     }
                 }
             }
 
-            if (this.chatFrame.Content != null && this.chatFrame.Content is StatePage page)
+            if (chatFrame.Content is not null and StatePage page)
             {
                 page.NavigationHelper.SetPageKey();
             }
 
-            if (this.ViewModel.Result.SelectedElement == null && this.chatFrame.Content != null)
+            if (ViewModel.Result.SelectedElement == null && chatFrame.Content != null)
             {
-                if (this.chatFrame.CanGoBack)
+                if (chatFrame.CanGoBack)
                 {
-                    this.chatFrame.GoBack();
+                    chatFrame.GoBack();
                 }
                 else
                 {
-                    await this.RegisterFrame();
+                    await RegisterFrame();
                 }
             }
 
-            foreach (var chat in chats) 
+            foreach (var chat in chats)
             {
-                foreach (var stack in this.chatFrame.ForwardStack.ToList())
+                foreach (var stack in chatFrame.ForwardStack.ToList())
                 {
                     var query = Query.Parse(stack.Parameter);
                     var chatId = query.GetValue<Guid>("chat-id");
 
                     if (chatId == chat.Id)
                     {
-                        this.chatFrame.ForwardStack.Remove(stack);
+                        chatFrame.ForwardStack.Remove(stack);
                     }
                 }
             }
 
-            this.RootPage?.UpdateBackState();
+            RootPage?.UpdateBackState();
         }
 
         #endregion
@@ -197,22 +194,22 @@ namespace Gpt.Labs
         {
             await sender.DisableUiAndExecuteAsync(async () =>
             {
-                var result = await this.ViewModel.Result.AddEditChat(null);
+                var result = await ViewModel.Result.AddEditChat(null);
 
                 if (result == SaveResult.Added)
                 {
-                    this.SelectChat(this.ViewModel.Result.ItemsCollection.FirstOrDefault());
+                    SelectChat(ViewModel.Result.ItemsCollection.FirstOrDefault());
                 }
             });
         }
-                
+
         private void OnChatListItemClick(object sender, ItemClickEventArgs e)
         {
             var chat = (OpenAIChat)e.ClickedItem;
 
-            if (this.ViewModel.Result.SelectedElement?.Id != chat?.Id)
+            if (ViewModel.Result.SelectedElement?.Id != chat?.Id)
             {
-                this.SelectChat(chat);
+                SelectChat(chat);
             }
         }
 
@@ -222,48 +219,48 @@ namespace Gpt.Labs
 
             if (chat != null)
             {
-                await this.ViewModel.Result.UpdateChatPosition(chat);
+                await ViewModel.Result.UpdateChatPosition(chat);
             }
         }
 
         private void OnSelectMultiClick(object sender, RoutedEventArgs e)
         {
-            this.ViewModel.Result.MultiSelectModeEnabled = !this.ViewModel.Result.MultiSelectModeEnabled;
+            ViewModel.Result.MultiSelectModeEnabled = !ViewModel.Result.MultiSelectModeEnabled;
 
-            if (!this.ViewModel.Result.MultiSelectModeEnabled)
+            if (!ViewModel.Result.MultiSelectModeEnabled)
             {
-                this.Bindings.Update();
+                Bindings.Update();
             }
             else
             {
-                this.SelectAll.IsChecked = false;
-                this.DeleteMulti.IsEnabled = false;
+                SelectAll.IsChecked = false;
+                DeleteMulti.IsEnabled = false;
             }
         }
 
         private void OnSelectAllClick(object sender, RoutedEventArgs e)
         {
-            if (this.SelectAll.IsChecked == true)
+            if (SelectAll.IsChecked == true)
             {
-                this.ChatList.SelectedItems.Clear();
+                ChatList.SelectedItems.Clear();
 
-                foreach (var item in this.ViewModel.Result.ItemsCollection)
+                foreach (var item in ViewModel.Result.ItemsCollection)
                 {
-                    this.ChatList.SelectedItems.Add(item);
+                    ChatList.SelectedItems.Add(item);
                 }
             }
             else
             {
-                this.ChatList.SelectedItems.Clear();
+                ChatList.SelectedItems.Clear();
             }
         }
 
         private void OnChatListSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (this.ViewModel.Result.MultiSelectModeEnabled)
+            if (ViewModel.Result.MultiSelectModeEnabled)
             {
-                this.DeleteMulti.IsEnabled = this.ChatList.SelectedItems.Count > 0;
-                this.SelectAll.IsChecked = this.ChatList.SelectedItems.Count > 0 && this.ChatList.SelectedItems.Count == this.ViewModel.Result.ItemsCollection.Count;
+                DeleteMulti.IsEnabled = ChatList.SelectedItems.Count > 0;
+                SelectAll.IsChecked = ChatList.SelectedItems.Count > 0 && ChatList.SelectedItems.Count == ViewModel.Result.ItemsCollection.Count;
             }
         }
 
@@ -271,8 +268,8 @@ namespace Gpt.Labs
         {
             await sender.DisableUiAndExecuteAsync(async () =>
             {
-                var chats = this.ChatList.SelectedItems.OfType<OpenAIChat>().ToArray();
-                await this.ViewModel.Result.DeleteChats(chats);
+                var chats = ChatList.SelectedItems.OfType<OpenAIChat>().ToArray();
+                await ViewModel.Result.DeleteChats(chats);
 
                 await ClearBackState(chats);
             });
@@ -280,20 +277,20 @@ namespace Gpt.Labs
 
         private async Task RegisterFrame()
         {
-            if (this.chatFrame != null)
+            if (chatFrame != null)
             {
-                this.RootPage?.SuspensionManager?.UnregisterFrame(this.chatFrame, true);
+                RootPage?.SuspensionManager?.UnregisterFrame(chatFrame, true);
 
-                this.RootGrid.Children.Remove(this.chatFrame);
+                RootGrid.Children.Remove(chatFrame);
             }
 
-            this.chatFrame = new Frame();
-            Grid.SetColumn(this.chatFrame, 1);
-            this.RootGrid.Children.Add(this.chatFrame);
+            chatFrame = new Frame();
+            Grid.SetColumn(chatFrame, 1);
+            RootGrid.Children.Add(chatFrame);
 
-            await this.chatFrame.ExecuteOnLoaded(() =>
-            {              
-                this.RootPage?.SuspensionManager?.RegisterFrame(this.chatFrame, $"ChatFrameState_{this.frameUid}");
+            await chatFrame.ExecuteOnLoaded(() =>
+            {
+                RootPage?.SuspensionManager?.RegisterFrame(chatFrame, $"ChatFrameState_{frameUid}");
             });
         }
 
@@ -304,14 +301,14 @@ namespace Gpt.Labs
                 return;
             }
 
-            this.ViewModel.Result.SelectChat(chat);
+            ViewModel.Result.SelectChat(chat);
 
             var query = new Query
             {
                 { "chat-id", chat.Id }
             };
 
-            this.chatFrame.Navigate(typeof(MessagesPage), query.ToString(), new EntranceNavigationTransitionInfo());
+            chatFrame.Navigate(typeof(MessagesPage), query.ToString(), new EntranceNavigationTransitionInfo());
         }
 
         #endregion

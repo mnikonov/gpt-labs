@@ -32,22 +32,22 @@ namespace Gpt.Labs.Models
         #region Properties
 
         [Required(ErrorMessage = "The 'Secret Key' field is required")]
-        [StringLength(100, ErrorMessage = "The 'Secret Key' field must be a string with a maximum length of {1}.")]
-        [RegularExpression(@"^sk-.*$",  ErrorMessage = "The field 'Secret Key' must start with 'sk-' prefix.")]
+        [StringLength(250, ErrorMessage = "The 'Secret Key' field must be a string with a maximum length of {1}.")]
+        [RegularExpression(@"^sk-.*$", ErrorMessage = "The field 'Secret Key' must start with 'sk-' prefix.")]
         [JsonPropertyOrder(1)]
         public string ApiKey
         {
-            get => this.apiKey;
-            set => this.Set(ref this.apiKey, value);
+            get => apiKey;
+            set => Set(ref apiKey, value);
         }
 
         [StringLength(50, ErrorMessage = "The 'Organization ID' field must be a string with a maximum length of {1}.")]
-        [RegularExpression(@"^org-.*$",  ErrorMessage = "The field 'Organization ID' must start with 'org-' prefix.")]
+        [RegularExpression(@"^org-.*$", ErrorMessage = "The field 'Organization ID' must start with 'org-' prefix.")]
         [JsonPropertyOrder(2)]
         public string Organization
         {
-            get => this.organization;
-            set => this.Set(ref this.organization, value);
+            get => organization;
+            set => Set(ref organization, value);
         }
 
         #endregion

@@ -13,7 +13,7 @@ namespace Gpt.Labs
     {
         #region Fields
 
-        private Guid windowId = Guid.Empty;
+        private string windowId;
 
         private Frame frame;
 
@@ -23,7 +23,7 @@ namespace Gpt.Labs
 
         public BasePage()
         {
-            this.Unloaded += this.OnBasePageUnloaded;
+            Unloaded += OnBasePageUnloaded;
         }
 
         #endregion
@@ -32,15 +32,15 @@ namespace Gpt.Labs
 
         public SuspensionManager SuspensionManager { get; private set; }
 
-        public bool HasFrame => this.frame != null;
+        public bool HasFrame => frame != null;
 
-        public MainWindow Window => WindowManager.GetWindow(this.windowId);
+        public MainWindow Window => WindowManager.Get(windowId);
 
         #endregion
 
         #region Public Methods
 
-        public void SetWindowId(Guid windowId)
+        public void SetWindowId(string windowId)
         {
             this.windowId = windowId;
         }
@@ -56,14 +56,14 @@ namespace Gpt.Labs
 
             if (initSuspensionManager)
             {
-                this.SuspensionManager = new SuspensionManager();
-                this.SuspensionManager.RegisterFrame(frame, sessionStateKey);
+                SuspensionManager = new SuspensionManager();
+                SuspensionManager.RegisterFrame(frame, sessionStateKey);
             }
         }
 
         public bool IsFrameHasContent()
         {
-            return this.HasFrame && this.frame.Content != null;
+            return HasFrame && frame.Content != null;
         }
 
         public Type GetFrameContentType()
@@ -73,34 +73,34 @@ namespace Gpt.Labs
 
         public bool CanGoBack()
         {
-            if (!this.HasFrame)
+            if (!HasFrame)
             {
                 return false;
             }
 
-            var innerFrame = this.GetPageInnerFrame();
-            return this.frame.CanGoBack || (innerFrame != null && innerFrame.CanGoBack);
+            var innerFrame = GetPageInnerFrame();
+            return frame.CanGoBack || (innerFrame != null && innerFrame.CanGoBack);
         }
 
         public bool CanGoForward()
         {
-            if (!this.HasFrame)
+            if (!HasFrame)
             {
                 return false;
             }
 
-            var innerFrame = this.GetPageInnerFrame();
-            return this.frame.CanGoForward || (innerFrame != null && innerFrame.CanGoForward);
+            var innerFrame = GetPageInnerFrame();
+            return frame.CanGoForward || (innerFrame != null && innerFrame.CanGoForward);
         }
 
         public void GoBack()
         {
-            if (!this.HasFrame)
+            if (!HasFrame)
             {
                 return;
             }
 
-            var innerFrame = this.GetPageInnerFrame();
+            var innerFrame = GetPageInnerFrame();
 
             if (innerFrame != null && innerFrame.CanGoBack)
             {
@@ -108,15 +108,15 @@ namespace Gpt.Labs
                 return;
             }
 
-            if (this.frame.CanGoBack)
+            if (frame.CanGoBack)
             {
-                this.frame.GoBack();
+                frame.GoBack();
             }
         }
 
         public void GoForward()
         {
-            var innerFrame = this.GetPageInnerFrame();
+            var innerFrame = GetPageInnerFrame();
 
             if (innerFrame != null && innerFrame.CanGoForward)
             {
@@ -124,20 +124,20 @@ namespace Gpt.Labs
                 return;
             }
 
-            if (this.frame.CanGoForward)
+            if (frame.CanGoForward)
             {
-                this.frame.GoForward();
+                frame.GoForward();
             }
         }
 
         public bool Navigate(Type page)
         {
-            return this.Navigate(page, new Query());
+            return Navigate(page, []);
         }
 
         public bool Navigate(Type page, Query parameter)
         {
-            return this.Navigate(page, parameter, new DrillInNavigationTransitionInfo());
+            return Navigate(page, parameter, new DrillInNavigationTransitionInfo());
         }
 
         public bool Navigate(Type page, Query parameter, NavigationTransitionInfo infoOverride)
@@ -149,7 +149,7 @@ namespace Gpt.Labs
 
             var queryParam = parameter?.ToString();
 
-            return this.frame.Navigate(page, queryParam, infoOverride);
+            return frame.Navigate(page, queryParam, infoOverride);
         }
 
         public virtual void UpdateBackState()
@@ -170,7 +170,7 @@ namespace Gpt.Labs
 
             var query = Query.Parse(e.Parameter);
 
-            if (query.TryGetValue("WindowId", out Guid windowId))
+            if (query.TryGetValue("WindowId", out string windowId))
             {
                 this.windowId = windowId;
             }
@@ -178,12 +178,12 @@ namespace Gpt.Labs
 
         private void OnBasePageUnloaded(object sender, RoutedEventArgs e)
         {
-            if (this.Window == null)
+            if (Window == null)
             {
                 return;
             }
 
-            var popups = VisualTreeHelper.GetOpenPopups(this.Window);
+            var popups = VisualTreeHelper.GetOpenPopups(Window);
             foreach (var popup in popups)
             {
                 if (popup.IsOpen)
@@ -195,7 +195,7 @@ namespace Gpt.Labs
 
         private Frame GetPageInnerFrame()
         {
-            return (this.frame?.Content as StatePage)?.GetInnerFrame();
+            return (frame?.Content as StatePage)?.GetInnerFrame();
         }
 
         #endregion

@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AppDisplayName" xml:space="preserve">
-    <value>GPT Giggle</value>
+    <value>GPT Labs</value>
   </data>
   <data name="ChatCaption" xml:space="preserve">
     <value>Chat</value>
@@ -648,5 +648,17 @@ I'm available to listen.</value>
   </data>
   <data name="QuestionLabel.Text" xml:space="preserve">
     <value>Question</value>
+  </data>
+  <data name="ApplicationSettings.Title" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="ApplicationStartDescription.Text" xml:space="preserve">
+    <value>Run application on windows start</value>
+  </data>
+  <data name="DialogDescription.UnableToChangeStateOfStartupTask2" xml:space="preserve">
+    <value>Unable to change state of startup task via the application - enable via Startup tab on Task Manager (Ctrl+Shift+Esc)</value>
+  </data>
+  <data name="DialogDescription.UnableToChangeStateOfStartupTask1" xml:space="preserve">
+    <value>Unable to change state of startup task</value>
   </data>
 </root>
