@@ -1,5 +1,4 @@
 using Gpt.Labs.Controls.Extensions;
-using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Models;
 using Gpt.Labs.ViewModels;
 using Gpt.Labs.ViewModels.Enums;
@@ -22,7 +21,7 @@ namespace Gpt.Labs.Controls
             nameof(ViewModel),
             typeof(MessagesListViewModel),
             typeof(MessagesPage),
-            new PropertyMetadata(null, null));  
+            new PropertyMetadata(null, null));
 
         public static readonly DependencyProperty ShowSettingsButtonProperty = DependencyProperty.Register(
             nameof(ShowSettingsButton),
@@ -42,7 +41,7 @@ namespace Gpt.Labs.Controls
 
         public MessagesControl()
         {
-            this.InitializeComponent();
+            InitializeComponent();
         }
 
         #endregion
@@ -75,8 +74,8 @@ namespace Gpt.Labs.Controls
         {
             var ctrlState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control);
             var shiftState = InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Shift);
-            var isCtrlDown = ctrlState == CoreVirtualKeyStates.Down || ctrlState == (CoreVirtualKeyStates.Down | CoreVirtualKeyStates.Locked);
-            var isShiftDown = shiftState == CoreVirtualKeyStates.Down || shiftState == (CoreVirtualKeyStates.Down | CoreVirtualKeyStates.Locked);
+            var isCtrlDown = ctrlState is CoreVirtualKeyStates.Down or (CoreVirtualKeyStates.Down | CoreVirtualKeyStates.Locked);
+            var isShiftDown = shiftState is CoreVirtualKeyStates.Down or (CoreVirtualKeyStates.Down | CoreVirtualKeyStates.Locked);
 
             if (isCtrlDown)
             {
@@ -93,29 +92,29 @@ namespace Gpt.Labs.Controls
                         return;
 
                     case VirtualKey.M:
-                        this.ChangeSelectMuliState();
+                        ChangeSelectMuliState();
                         e.Handled = true;
                         return;
 
                     case VirtualKey.Delete:
-                        await this.DeleteChats();
+                        await DeleteChats();
                         e.Handled = true;
                         return;
 
                     case VirtualKey.C:
-                        var copyMessages = this.MessagesList.SelectedItems.OfType<OpenAIMessage>().ToArray();
-                        await this.ViewModel.CopyMessages(copyMessages);
+                        var copyMessages = MessagesList.SelectedItems.OfType<OpenAIMessage>().ToArray();
+                        await ViewModel.CopyMessages(copyMessages);
                         e.Handled = true;
                         return;
 
                     case VirtualKey.H:
-                        var shareMessages = this.MessagesList.SelectedItems.OfType<OpenAIMessage>().ToArray();
-                        this.ViewModel.ShareMessages(shareMessages);
+                        var shareMessages = MessagesList.SelectedItems.OfType<OpenAIMessage>().ToArray();
+                        ViewModel.ShareMessages(shareMessages);
                         e.Handled = true;
                         return;
 
                     case VirtualKey.N:
-                        await ViewModel.OpenChatInNewWindow();
+                        ViewModel.OpenChatInNewWindow();
                         e.Handled = true;
                         return;
 
@@ -135,10 +134,10 @@ namespace Gpt.Labs.Controls
             {
                 switch (e.Key)
                 {
-                   case VirtualKey.Enter:
-                        this.MessageTextBox.Text += "\r";
-                        this.MessageTextBox.SelectionStart = this.MessageTextBox.Text.Length;
-                        this.MessageTextBox.SelectionLength = 0;
+                    case VirtualKey.Enter:
+                        MessageTextBox.Text += "\r";
+                        MessageTextBox.SelectionStart = MessageTextBox.Text.Length;
+                        MessageTextBox.SelectionLength = 0;
                         e.Handled = true;
                         return;
                 }
@@ -149,16 +148,16 @@ namespace Gpt.Labs.Controls
                 switch (e.Key)
                 {
                     case VirtualKey.Enter:
-                        await this.SendChatMessage();
+                        await SendChatMessage();
                         e.Handled = true;
                         return;
                 }
             }
         }
-                
+
         private async void OnMessageTextBoxPreviewKeyUp(object sender, KeyRoutedEventArgs e)
         {
-            if ((e.Key == VirtualKey.Control || e.Key == VirtualKey.R) && this.ViewModel.IsRecording)
+            if ((e.Key == VirtualKey.Control || e.Key == VirtualKey.R) && ViewModel.IsRecording)
             {
                 await ViewModel.StartStopRecord();
                 e.Handled = true;
@@ -167,75 +166,72 @@ namespace Gpt.Labs.Controls
 
         private void OnShowHideChatSettingsClick(object sender, RoutedEventArgs e)
         {
-            this.ViewModel.ExpandCollapsePanel(ChatPanelTypes.ChatSettings);
+            ViewModel.ExpandCollapsePanel(ChatPanelTypes.ChatSettings);
         }
 
         private void OnSelectMultiClick(object sender, RoutedEventArgs e)
         {
-            this.ChangeSelectMuliState();
+            ChangeSelectMuliState();
         }
 
         private void OnSelectAllClick(object sender, RoutedEventArgs e)
         {
-            if (this.SelectAll.IsChecked == true)
+            if (SelectAll.IsChecked == true)
             {
-                this.MessagesList.SelectedItems.Clear();
+                MessagesList.SelectedItems.Clear();
 
-                foreach (var item in this.ViewModel.ItemsCollection)
+                foreach (var item in ViewModel.ItemsCollection)
                 {
-                    this.MessagesList.SelectedItems.Add(item);
+                    MessagesList.SelectedItems.Add(item);
                 }
             }
             else
             {
-                this.MessagesList.SelectedItems.Clear();
+                MessagesList.SelectedItems.Clear();
             }
         }
 
         private void OnChatListSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (this.ViewModel.MultiSelectModeEnabled)
+            if (ViewModel.MultiSelectModeEnabled)
             {
-                this.DeleteMulti.IsEnabled = this.MessagesList.SelectedItems.Count > 0;
-                this.ShareMulti.IsEnabled = this.MessagesList.SelectedItems.Count > 0;
-                this.CopyMulti.IsEnabled = this.MessagesList.SelectedItems.Count > 0;
+                DeleteMulti.IsEnabled = MessagesList.SelectedItems.Count > 0;
+                ShareMulti.IsEnabled = MessagesList.SelectedItems.Count > 0;
+                CopyMulti.IsEnabled = MessagesList.SelectedItems.Count > 0;
 
-                this.SelectAll.IsChecked = this.MessagesList.SelectedItems.Count > 0 && 
-                        this.MessagesList.SelectedItems.Count == this.ViewModel.ItemsCollection.Count;
+                SelectAll.IsChecked = MessagesList.SelectedItems.Count > 0 &&
+                        MessagesList.SelectedItems.Count == ViewModel.ItemsCollection.Count;
             }
         }
 
         private async void OnDeleteMultiClick(object sender, RoutedEventArgs e)
         {
-            await sender.DisableUiAndExecuteAsync(async () =>
-            {
-                await this.DeleteChats();
-            });
+            await sender.DisableUiAndExecuteAsync(DeleteChats);
         }
 
         private async void OnCopyMultiClick(object sender, RoutedEventArgs e)
         {
-            var messages = this.MessagesList.SelectedItems.OfType<OpenAIMessage>().ToArray();
-            await this.ViewModel.CopyMessages(messages);
+            var messages = MessagesList.SelectedItems.OfType<OpenAIMessage>().ToArray();
+            await ViewModel.CopyMessages(messages);
         }
 
         private void OnShareMultiClick(object sender, RoutedEventArgs e)
         {
-            var messages = this.MessagesList.SelectedItems.OfType<OpenAIMessage>().ToArray();
-            this.ViewModel.ShareMessages(messages);
+            var messages = MessagesList.SelectedItems.OfType<OpenAIMessage>().ToArray();
+            ViewModel.ShareMessages(messages);
         }
 
         private void ChangeSelectMuliState()
         {
-            this.ViewModel.MultiSelectModeEnabled = !this.ViewModel.MultiSelectModeEnabled;
+            ViewModel.MultiSelectModeEnabled = !ViewModel.MultiSelectModeEnabled;
 
-            if (this.ViewModel.MultiSelectModeEnabled)
+            if (ViewModel.MultiSelectModeEnabled)
             {
-                this.DeleteMulti.IsEnabled = false;
-                this.ShareMulti.IsEnabled = false;
-                this.CopyMulti.IsEnabled = false;
+                DeleteMulti.IsEnabled = false;
+                ShareMulti.IsEnabled = false;
+                CopyMulti.IsEnabled = false;
 
-                this.SelectAll.IsChecked = false;
+                SelectAll.IsChecked = false;
             }
         }
 
@@ -251,21 +247,21 @@ namespace Gpt.Labs.Controls
 
         private async Task DeleteChats()
         {
-            var messages = this.MessagesList.SelectedItems.OfType<OpenAIMessage>().ToArray();
+            var messages = MessagesList.SelectedItems.OfType<OpenAIMessage>().ToArray();
 
             if (messages.Length == 0)
             {
                 return;
             }
 
-            await this.ViewModel.DeleteMessages(true, messages);
+            await ViewModel.DeleteMessages(true, messages);
 
-            if (this.ViewModel.MultiSelectModeEnabled && this.ViewModel.ItemsCollection.Count == 0)
+            if (ViewModel.MultiSelectModeEnabled && ViewModel.ItemsCollection.Count == 0)
             {
-                this.ViewModel.MultiSelectModeEnabled = false;
+                ViewModel.MultiSelectModeEnabled = false;
             }
         }
-                
+
         private void OnMessagePanelSizeChanged(object sender, SizeChangedEventArgs e)
         {
             MessagesList.Padding = new Thickness(MessagesList.Padding.Left, MessagesList.Padding.Top, MessagesList.Padding.Right, e.NewSize.Height);

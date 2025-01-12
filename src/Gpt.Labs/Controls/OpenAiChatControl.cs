@@ -3,6 +3,7 @@ using Gpt.Labs.Helpers;
 using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Models;
 using Gpt.Labs.ViewModels;
+using H.NotifyIcon;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -102,9 +103,16 @@ namespace Gpt.Labs.Controls
             VisualStateManager.GoToState(this, "PointerExited", true);
         }
 
-        private async void OnOpenChatInNewWindowButtonClick(object sender, RoutedEventArgs e)
+        private void OnOpenChatInNewWindowButtonClick(object sender, RoutedEventArgs e)
         {
-            await ViewModel.OpenChatInNewWindows();
+            if (ViewModel.TryGetChatWindow(out var window) || !window.Visible)
+            {
+                window.Show();
+            }
+            else
+            {
+                window.BringToFront();
+            }
         }
 
         private async void OnEditButtonClick(object sender, RoutedEventArgs e)

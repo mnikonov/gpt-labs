@@ -7,6 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:controls="using:Gpt.Labs.Controls"
     xmlns:models="using:Gpt.Labs.Models"
+    xmlns:de="using:Gpt.Labs.Controls.DependencyExtensions"
     Title="Chat details"
     PrimaryButtonText="Apply" 
     SecondaryButtonText="Cancel"
@@ -49,6 +50,18 @@
         </TextBox>
 
         <TextBlock x:Uid="SystemMessageDescription" Style="{StaticResource DescriptionStyle}" />
+        
+        
+        <TextBlock x:Uid="HotKeyLabel" Style="{StaticResource LabelStyle}"
+            Text="Hot key"/>
+
+        <TextBox x:Name="HotKeyTextBox" x:Uid="HotKeyTextBox" MaxLength="25"
+                 de:HotKeyTextBoxExtensions.HandleHotKey="True"
+                 Text="{x:Bind ViewModel.Settings.HotKey, Mode=TwoWay}"
+                 PlaceholderText="Enter hot key">
+        </TextBox>
+
+         <TextBlock x:Uid="HotKeyDescription" Style="{StaticResource DescriptionStyle}" />
         
          
         <TextBlock x:Uid="OpenAiUserLabel" Style="{StaticResource LabelStyle}"

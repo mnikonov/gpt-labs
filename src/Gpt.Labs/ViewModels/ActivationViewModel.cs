@@ -5,12 +5,10 @@ using Gpt.Labs.Models;
 using Gpt.Labs.Models.Base;
 using Gpt.Labs.Models.Exceptions;
 using Gpt.Labs.ViewModels.Base;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using OpenAI;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Gpt.Labs.ViewModels
@@ -21,8 +19,6 @@ namespace Gpt.Labs.ViewModels
 
         private readonly Func<object[], Task> executeAndContinue;
 
-        private static Mutex mut = new Mutex(false, @"GptLab-InitDatabase");
-
         #endregion
 
         #region Constructors
@@ -31,7 +27,7 @@ namespace Gpt.Labs.ViewModels
             : base(getBasePage)
         {
             this.executeAndContinue = executeAndContinue;
-            this.step = this.GetInitializationStep();
+            step = GetInitializationStep();
         }
 
         #endregion
@@ -42,7 +38,7 @@ namespace Gpt.Labs.ViewModels
 
         public bool HasAuthenticationSettings => !string.IsNullOrEmpty(ApplicationSettings.Instance.OpenAIApiKey);
 
-        public bool CanNavigateToShell {get; private set; } = false;
+        public bool CanNavigateToShell { get; private set; } = false;
 
         #endregion
 
@@ -50,7 +46,7 @@ namespace Gpt.Labs.ViewModels
 
         public Task ExecuteAndContinue(params object[] args)
         {
-            return this.executeAndContinue.Invoke(args);
+            return executeAndContinue.Invoke(args);
         }
 
         private WizardStepCommandBase GetInitializationStep()
@@ -60,9 +56,7 @@ namespace Gpt.Labs.ViewModels
                 (model) => new InitializationControl(),
                 async (model, args) =>
                 {
-                    await Task.Run(async () => await MigrateDatabase().ConfigureAwait(false));
-
-                    if (this.HasAuthenticationSettings)
+                    if (HasAuthenticationSettings)
                     {
                         try
                         {
@@ -70,9 +64,9 @@ namespace Gpt.Labs.ViewModels
                         }
                         catch (OpenAiException ex)
                         {
-                            await this.DispatcherQueue.EnqueueAsync(async () =>
+                            await DispatcherQueue.EnqueueAsync(async () =>
                             {
-                                await this.Window.CreateErrorDialog(ex).ShowAsync();
+                                await Window.CreateErrorDialog(ex).ShowAsync();
                             });
 
                             return;
@@ -81,9 +75,9 @@ namespace Gpt.Labs.ViewModels
                         {
                             ex.LogError();
 
-                            await this.DispatcherQueue.EnqueueAsync(async () =>
+                            await DispatcherQueue.EnqueueAsync(async () =>
                             {
-                                await this.Window.CreateExceptionDialog(ex).ShowAsync();
+                                await Window.CreateExceptionDialog(ex).ShowAsync();
                             });
 
                             return;
@@ -93,18 +87,18 @@ namespace Gpt.Labs.ViewModels
                     {
                         return;
                     }
-                     
-                    this.CanNavigateToShell = true;
 
-                    await this.DispatcherQueue.EnqueueAsync(() =>
+                    CanNavigateToShell = true;
+
+                    await DispatcherQueue.EnqueueAsync(() =>
                     {
-                        this.NavigateToShell(false);
+                        NavigateToShell(false);
                     });
                 },
                 null,
                 () =>
                 {
-                    return !this.CanNavigateToShell ? GetOpenAISettingsStep() : null;
+                    return !CanNavigateToShell ? GetOpenAISettingsStep() : null;
                 },
                 null,
                 true,
@@ -125,7 +119,7 @@ namespace Gpt.Labs.ViewModels
                         }
                         catch (OpenAiException ex)
                         {
-                            await this.DispatcherQueue.EnqueueAsync(() =>
+                            await DispatcherQueue.EnqueueAsync(() =>
                             {
                                 switch (ex.Code)
                                 {
@@ -145,11 +139,11 @@ namespace Gpt.Labs.ViewModels
                         {
                             ex.LogError();
 
-                            await this.DispatcherQueue.EnqueueAsync(async () =>
+                            await DispatcherQueue.EnqueueAsync(async () =>
                             {
                                 model.AddError(string.Empty, App.ResourceLoader.GetString("OpenAiUnexpectedAuthenticationError"));
 
-                                await this.Window.CreateExceptionDialog(ex).ShowAsync();
+                                await Window.CreateExceptionDialog(ex).ShowAsync();
                             });
                         }
 
@@ -161,16 +155,16 @@ namespace Gpt.Labs.ViewModels
                         ApplicationSettings.Instance.OpenAIOrganization = model.Organization;
                         ApplicationSettings.Instance.OpenAIApiKey = model.ApiKey;
 
-                        await this.DispatcherQueue.EnqueueAsync(() =>
+                        await DispatcherQueue.EnqueueAsync(() =>
                         {
-                            this.NavigateToShell(true);
+                            NavigateToShell(true);
                         });
-                    }, 
-                null, 
-                null, 
-                null, 
+                    },
+                null,
+                null,
+                null,
                 false,
-                "WizardDialog/Apply", 
+                "WizardDialog/Apply",
                 string.Empty);
         }
 
@@ -178,12 +172,12 @@ namespace Gpt.Labs.ViewModels
         {
             if (setIsTerminated)
             {
-                this.NavigationParameter["IsTerminated"] = true;
+                NavigationParameter["IsTerminated"] = true;
             }
 
-            ((Frame)this.Window.Content).Navigate(
+            ((Frame)Window.Content).Navigate(
                 typeof(ShellPage),
-                this.NavigationParameter.ToString(),
+                NavigationParameter.ToString(),
                 new SlideNavigationTransitionInfo { Effect = SlideNavigationTransitionEffect.FromLeft });
         }
 
@@ -191,26 +185,6 @@ namespace Gpt.Labs.ViewModels
         {
             var api = new OpenAIClient(new OpenAIAuthentication(apiKey, organization));
             await api.WrapAction((client) => client.ModelsEndpoint.GetModelsAsync());
-        }
-
-        private async Task MigrateDatabase()
-        {
-            mut.WaitOne();
-
-            try
-            {
-                using (var db = new DataContext())
-                {
-                    await db.Database.MigrateAsync();
-
-                    // var users = db.Profiles.ToList();
-                    // var dbFolder = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
-                }
-            }
-            finally
-            {
-                mut.ReleaseMutex();
-            }
         }
 
         #endregion

@@ -1,5 +1,6 @@
 using CommunityToolkit.WinUI.UI.Controls;
 using Gpt.Labs.Controls.Extensions;
+using Gpt.Labs.Controls.Markdown;
 using Gpt.Labs.Helpers;
 using Gpt.Labs.Models;
 using Gpt.Labs.ViewModels;
@@ -68,12 +69,12 @@ namespace Gpt.Labs.Controls
             {
                 textBlock.LinkClicked -= OnMarkdownTextBlockLinkClicked;
                 textBlock.LinkClicked += OnMarkdownTextBlockLinkClicked;
-                //this.textBlock.ImageResolving -= this.OnMarkdownTextBlockImageResolving;
-                //this.textBlock.ImageResolving += this.OnMarkdownTextBlockImageResolving;
+                //textBlock.ImageResolving -= OnMarkdownTextBlockImageResolving;
+                //textBlock.ImageResolving += OnMarkdownTextBlockImageResolving;
                 textBlock.ImageClicked -= OnMarkdownTextBlockImageClicked;
                 textBlock.ImageClicked += OnMarkdownTextBlockImageClicked;
 
-                //textBlock.SetRenderer<ExtendedMarkdownRenderer>();
+                textBlock.SetRenderer<ExtendedMarkdownRenderer>();
             }
 
             if (copyButton != null)

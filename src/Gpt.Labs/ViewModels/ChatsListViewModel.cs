@@ -6,7 +6,6 @@ using Gpt.Labs.Models;
 using Gpt.Labs.Models.Enums;
 using Gpt.Labs.Models.Exceptions;
 using Gpt.Labs.ViewModels.Base;
-using Gpt.Labs.ViewModels.Collections;
 using Gpt.Labs.ViewModels.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml.Controls;
@@ -252,11 +251,7 @@ namespace Gpt.Labs.ViewModels
                 ? parameters.GetValue<OpenAIChatType>("chat-type")
                 : state.GetValue<OpenAIChatType>(nameof(ChatType));
 
-            using (var context = new DataContext())
-            {
-                var chats = await context.Chats.Include(p => p.Settings).AsNoTracking().Where(p => p.Type == ChatType).OrderBy(p => p.Position).ToListAsync();
-                ItemsCollection = new ObservableList<OpenAIChat, Guid>(chats, p => p.Id);
-            }
+            ItemsCollection = DataManager.Instance[ChatType];
 
             await base.LoadStateAsync(destinationPageType, parameters, state, mode);
         }

@@ -1,17 +1,20 @@
 ﻿using Gpt.Labs.Helpers;
 using Gpt.Labs.Helpers.Extensions;
 using Gpt.Labs.Helpers.Navigation;
+using Gpt.Labs.Models;
 using H.NotifyIcon;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.Windows.ApplicationModel.Resources;
 using Microsoft.Windows.AppLifecycle;
 using System;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.Activation;
 
 #if !DEBUG
@@ -27,10 +30,14 @@ namespace Gpt.Labs;
 
 public partial class App : Application
 {
+    private static Mutex mut = new Mutex(false, @"GptLab-InitDatabase");
+
     #region Constructors
 
     public App()
     {
+        MigrateDatabase();
+
         InitializeComponent();
 
 #if !DEBUG
@@ -60,73 +67,13 @@ public partial class App : Application
 
     public static ResourceLoader ResourceLoader { get; } = new();
 
-    public TaskbarIcon TrayIcon { get; private set; }
+    public static TaskbarIcon TrayIcon { get; private set; }
 
     #endregion
 
-    protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+    public static bool GetMainWindow(out MainWindow window, IActivatedEventArgs args = null)
     {
-        InitializeTrayIcon();
-
-        var kind = AppInstance.FindOrRegisterForKey(Program.AppInstanceKey).GetActivatedEventArgs().Kind;
-
-        if (kind != ExtendedActivationKind.StartupTask)
-        {
-            GetMainWindow(args.UWPLaunchActivatedEventArgs, out var window);
-            window.Show();
-        }
-    }
-
-    #region Private Methods
-
-    private void KeyInstance_Activated(object sender, AppActivationArguments e)
-    {
-        TrayIcon.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
-        {
-            if (GetMainWindow(null, out var window) || !window.Visible)
-            {
-                window.Show();
-            }
-            else
-            {
-                window.BringToFront();
-            }
-        });
-    }
-
-    private void InitializeTrayIcon()
-    {
-        if (TrayIcon != null)
-        {
-            return;
-        }
-
-        var showHideWindowCommand = (XamlUICommand)Resources["ShowHideWindowCommand"];
-        showHideWindowCommand.ExecuteRequested += ShowHideWindowCommand_ExecuteRequested;
-
-        var exitApplicationCommand = (XamlUICommand)Resources["ExitApplicationCommand"];
-        exitApplicationCommand.ExecuteRequested += ExitApplicationCommand_ExecuteRequested;
-
-        TrayIcon = (TaskbarIcon)Resources["TrayIcon"];
-        TrayIcon.ForceCreate();
-    }
-
-    private void ExitApplicationCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
-    {
-        TrayIcon?.Dispose();
-
-        WindowManager.CloseWindows();
-
-        // https://github.com/HavenDV/H.NotifyIcon/issues/66
-        //if (MainWindow == null)
-        //{
-        //    Environment.Exit(0);
-        //}
-    }
-
-    private bool GetMainWindow(IActivatedEventArgs args, out MainWindow window)
-    {
-        var isNew = WindowManager.TryGet(() => typeof(SingleChatPage).CreatePageId(), window =>
+        return WindowManager.TryGet(() => typeof(ActivationPage).CreatePageId(), window =>
         {
             window.SetTitle(ResourceLoader.GetString("AppDisplayName"));
 
@@ -154,11 +101,51 @@ public partial class App : Application
                 rootFrame.Navigate(typeof(ActivationPage), query.ToString(), new CommonNavigationTransitionInfo());
             }
         }, out window);
-
-        return isNew;
     }
 
-    private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
+    protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+    {
+        InitializeTrayIcon();
+
+        var kind = AppInstance.FindOrRegisterForKey(Program.AppInstanceKey).GetActivatedEventArgs().Kind;
+
+        if (kind != ExtendedActivationKind.StartupTask)
+        {
+            GetMainWindow(out var window, args.UWPLaunchActivatedEventArgs);
+            window.Show();
+        }
+    }
+
+    #region Private Methods
+
+    private void KeyInstance_Activated(object sender, AppActivationArguments e)
+    {
+        TrayIcon.DispatcherQueue.TryEnqueue(DispatcherQueuePriority.Normal, () =>
+        {
+            if (GetMainWindow(out var window) || !window.Visible)
+            {
+                window.Show();
+            }
+            else
+            {
+                window.BringToFront();
+            }
+        });
+    }
+
+    private void InitializeTrayIcon()
+    {
+        if (TrayIcon != null)
+        {
+            return;
+        }
+
+        TrayIcon = (TaskbarIcon)Resources["TrayIcon"];
+
+        TrayIcon.ForceCreate();
+    }
+
+    private static void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
     {
         throw new Exception($"Failed to load {e.SourcePageType.FullName}: {e.Exception}");
     }
@@ -175,18 +162,23 @@ public partial class App : Application
         e.Handled = true;
     }
 
-    private void ShowHideWindowCommand_ExecuteRequested(XamlUICommand sender, ExecuteRequestedEventArgs args)
+    private void MigrateDatabase()
     {
-        if (!GetMainWindow(null, out var window))
+        mut.WaitOne();
+
+        try
         {
-            if (window.Visible)
+            using (var db = new DataContext())
             {
-                window.Hide();
+                db.Database.Migrate();
+
+                // var users = db.Profiles.ToList();
+                // var dbFolder = Windows.Storage.ApplicationData.Current.LocalFolder.Path;
             }
-            else
-            {
-                window.Show();
-            }
+        }
+        finally
+        {
+            mut.ReleaseMutex();
         }
     }
 

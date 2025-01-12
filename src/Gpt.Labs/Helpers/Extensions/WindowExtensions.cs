@@ -7,7 +7,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media.Animation;
 using System;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using Windows.ApplicationModel.DataTransfer;
 using Windows.Graphics;
 using WinRT;
@@ -23,6 +22,10 @@ public static class AppWindowExtensions
 
     private static IDataTransferManagerInterop DataTransferManagerInterop => DataTransferManager.As<IDataTransferManagerInterop>();
 
+    private static readonly int GWL_STYLE = -16;
+
+    private static readonly int WS_VISIBLE = 0x10000000;
+
     #endregion
 
     #region Public Methods
@@ -37,6 +40,13 @@ public static class AppWindowExtensions
     {
         var windowHandle = window.GetHwndForWindow();
         SetForegroundWindow(windowHandle);
+    }
+
+    public static bool IsWindowHidden(this Window window)
+    {
+        var windowHandle = window.GetHwndForWindow();
+        long style = GetWindowLong(windowHandle, GWL_STYLE);
+        return (style & WS_VISIBLE) == 0;
     }
 
     public static double GetDpiScale(this Window window)
@@ -101,14 +111,14 @@ public static class AppWindowExtensions
         appWindow.Title = title;
     }
 
-    public static async Task OpenChatInNewWindows(this OpenAIChat chat)
+    public static bool TryGetChatWindow(this OpenAIChat chat, out MainWindow window)
     {
         var query = new Query
             {
                 { "chat-id", chat.Id }
             };
 
-        WindowManager.TryGet(() => typeof(SingleChatPage).CreatePageId(query), window =>
+        return WindowManager.TryGet(() => typeof(SingleChatPage).CreatePageId(query), window =>
         {
             var content = new SingleWindowPage();
             content.Title.Text = chat.Title;
@@ -117,15 +127,13 @@ public static class AppWindowExtensions
             window.Content = content;
 
             window.SetTitle(chat.Title);
-            window.Resize((int)(600 * window.GetDpiScale()), window.AppWindow.Size.Height);
+            window.Resize((int)(800 * window.GetDpiScale()), window.AppWindow.Size.Height);
 
             _ = content.ExecuteOnLoaded(() =>
             {
                 content.PageFrame.Navigate(typeof(SingleChatPage), query.ToString(), new DrillInNavigationTransitionInfo());
             });
-        }, out var window);
-
-        window.Activate();
+        }, out window);
     }
 
     public static string CreatePageId(this Type pageType, Query query = null)
@@ -143,6 +151,9 @@ public static class AppWindowExtensions
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+    [DllImport("user32.dll")]
+    public static extern long GetWindowLong(IntPtr hWnd, int nIndex);
 
     private static AppWindow GetAppWindowFromWindowHandle(IntPtr windowHandle)
     {

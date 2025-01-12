@@ -10,6 +10,7 @@ using Gpt.Labs.ViewModels.Collections.Interfaces;
 using Gpt.Labs.ViewModels.Enums;
 using Gpt.Labs.ViewModels.OpenAiEndpointsProcessors;
 using Gpt.Labs.ViewModels.OpenAiEndpointsProcessors.Base;
+using H.NotifyIcon;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -400,9 +401,16 @@ namespace Gpt.Labs.ViewModels
             }
         }
 
-        public async Task OpenChatInNewWindow()
+        public void OpenChatInNewWindow()
         {
-            await Chat.OpenChatInNewWindows();
+            if (Chat.TryGetChatWindow(out var window) || !window.Visible)
+            {
+                window.Show();
+            }
+            else
+            {
+                window.BringToFront();
+            }
         }
 
         public async Task StartStopRecord()
@@ -585,8 +593,9 @@ namespace Gpt.Labs.ViewModels
 
         private async Task LoadChatInfo()
         {
+            Chat = DataManager.Instance.GetChat(ChatId);
+
             using var context = new DataContext();
-            Chat = await context.Chats.AsNoTracking().Include(p => p.Settings).SingleAsync(p => p.Id == ChatId);
 
             switch (Chat.Type)
             {

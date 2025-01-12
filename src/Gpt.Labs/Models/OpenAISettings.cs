@@ -24,6 +24,8 @@ namespace Gpt.Labs.Models
 
         private string openAIOrganization;
 
+        public string hotKey;
+
         #endregion
 
         #region Properties
@@ -89,6 +91,13 @@ namespace Gpt.Labs.Models
         {
             get => openAIOrganization;
             set => Set(ref openAIOrganization, value);
+        }
+
+        [StringLength(25, ErrorMessage = "The field 'Hot key' must be a string with a maximum length of {25}.")]
+        public string HotKey
+        {
+            get => hotKey;
+            set => Set(ref hotKey, value);
         }
 
         #endregion

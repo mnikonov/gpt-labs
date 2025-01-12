@@ -17,6 +17,21 @@ namespace Gpt.Labs.Helpers
             return windows.Values;
         }
 
+        public static bool HasWindows => windows.Count > 0;
+
+        public static bool HasNotHiddenWindowsExcept(MainWindow window)
+        {
+            foreach (var item in Enumerate())
+            {
+                if (item.WindowId != window.WindowId && !item.IsWindowHidden())
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static bool TryGet(Func<string> createWindowId, Action<MainWindow> initializeContent, out MainWindow window)
         {
             var windowId = createWindowId();
@@ -67,7 +82,7 @@ namespace Gpt.Labs.Helpers
             if (HandleClosedEvents)
             {
                 args.Handled = true;
-                window.Hide();
+                window.Hide(!HasNotHiddenWindowsExcept(window));
             }
         }
     }

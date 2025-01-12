@@ -1,0 +1,27 @@
+<MenuFlyout
+    x:Class="Gpt.Labs.Controls.TaskBarIconMenuFlyout"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Gpt.Labs.Controls"
+    xmlns:dependency="using:Gpt.Labs.Controls.DependencyExtensions"
+    xmlns:enums="using:Gpt.Labs.Models.Enums"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    x:Name="MainMenu">
+    
+    <MenuFlyoutSubItem x:Uid="MenuItemChats" x:Name="Chats" Text="Chats">
+    </MenuFlyoutSubItem>
+    
+    <MenuFlyoutSubItem x:Uid="MenuItemImages" x:Name="Images" Text="Images">
+    </MenuFlyoutSubItem>
+    
+    <ToggleMenuFlyoutItem x:Uid="MenuItemMainWindow" x:Name="MainWindow" Text="Main Window" Click="MainWindow_Click" />
+    
+    <MenuFlyoutSeparator />
+    
+    <!--<MenuFlyoutItem x:Uid="MenuItemExit" x:Name="Exit" Text="Exit" Click="Exit_Click" Command="" />-->
+    
+    <MenuFlyoutItem Command="{StaticResource ExitApplicationCommand}" />
+    
+</MenuFlyout>

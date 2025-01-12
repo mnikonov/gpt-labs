@@ -32,6 +32,7 @@
     <None Remove="Controls\OpenAiLogitBiasSettingsControl.xaml" />
     <None Remove="Controls\OpenAiSettingsPanel.xaml" />
     <None Remove="Controls\OpenAiStopsSettingControls.xaml" />
+    <None Remove="Controls\TaskBarIconMenuFlyout.xaml" />
     <None Remove="Controls\Wizards\Activation\OpenAISettingsControl.xaml" />
     <None Remove="Controls\Wizards\Initialization.xaml" />
     <None Remove="logo.pdn" />
@@ -62,6 +63,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.WinUI.UI.Controls.Markdown" Version="7.1.2" />
+    <PackageReference Include="H.Hooks" Version="1.7.0" />
     <PackageReference Include="H.NotifyIcon.WinUI" Version="2.2.0" />
     <PackageReference Include="Microsoft.AppCenter.Analytics" Version="5.0.6" />
     <PackageReference Include="Microsoft.AppCenter.Crashes" Version="5.0.6" />
@@ -83,6 +85,11 @@
   -->
   <ItemGroup Condition="'$(DisableMsixProjectCapabilityAddedByProject)'!='true' and '$(EnableMsixTooling)'=='true'">
     <ProjectCapability Include="Msix" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Controls\TaskBarIconMenuFlyout.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="Controls\MessagesControl.xaml">

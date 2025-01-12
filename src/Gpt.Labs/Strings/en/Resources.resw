@@ -661,4 +661,25 @@ I'm available to listen.</value>
   <data name="DialogDescription.UnableToChangeStateOfStartupTask1" xml:space="preserve">
     <value>Unable to change state of startup task</value>
   </data>
+  <data name="MenuItemChats.Text" xml:space="preserve">
+    <value>Chats</value>
+  </data>
+  <data name="MenuItemImages.Text" xml:space="preserve">
+    <value>Images</value>
+  </data>
+  <data name="MenuItemMainWindow.Text" xml:space="preserve">
+    <value>Main Window</value>
+  </data>
+  <data name="MenuItemExit.Text" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="HotKeyLabel.Text" xml:space="preserve">
+    <value>Hot key (optional)</value>
+  </data>
+  <data name="HotKeyTextBox.PlaceholderText" xml:space="preserve">
+    <value>Enter hot key</value>
+  </data>
+  <data name="HotKeyDescription.Text" xml:space="preserve">
+    <value>Enter your desired hotkey combination (e.g., Ctrl + Alt + E) using modifiers and a key. Ensure it doesn't conflict with existing shortcuts.</value>
+  </data>
 </root>
