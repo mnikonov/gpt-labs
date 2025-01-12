@@ -22,6 +22,6 @@
     
     <!--<MenuFlyoutItem x:Uid="MenuItemExit" x:Name="Exit" Text="Exit" Click="Exit_Click" Command="" />-->
     
-    <MenuFlyoutItem Command="{StaticResource ExitApplicationCommand}" />
+    <MenuFlyoutItem Command="{StaticResource ExitApplicationCommand}" KeyboardAcceleratorTextOverride="sdfsdf" />
     
 </MenuFlyout>

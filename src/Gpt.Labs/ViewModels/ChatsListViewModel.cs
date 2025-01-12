@@ -78,6 +78,7 @@ namespace Gpt.Labs.ViewModels
                     break;
             }
 
+            settings.HotKey = chat?.Settings.HotKey;
             settings.User = chat?.Settings.User;
             settings.OpenAIOrganization = chat?.Settings.OpenAIOrganization;
 
@@ -115,6 +116,7 @@ namespace Gpt.Labs.ViewModels
                 chat.Settings.User = settings.User;
                 chat.Settings.OpenAIOrganization = settings.OpenAIOrganization;
                 chat.Settings.ModelId = settings.ModelId;
+                chat.Settings.HotKey = settings.HotKey;
 
                 switch (ChatType)
                 {

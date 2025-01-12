@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:controls="using:Gpt.Labs.Controls"
     xmlns:models="using:Gpt.Labs.Models"
-    xmlns:dependency="using:Gpt.Labs.Controls.DependencyExtensions"
+    xmlns:de="using:Gpt.Labs.Controls.DependencyExtensions"
     Title="Chat details"
     PrimaryButtonText="Apply" 
     SecondaryButtonText="Cancel"
@@ -16,77 +16,91 @@
     x:Name="EditChatDialog"
     mc:Ignorable="d">
 
-     <StackPanel Width="480" Margin="0 6 0 0" Spacing="4">
-        <TextBlock x:Uid="TitleLabel" Style="{StaticResource LabelStyle}" Text="Title"/>
+    <ScrollViewer>
+        <StackPanel Width="480" Margin="0 6 0 0" Spacing="4">
+            <TextBlock x:Uid="TitleLabel" Style="{StaticResource LabelStyle}" Text="Title"/>
 
-        <TextBox x:Name="TitleTextBox" x:Uid="TitleTextBox" MaxLength="255"
-            Text="{x:Bind ViewModel.Title, Mode=TwoWay}"
-            PlaceholderText="Enter title">
-        </TextBox>
-         
-            
-        <TextBlock x:Uid="ModelLabel" Style="{StaticResource LabelStyle}" Text="Model"/>
+            <TextBox x:Name="TitleTextBox" x:Uid="TitleTextBox" MaxLength="255"
+                Text="{x:Bind ViewModel.Title, Mode=TwoWay}"
+                PlaceholderText="Enter title">
+            </TextBox>
+     
         
-        <ComboBox x:Name="ModelComboBox" HorizontalAlignment="Stretch"
-                ItemsSource="{x:Bind SupportedAiModels}" 
-                SelectedItem="{x:Bind ViewModel.Settings.ModelId, Mode=TwoWay}" >
-        </ComboBox>
+            <TextBlock x:Uid="ModelLabel" Style="{StaticResource LabelStyle}" Text="Model"/>
+    
+            <ComboBox x:Name="ModelComboBox" HorizontalAlignment="Stretch"
+                    ItemsSource="{x:Bind SupportedAiModels}" 
+                    SelectedItem="{x:Bind ViewModel.Settings.ModelId, Mode=TwoWay}" >
+            </ComboBox>
 
-        <TextBlock x:Uid="ModelDescription" Style="{StaticResource DescriptionStyle}">                    
-            <Run x:Uid="ModelDescription1"/><Hyperlink NavigateUri="https://platform.openai.com/docs/models"><Run x:Uid="ModelDescription2"/></Hyperlink><Run x:Uid="ModelDescription3"/>
-            <LineBreak/><LineBreak/>
-            <Run x:Uid="ModelDescription4"/><Hyperlink NavigateUri="https://platform.openai.com/docs/models/model-endpoint-compatibility"><Run x:Uid="ModelDescription5"/></Hyperlink><Run x:Uid="ModelDescription7"/>
-        </TextBlock>
-         
-         
-        <TextBlock x:Uid="SizeLabel" Style="{StaticResource LabelStyle}" Text="Size"/>
+            <TextBlock x:Uid="ModelDescription" Style="{StaticResource DescriptionStyle}">                    
+                <Run x:Uid="ModelDescription1"/><Hyperlink NavigateUri="https://platform.openai.com/docs/models"><Run x:Uid="ModelDescription2"/></Hyperlink><Run x:Uid="ModelDescription3"/>
+                <LineBreak/><LineBreak/>
+                <Run x:Uid="ModelDescription4"/><Hyperlink NavigateUri="https://platform.openai.com/docs/models/model-endpoint-compatibility"><Run x:Uid="ModelDescription5"/></Hyperlink><Run x:Uid="ModelDescription7"/>
+            </TextBlock>
+     
+     
+            <TextBlock x:Uid="SizeLabel" Style="{StaticResource LabelStyle}" Text="Size"/>
 
-        <ComboBox x:Name="SizeComboBox" HorizontalAlignment="Stretch"
-                  dependency:ImageSizeComboBoxHelper.Settings="{x:Bind ViewModel.Settings, Mode=OneWay}"
-                  SelectedValue="{Binding ViewModel.Settings.Size, ElementName=EditChatDialog, Mode=TwoWay}"
-                  DisplayMemberPath="Caption"
-                  SelectedValuePath="Value">
-        </ComboBox>
+            <ComboBox x:Name="SizeComboBox" HorizontalAlignment="Stretch"
+                      de:ImageSizeComboBoxHelper.Settings="{x:Bind ViewModel.Settings, Mode=OneWay}"
+                      SelectedValue="{Binding ViewModel.Settings.Size, ElementName=EditChatDialog, Mode=TwoWay}"
+                      DisplayMemberPath="Caption"
+                      SelectedValuePath="Value">
+            </ComboBox>
 
-        <TextBlock x:Uid="SizeMessageDescription" Style="{StaticResource DescriptionStyle}" />
+            <TextBlock x:Uid="SizeMessageDescription" Style="{StaticResource DescriptionStyle}" />
 
-         
-        <TextBlock x:Uid="OpenAiUserLabel" Style="{StaticResource LabelStyle}"
-                    Text="User"/>
+     
+            <TextBlock x:Uid="HotKeyLabel" Style="{StaticResource LabelStyle}"
+                Text="Hot key"/>
 
-        <TextBox x:Name="UserTextBox" x:Uid="UserTextBox" MaxLength="250"
-                    Text="{x:Bind ViewModel.Settings.User, Mode=TwoWay}"
-                    PlaceholderText="Enter user">
-        </TextBox>
+            <TextBox x:Name="HotKeyTextBox" x:Uid="HotKeyTextBox" MaxLength="25"
+                     de:HotKeyTextBoxExtensions.HandleHotKey="True"
+                     Text="{x:Bind ViewModel.Settings.HotKey, Mode=TwoWay}"
+                     PlaceholderText="Enter hot key">
+            </TextBox>
 
-        <TextBlock x:Uid="UserDescription" Style="{StaticResource DescriptionStyle}">
-            <Run x:Uid="UserDescription1"/><Hyperlink NavigateUri="https://platform.openai.com/docs/guides/safety-best-practices/end-user-ids"><Run x:Uid="UserDescription2"/></Hyperlink>
-        </TextBlock>
-         
-        
-        <TextBlock x:Name="OpenAIOrganizationLabel" x:Uid="OpenAIOrganizationLabel" Text="Organization ID" 
-                   Style="{StaticResource LabelStyle}"/>
-
-        <PasswordBox x:Name="OpenAIOrganizationTextBox" x:Uid="OpenAIOrganizationTextBox" MaxLength="50"
-                     Password="{x:Bind ViewModel.Settings.OpenAIOrganization, Mode=TwoWay}"
-                     PlaceholderText="Enter OpenAI organization ID..."></PasswordBox>
-         
-        <TextBlock Style="{StaticResource DescriptionStyle}">
-            <Run x:Uid="OpenAIOrganizationDescription4"/>
-        </TextBlock>
-         
-         
-        <StackPanel Margin="0 24 0 0" Grid.Row="1" >
-            <controls:ErrorsListPanel
-                ViewModel="{x:Bind ViewModel.Errors, Mode=OneWay}"
-                Visibility="{x:Bind ViewModel.HasErrors, Mode=OneWay}">
-            </controls:ErrorsListPanel>
+            <TextBlock x:Uid="HotKeyDescription" Style="{StaticResource DescriptionStyle}" />
             
-            <controls:ErrorsListPanel
-                ViewModel="{x:Bind ViewModel.Settings.Errors, Mode=OneWay}"
-                Visibility="{x:Bind ViewModel.Settings.HasErrors, Mode=OneWay}">
-            </controls:ErrorsListPanel>
+            <TextBlock x:Uid="OpenAiUserLabel" Style="{StaticResource LabelStyle}"
+                        Text="User"/>
+
+            <TextBox x:Name="UserTextBox" x:Uid="UserTextBox" MaxLength="250"
+                        Text="{x:Bind ViewModel.Settings.User, Mode=TwoWay}"
+                        PlaceholderText="Enter user">
+            </TextBox>
+
+            <TextBlock x:Uid="UserDescription" Style="{StaticResource DescriptionStyle}">
+                <Run x:Uid="UserDescription1"/><Hyperlink NavigateUri="https://platform.openai.com/docs/guides/safety-best-practices/end-user-ids"><Run x:Uid="UserDescription2"/></Hyperlink>
+            </TextBlock>
+     
+    
+            <TextBlock x:Name="OpenAIOrganizationLabel" x:Uid="OpenAIOrganizationLabel" Text="Organization ID" 
+                       Style="{StaticResource LabelStyle}"/>
+
+            <PasswordBox x:Name="OpenAIOrganizationTextBox" x:Uid="OpenAIOrganizationTextBox" MaxLength="50"
+                         Password="{x:Bind ViewModel.Settings.OpenAIOrganization, Mode=TwoWay}"
+                         PlaceholderText="Enter OpenAI organization ID..."></PasswordBox>
+     
+            <TextBlock Style="{StaticResource DescriptionStyle}">
+                <Run x:Uid="OpenAIOrganizationDescription4"/>
+            </TextBlock>
+     
+     
+            <StackPanel Margin="0 24 0 0" Grid.Row="1" >
+                <controls:ErrorsListPanel
+                    ViewModel="{x:Bind ViewModel.Errors, Mode=OneWay}"
+                    Visibility="{x:Bind ViewModel.HasErrors, Mode=OneWay}">
+                </controls:ErrorsListPanel>
+        
+                <controls:ErrorsListPanel
+                    ViewModel="{x:Bind ViewModel.Settings.Errors, Mode=OneWay}"
+                    Visibility="{x:Bind ViewModel.Settings.HasErrors, Mode=OneWay}">
+                </controls:ErrorsListPanel>
+            </StackPanel>
+
         </StackPanel>
-
-    </StackPanel>
+    </ScrollViewer>
+    
 </base:ContentDialogBase>

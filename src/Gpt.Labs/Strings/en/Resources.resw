@@ -682,4 +682,7 @@ I'm available to listen.</value>
   <data name="HotKeyDescription.Text" xml:space="preserve">
     <value>Enter your desired hotkey combination (e.g., Ctrl + Alt + E) using modifiers and a key. Ensure it doesn't conflict with existing shortcuts.</value>
   </data>
+  <data name="MainWindowHotKeyLabel.Text" xml:space="preserve">
+    <value>Main window hot key</value>
+  </data>
 </root>

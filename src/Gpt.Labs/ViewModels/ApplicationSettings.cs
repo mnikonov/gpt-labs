@@ -95,6 +95,12 @@ public class ApplicationSettings : ObservableObject
         set => Set(value);
     }
 
+    public string OpenMainWindowHotKey
+    {
+        get => Get(string.Empty);
+        set => Set(value);
+    }
+
     public bool LaunchOnStartup
     {
         get => _launchOnStartup;

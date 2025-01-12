@@ -52,18 +52,25 @@ public class HotKeyTextBoxExtensions : DependencyObject
 
                 if (!IsModifierDown(e.Key))
                 {
+                    var r = IsModifierDown(e.Key);
+                    Debug.WriteLine($"Info: Modifier NOT PRESSED");
                     return;
-                }
-
-                var existKey = GetKey(pressedKeys);
-
-                if (!IsModifier(e.Key) && existKey != VirtualKey.None && e.Key != existKey)
-                {
-                    pressedKeys.Remove(existKey);
                 }
 
                 if (!pressedKeys.Contains(e.Key))
                 {
+                    Debug.WriteLine($"Info: Pressed Key: {e.Key}");
+
+                    if (!IsModifier(e.Key))
+                    {
+                        var existKey = GetKey(pressedKeys);
+
+                        if (existKey != VirtualKey.None)
+                        {
+                            pressedKeys.Remove(existKey);
+                        }
+                    }
+
                     pressedKeys.Add(e.Key);
 
                     hotKeyTextBox.Text = GetText(pressedKeys);
@@ -136,9 +143,9 @@ public class HotKeyTextBoxExtensions : DependencyObject
     private static bool IsModifierDown(VirtualKey key)
     {
         return IsModifier(key) ||
-            InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control) == CoreVirtualKeyStates.Down ||
-            InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Menu) == CoreVirtualKeyStates.Down ||
-            InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Shift) == CoreVirtualKeyStates.Down;
+            (InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Control) & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down ||
+            (InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Menu) & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down ||
+            (InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.Shift) & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down;
     }
 
     #endregion

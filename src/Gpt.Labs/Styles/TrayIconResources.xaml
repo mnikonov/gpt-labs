@@ -32,7 +32,7 @@
         Visibility="Visible"
         ToolTipText="GPT Labs"
         RequestedTheme="Dark"
-        ContextMenuMode="SecondWindow"
+        ContextMenuMode="PopupMenu"
         NoLeftClickDelay="True"
         MenuActivation="LeftOrRightClick"
         IconSource="\Assets\Icon.ico">

@@ -12,20 +12,23 @@
     PrimaryButtonClick="OnPrimaryButtonClick"
     x:Uid="EditStopDialog"
     mc:Ignorable="d">
+    
+    <ScrollViewer>
+        <StackPanel Width="480" Margin="0 6 0 0" Spacing="4">
+            <TextBlock x:Uid="TokenLabel" Style="{StaticResource LabelStyle}"
+                            Text="Token"/>
 
-     <StackPanel Width="480" Margin="0 6 0 0" Spacing="4">
-        <TextBlock x:Uid="TokenLabel" Style="{StaticResource LabelStyle}"
-                        Text="Token"/>
-
-        <TextBox x:Name="TokenTextBox" x:Uid="TokenTextBox" MaxLength="250"
-            Text="{x:Bind ViewModel.Token, Mode=TwoWay}"
-            PlaceholderText="Enter token">
-        </TextBox>
+            <TextBox x:Name="TokenTextBox" x:Uid="TokenTextBox" MaxLength="250"
+                Text="{x:Bind ViewModel.Token, Mode=TwoWay}"
+                PlaceholderText="Enter token">
+            </TextBox>
             
-        <controls:ErrorsListPanel x:Name="ErrorsPanel" Margin="0 24 0 0" Grid.Row="1" 
-            ViewModel="{x:Bind ViewModel.Errors, Mode=OneWay}"
-            Visibility="{x:Bind ViewModel.HasErrors, Mode=OneWay}">
-        </controls:ErrorsListPanel>
+            <controls:ErrorsListPanel x:Name="ErrorsPanel" Margin="0 24 0 0" Grid.Row="1" 
+                ViewModel="{x:Bind ViewModel.Errors, Mode=OneWay}"
+                Visibility="{x:Bind ViewModel.HasErrors, Mode=OneWay}">
+            </controls:ErrorsListPanel>
 
-    </StackPanel>
+        </StackPanel>    
+    </ScrollViewer>
+    
 </base:ContentDialogBase>

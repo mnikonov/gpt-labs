@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     xmlns:controls="using:Gpt.Labs.Controls"
+    xmlns:de="using:Gpt.Labs.Controls.DependencyExtensions"
     mc:Ignorable="d">
 
     <local:StatePage.AppTitleBarContent>
@@ -25,6 +26,18 @@
         
                         <ToggleSwitch IsOn="{x:Bind SettingsViewModel.Result.LaunchOnStartup, Mode=OneWay}" Toggled="LaunchOnStartup_Toggled" />
  
+                        
+                        <TextBlock x:Uid="MainWindowHotKeyLabel" Style="{StaticResource LabelStyle}"
+                            Text="Main Window Hot key"/>
+
+                        <TextBox x:Name="HotKeyTextBox" x:Uid="HotKeyTextBox"
+                                 de:HotKeyTextBoxExtensions.HandleHotKey="True"
+                                 Text="{x:Bind SettingsViewModel.Result.OpenMainWindowHotKey, Mode=TwoWay}"
+                                 PlaceholderText="Enter hot key">
+                        </TextBox>
+
+                        <TextBlock x:Uid="HotKeyDescription" Style="{StaticResource DescriptionStyle}" />
+                        
                     </StackPanel>
                  </controls:TitledContentPanel>
                 

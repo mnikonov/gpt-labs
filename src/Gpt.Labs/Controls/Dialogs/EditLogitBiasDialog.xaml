@@ -13,33 +13,35 @@
     x:Uid="EditLogitBiasDialog"
     mc:Ignorable="d">
 
-     <StackPanel Width="480" Margin="0 6 0 0" Spacing="4">
-        <TextBlock x:Uid="TokenLabel" Style="{StaticResource LabelStyle}"
-                        Text="Token"/>
+    <ScrollViewer>
+        <StackPanel Width="480" Margin="0 6 0 0" Spacing="4">
+            <TextBlock x:Uid="TokenLabel" Style="{StaticResource LabelStyle}"
+                            Text="Token"/>
 
-        <TextBox x:Name="TokenTextBox" x:Uid="TokenTextBox" MaxLength="250"
-            Text="{x:Bind ViewModel.Token, Mode=TwoWay}"
-            PlaceholderText="Enter token">
-        </TextBox>
-            
+            <TextBox x:Name="TokenTextBox" x:Uid="TokenTextBox" MaxLength="250"
+                Text="{x:Bind ViewModel.Token, Mode=TwoWay}"
+                PlaceholderText="Enter token">
+            </TextBox>
         
-        <TextBlock x:Uid="BiasLabel" Style="{StaticResource LabelStyle}" Text="Bias" />
+    
+            <TextBlock x:Uid="BiasLabel" Style="{StaticResource LabelStyle}" Text="Bias" />
 
-        <NumberBox x:Name="BiasNumberBox" x:Uid="BiasNumberBox" 
-                    Value="{x:Bind ViewModel.Bias, Mode=TwoWay}"
-                    Minimum="-100"
-                    Maximum="100"
-                    SpinButtonPlacementMode="Compact"
-                    SmallChange="1"
-                    LargeChange="10"
-                    PlaceholderText="Enter bias">
-        </NumberBox>
+            <NumberBox x:Name="BiasNumberBox" x:Uid="BiasNumberBox" 
+                        Value="{x:Bind ViewModel.Bias, Mode=TwoWay}"
+                        Minimum="-100"
+                        Maximum="100"
+                        SpinButtonPlacementMode="Compact"
+                        SmallChange="1"
+                        LargeChange="10"
+                        PlaceholderText="Enter bias">
+            </NumberBox>
 
-         
-        <controls:ErrorsListPanel x:Name="ErrorsPanel" Margin="0 24 0 0" Grid.Row="1" 
-            ViewModel="{x:Bind ViewModel.Errors, Mode=OneWay}"
-            Visibility="{x:Bind ViewModel.HasErrors, Mode=OneWay}">
-        </controls:ErrorsListPanel>
+     
+            <controls:ErrorsListPanel x:Name="ErrorsPanel" Margin="0 24 0 0" Grid.Row="1" 
+                ViewModel="{x:Bind ViewModel.Errors, Mode=OneWay}"
+                Visibility="{x:Bind ViewModel.HasErrors, Mode=OneWay}">
+            </controls:ErrorsListPanel>
 
-    </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
 </base:ContentDialogBase>
